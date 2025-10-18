@@ -1,0 +1,64 @@
+// StatusDropdown.scss
+
+.status-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 160px;
+  padding: 0.45em 1.3em 0.45em 1em;
+  font-size: 0.98rem;
+  background: #fff;
+  border-radius: 7px;
+  border: 1.5px solid #e9eef1;
+  font-weight: 500;
+  color: #31455e;
+  cursor: pointer;
+  transition: border 0.16s, box-shadow 0.15s;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(47,65,86,0.06);
+
+  &:hover, &:focus {
+    border-color: #8da9ba;
+    background: #f7f9fa;
+    box-shadow: 0 6px 22px rgba(47,65,86,0.10);
+  }
+
+  .dropdown-icon {
+    margin-left: 0.65em;
+    font-size: 1em;
+    color: #789;
+    transition: transform 0.2s;
+  }
+}
+
+.ant-dropdown-menu {
+  min-width: 160px;
+  border-radius: 8px !important;
+  padding: 0.4em 0 !important;
+  box-shadow: 0 4px 24px rgba(47,65,86,0.11);
+
+  .ant-dropdown-menu-item {
+    font-size: 0.98rem;
+    padding: 0.6em 1.1em;
+    border-radius: 4px;
+    color: #2f4156 !important;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover, &.ant-dropdown-menu-item-active {
+      background: #f4fbfa !important;
+      color: #1575d0 !important;
+    }
+  }
+}
+
+// Optional: Responsive
+@media (max-width: 600px) {
+  .status-dropdown-trigger {
+    min-width: 120px;
+    font-size: 0.92rem;
+    padding: 0.35em 1em 0.35em 0.7em;
+  }
+  .ant-dropdown-menu {
+    min-width: 110px;
+  }
+}
