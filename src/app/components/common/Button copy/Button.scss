@@ -1,0 +1,145 @@
+@import '../../../scss/variables.scss';
+
+.custom-button {
+  font-family: $btn-font-family;
+  font-size: $btn-font-size;
+  font-weight: $btn-font-weight;
+  line-height: $btn-line-height;
+  border: $btn-border-width solid transparent;
+  border-radius: $btn-border-radius;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  // Primary variant
+  &.primary {
+    color: $btn-primary-default-color;
+    background-color: get-color($accent1, "default");
+    border-color: get-color($accent1, "default");
+
+    &:hover:not(:disabled) {
+      background-color: get-color($accent1, "600");
+      border-color: get-color($accent1, "600");
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 111, 97, 0.3);
+    }
+
+    &:disabled {
+      background-color: $btn-primary-disabled-bg;
+      color: $btn-primary-disabled-color;
+      border-color: $btn-primary-disabled-bg;
+    }
+  }
+
+  // Secondary variant
+  &.secondary {
+    color: $btn-second-default-color;
+    background-color: $btn-second-bg;
+    border-color: $btn-second-default-border-color;
+
+    &:hover:not(:disabled) {
+      color: $btn-second-hover-color;
+      border-color: $btn-second-hover-border-color;
+      background-color: get-color($primary, "50");
+    }
+
+    &:disabled {
+      color: $btn-second-disabled-color;
+      border-color: $btn-second-disabled-border-color;
+    }
+  }
+
+  // Accent variant
+  &.accent {
+    color: get-color($accent2, "foreground");
+    background-color: get-color($accent2, "default");
+    border-color: get-color($accent2, "default");
+
+    &:hover:not(:disabled) {
+      background-color: get-color($accent2, "600");
+      border-color: get-color($accent2, "600");
+    }
+  }
+
+  // Ghost variant
+  &.ghost {
+    color: get-color($primary, "default");
+    background-color: transparent;
+    border-color: transparent;
+
+    &:hover:not(:disabled) {
+      background-color: get-color($neutral, "50");
+      color: get-color($primary, "600");
+    }
+  }
+
+  // Link variant
+  &.link {
+    color: $btn-link-default-color;
+    background-color: transparent;
+    border-color: transparent;
+    padding: $btn-link-padding-y $btn-link-padding-x;
+    text-decoration: underline;
+
+    &:hover:not(:disabled) {
+      color: $btn-link-hover-color;
+      text-decoration: none;
+    }
+
+    &:disabled {
+      color: $btn-link-disabled-color;
+    }
+  }
+
+  // Sizes
+  &.large {
+    padding: $btn-padding-y-lg $btn-padding-x-lg;
+    font-size: $btn-font-size-lg;
+  }
+
+  &.medium {
+    padding: $btn-padding-y-md $btn-padding-x-md;
+    font-size: $btn-font-size-md;
+  }
+
+  &.small {
+    padding: $btn-padding-y-sm $btn-padding-x-sm;
+    font-size: $btn-font-size-sm;
+  }
+
+  // Loading state
+  &.loading {
+    position: relative;
+    color: transparent;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: inherit;
+    }
+  }
+
+  @keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+}

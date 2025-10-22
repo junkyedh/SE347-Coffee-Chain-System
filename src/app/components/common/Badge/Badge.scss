@@ -1,0 +1,100 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 1.4em;
+  padding: 0 0.7em;
+  min-width: 1.7em;
+  height: 1.8em;
+  font-size: 1em;
+  background: #f6f6f6;
+  color: #2F4156;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(50,50,70,0.07);
+  border: none;
+  user-select: none;
+  white-space: nowrap;
+  transition: background 0.14s, color 0.14s;
+}
+
+// Kích thước
+.badge--sm {
+  font-size: 0.75rem;
+  height: 1.3em;
+  min-width: 1.3em;
+  padding: 0 0.2em;
+}
+.badge--md {
+  font-size: 0.97rem;
+  height: 1.7em;
+  min-width: 1.7em;
+  padding: 0 0.7em;
+}
+.badge--lg {
+  font-size: 1.09rem;
+  height: 2.1em;
+  min-width: 2.1em;
+  padding: 0 0.9em;
+}
+
+// Variants
+.badge--default   { background: #f3f4f6; color: #2F4156; }
+.badge--primary   { background: #ff6f61; color: #fff; }
+.badge--secondary { background: #2F4156; color: #fff; }
+.badge--accent    { background: #CABBE9; color: #2F4156; }
+.badge--success   { background: #16c98d; color: #fff; }
+.badge--warning   { background: #ffe066; color: #b48600; }
+.badge--error     { background: #ef4444; color: #fff; }
+.badge--outline   { 
+  background: #fff; 
+  color: #2F4156; 
+  border: 1.5px solid #CABBE9; 
+}
+
+// Đánh dấu dot nhỏ
+.badge--dot {
+  padding-left: 0.45em;
+  padding-right: 0.45em;
+}
+.badge__dot {
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 50%;
+  background: #ff6f61;
+  display: inline-block;
+  margin-right: 0.4em;
+}
+
+// Hiệu ứng nổi bật cho badge trong cart
+.cart-badge, .badge--error {
+  box-shadow: 0 2px 10px rgba(255,111,97,0.14);
+  border: 2px solid #fff;
+  font-size: 0.96rem;
+  background: #ff6f61 !important;
+  color: #fff !important;
+  min-width: 1.2em;
+  height: 1.2em;
+  padding: 0 0.4em;
+  top: 3px;
+  right: 5px;
+  z-index: 10;
+}
+
+// Badge khi nằm trên nền sáng (giỏ hàng header)
+.badge--on-header {
+  border: 1px solid #fff;
+  background: #ff6f61;
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(255,111,97,0.19);
+}
+
+@media (max-width: 700px) {
+  .badge, .cart-badge {
+    font-size: 0.83rem;
+    min-width: 1.2em;
+    height: 1.25em;
+    padding: 0 0.45em;
+  }
+}
