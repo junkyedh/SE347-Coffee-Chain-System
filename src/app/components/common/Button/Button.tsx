@@ -1,7 +1,6 @@
-import React from "react"
 import { forwardRef } from "react"
 import "./Button.scss"
-import { cn } from "../../../modules/utils"
+import { cn } from "@/app/modules/utils"
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "accent" | "ghost" | "link" | "destructive" | "outline"
