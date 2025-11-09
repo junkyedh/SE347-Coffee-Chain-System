@@ -1,0 +1,245 @@
+@import '../../../scss/variables.scss';
+
+.admin-button {
+  &.btn {
+    font-family: $btn-font-family;
+    font-weight: 500;
+    border-radius: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(get-color($primary, "default"), 0.08);
+    border: none;
+    position: relative;
+    overflow: hidden;
+    
+    // Subtle shine effect
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    &:hover::before {
+      left: 100%;
+    }
+
+    // Primary variant
+    &.btn-primary {
+      background: linear-gradient(135deg, 
+        get-color($primary, "600"), 
+        get-color($primary, "700")
+      );
+      color: white;
+
+      &:hover:not(:disabled) {
+        background: linear-gradient(135deg, 
+          get-color($primary, "700"), 
+          get-color($primary, "800")
+        );
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(get-color($primary, "600"), 0.25);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    // Secondary variant
+    &.btn-secondary {
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.9), 
+        rgba(get-color($primary2, "50"), 0.8)
+      );
+      color: get-color($primary, "700");
+      border: 1px solid rgba(get-color($primary, "300"), 0.6);
+      backdrop-filter: blur(10px);
+
+      &:hover:not(:disabled) {
+        background: linear-gradient(135deg, 
+          rgba(get-color($primary, "50"), 0.9), 
+          rgba(get-color($primary2, "100"), 0.8)
+        );
+        color: get-color($primary, "800");
+        border-color: get-color($primary, "400");
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(get-color($primary, "default"), 0.12);
+      }
+    }
+
+    // Accent variant
+    &.btn-accent {
+      background: get-color($primary, "foreground");
+      color: rgb(255, 80, 80);
+
+      &:hover:not(:disabled) {
+        background: rgba(get-color($accent1, "100"), 0.8);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(get-color($accent2, "500"), 0.3);
+      }
+    }
+
+    // Destructive variant
+    &.btn-destructive {
+      background: linear-gradient(135deg, 
+        get-color($accent1, "500"), 
+        get-color($accent1, "600")
+      );
+      color: white;
+
+      &:hover:not(:disabled) {
+        background: linear-gradient(135deg, 
+          get-color($accent1, "600"), 
+          get-color($accent1, "700")
+        );
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(get-color($accent1, "500"), 0.3);
+      }
+    }
+
+    // Ghost variant
+    &.btn-ghost {
+      background: transparent;
+      color: get-color($primary, "600");
+      border: 1px solid transparent;
+
+      &:hover:not(:disabled) {
+        background: rgba(get-color($primary, "50"), 0.8);
+        color: get-color($primary, "700");
+        border-color: rgba(get-color($primary, "200"), 0.6);
+        backdrop-filter: blur(10px);
+      }
+    }
+
+    // Size variants
+    &.btn-sm {
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+      min-height: 36px;
+      border-radius: 0.5rem;
+    }
+
+    &.btn-md {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
+      min-height: 44px;
+      border-radius: 0.75rem;
+    }
+
+    &.btn-lg {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      min-height: 52px;
+      border-radius: 1rem;
+    }
+
+    // Icon only buttons
+    &.btn-icon-only {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.75rem;
+
+      &.btn-sm {
+        width: 36px;
+        height: 36px;
+        border-radius: 0.5rem;
+      }
+
+      &.btn-lg {
+        width: 52px;
+        height: 52px;
+        border-radius: 1rem;
+      }
+    }
+
+    // Loading state
+    &.btn-loading {
+      position: relative;
+      color: transparent;
+
+      .btn-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 18px;
+        height: 18px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        color: currentColor;
+      }
+    }
+
+    // Icon spacing
+    .btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      i {
+        font-size: 1em;
+      }
+    }
+
+    // Disabled state
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+      background: get-color($neutral, "100");
+      
+      
+      &::before {
+        display: none;
+      }
+    }
+
+    // Focus states
+    &:focus-visible {
+      outline: 2px solid get-color($accent2, "400");
+      outline-offset: 2px;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+// Button group styles
+.admin-button-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+
+  
+  &.vertical {
+    flex-direction: column;
+    
+    .admin-button {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .admin-button {
+      width: 100%;
+    }
+  }
+}
