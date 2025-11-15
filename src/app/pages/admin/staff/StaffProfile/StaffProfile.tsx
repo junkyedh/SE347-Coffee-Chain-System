@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Card, Descriptions, Button, Modal, Form, message } from "antd";
 import FloatingLabelInput from "@/components/FloatingInput/FloatingLabelInput";
-import moment from "moment";
 import { AdminApiRequest } from "@/services/AdminApiRequest";
-import "./StaffProfile.scss";
+import { Button, Card, Descriptions, Form, message, Modal } from "antd";
 import { jwtDecode } from "jwt-decode";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import "./StaffProfile.scss";
 
 interface TokenPayload {
   id?: number;

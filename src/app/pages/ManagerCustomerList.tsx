@@ -1,26 +1,14 @@
-import {
-  Button,
-  DatePicker,
-  Form,
-  Input,
-  message,
-  Modal,
-  Popconfirm,
-  Select,
-  Space,
-  Table,
-  Upload,
-} from "antd";
-import { UploadOutlined, DownloadOutlined } from "@ant-design/icons";
+import FloatingLabelInput from "@/components/FloatingInput/FloatingLabelInput";
+import SearchInput from "@/components/Search/SearchInput";
+import AdminButton from "@/pages/admin/button/AdminButton";
+import AdminPopConfirm from "@/pages/admin/button/AdminPopConfirm";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
+import { DownloadOutlined } from "@ant-design/icons";
+import { Form, message, Modal, Space, Table } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../admin/adminPage.scss";
-import SearchInput from "@/components/Search/SearchInput";
-import { AdminApiRequest } from "@/services/AdminApiRequest";
-import FloatingLabelInput from "@/components/FloatingInput/FloatingLabelInput";
-import AdminButton from "@/pages/admin/button/AdminButton";
-import AdminPopConfirm from "@/pages/admin/button/AdminPopConfirm";
 
 const ManagerCustomerList = () => {
   const [customerList, setCustomerList] = useState<any[]>([]);
@@ -47,7 +35,7 @@ const ManagerCustomerList = () => {
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();
     if (!keyword) {
-      fetchCustomerList(); // Lấy lại danh sách đầy đủ nếu không có từ khóa tìm kiếm
+      fetchCustomerList();
       return;
     }
 
@@ -66,7 +54,7 @@ const ManagerCustomerList = () => {
   };
   useEffect(() => {
     if (!searchKeyword.trim()) {
-      fetchCustomerList(); // Lấy lại danh sách đầy đủ nếu không có từ khóa tìm kiếm
+      fetchCustomerList();
     }
   }, [searchKeyword]);
 
@@ -97,7 +85,6 @@ const ManagerCustomerList = () => {
         registrationDate: moment(record.registrationDate),
       });
     } else {
-      // Tạo mới => set ngày hiện tại
       form.setFieldsValue({
         registrationDate: moment(),
         total: 0,
@@ -171,7 +158,7 @@ const ManagerCustomerList = () => {
     <div className="container-fluid">
       <div className="sticky-header-wrapper">
         <h2 className="header-custom">QUẢN LÝ KHÁCH HÀNG</h2>
-        {/* Tìm kiếm và Import + Export */}
+
         <div className="header-actions">
           <div className="search-form">
             <SearchInput
@@ -261,12 +248,6 @@ const ManagerCustomerList = () => {
             />
           </div>
 
-          {/*<FloatingLabelInput
-                        name="image"
-                        label="Ảnh đại diện (URL)"
-                        component='input'
-                    />*/}
-
           <div className="modal-footer-custom">
             <AdminButton variant="secondary" onClick={onCancelCreateCustomer}>
               Hủy
@@ -283,9 +264,8 @@ const ManagerCustomerList = () => {
         rowKey="id"
         dataSource={customerList}
         pagination={{
-          pageSize: 10, // Số lượng item trên mỗi trang
-          showSizeChanger: true, // Hiển thị tùy chọn thay đổi số item trên mỗi trang
-          // Các tùy chọn cho số item mỗi trang
+          pageSize: 10,
+          showSizeChanger: true,
         }}
         columns={[
           {
