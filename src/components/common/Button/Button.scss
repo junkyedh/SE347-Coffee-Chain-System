@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@import '../../../styles/variables.scss';
 
 .custom-button {
   font-family: $btn-font-family;
@@ -24,12 +24,12 @@
   // Primary variant
   &.primary {
     color: $btn-primary-default-color;
-    background-color: get-color($accent1, "default");
-    border-color: get-color($accent1, "default");
+    background-color: get-color($accent1, 'default');
+    border-color: get-color($accent1, 'default');
 
     &:hover:not(:disabled) {
-      background-color: get-color($accent1, "600");
-      border-color: get-color($accent1, "600");
+      background-color: get-color($accent1, '600');
+      border-color: get-color($accent1, '600');
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(255, 111, 97, 0.3);
     }
@@ -50,7 +50,7 @@
     &:hover:not(:disabled) {
       color: $btn-second-hover-color;
       border-color: $btn-second-hover-border-color;
-      background-color: get-color($primary, "50");
+      background-color: get-color($primary, '50');
     }
 
     &:disabled {
@@ -61,25 +61,25 @@
 
   // Accent variant
   &.accent {
-    color: get-color($accent2, "foreground");
-    background-color: get-color($accent2, "default");
-    border-color: get-color($accent2, "default");
+    color: get-color($accent2, 'foreground');
+    background-color: get-color($accent2, 'default');
+    border-color: get-color($accent2, 'default');
 
     &:hover:not(:disabled) {
-      background-color: get-color($accent2, "600");
-      border-color: get-color($accent2, "600");
+      background-color: get-color($accent2, '600');
+      border-color: get-color($accent2, '600');
     }
   }
 
   // Ghost variant
   &.ghost {
-    color: get-color($primary, "default");
+    color: get-color($primary, 'default');
     background-color: transparent;
     border-color: transparent;
 
     &:hover:not(:disabled) {
-      background-color: get-color($neutral, "50");
-      color: get-color($primary, "600");
+      background-color: get-color($neutral, '50');
+      color: get-color($primary, '600');
     }
   }
 
@@ -139,7 +139,11 @@
   }
 
   @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
   }
 }
