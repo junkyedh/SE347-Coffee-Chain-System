@@ -1,125 +1,125 @@
-"use client"
-
-import type React from "react"
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import Breadcrumbs from "@/components/littleComponent/Breadcrumbs/Breadcrumbs"
-import { MainApiRequest } from "@/services/MainApiRequest"
-import "./ProfileUser.scss"
-import { User, Phone, Calendar, Award, Camera, Edit3, Save, X } from "lucide-react"
-import { Button } from "@/components/littleComponent/Button/Button"
+import { MainApiRequest } from '@/services/MainApiRequest';
+import { Award, Calendar, Camera, Edit3, Phone, Save, User, X } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './ProfileUser.scss';
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import { Button } from '@/components/common/Button/Button';
 
 interface Customer {
-  id: number
-  phone: string
-  name: string
-  gender: "Nam" | "Nữ" | "Khác"
-  total: number
-  registrationDate: string
-  rank: string
-  image: string | null
-  address: string | null
+  id: number;
+  phone: string;
+  name: string;
+  gender: 'Nam' | 'Nữ' | 'Khác';
+  total: number;
+  registrationDate: string;
+  rank: string;
+  image: string | null;
+  address: string | null;
 }
 
 const ProfileUser: React.FC = () => {
-  const [customer, setCustomer] = useState<Customer | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [editing, setEditing] = useState(false)
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    address: "",
-    gender: "Nam" as "Nam" | "Nữ" | "Khác",
-  })
-  const navigate = useNavigate()
+    name: '',
+    address: '',
+    gender: 'Nam' as 'Nam' | 'Nữ' | 'Khác',
+  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await MainApiRequest.get<{ data: { phone: string } }>("/auth/callback")
-        const phone = res.data.data.phone
-        if (!phone) throw new Error("No phone in callback")
+        const res = await MainApiRequest.get<{ data: { phone: string } }>('/auth/callback');
+        const phone = res.data.data.phone;
+        if (!phone) throw new Error('No phone in callback');
 
-        const customerRes = await MainApiRequest.get<Customer>(`/customer/${encodeURIComponent(phone)}`)
-        setCustomer(customerRes.data)
+        const customerRes = await MainApiRequest.get<Customer>(
+          `/customer/${encodeURIComponent(phone)}`
+        );
+        setCustomer(customerRes.data);
         setFormData({
           name: customerRes.data.name,
-          address: customerRes.data.address || "",
+          address: customerRes.data.address || '',
           gender: customerRes.data.gender,
-        })
+        });
       } catch (err) {
-        console.error("Không tải được profile:", err)
-        navigate("/login")
+        console.error('Không tải được profile:', err);
+        navigate('/login');
       }
-    }
+    };
 
-    fetchProfile()
-  }, [navigate])
+    fetchProfile();
+  }, [navigate]);
 
   const handleSave = async () => {
-    if (!customer) return
-    setLoading(true)
+    if (!customer) return;
+    setLoading(true);
     try {
-      await MainApiRequest.put(`/customer/${customer.id}`, formData)
+      await MainApiRequest.put(`/customer/${customer.id}`, formData);
 
-      const updated = await MainApiRequest.get<Customer>(`/customer/${customer.phone}`)
-      setCustomer(updated.data)
+      const updated = await MainApiRequest.get<Customer>(`/customer/${customer.phone}`);
+      setCustomer(updated.data);
       setFormData({
         name: updated.data.name,
-        address: updated.data.address || "",
+        address: updated.data.address || '',
         gender: updated.data.gender,
-      })
-      setEditing(false)
+      });
+      setEditing(false);
     } catch (err) {
-      console.error("Cập nhật thất bại:", err)
+      console.error('Cập nhật thất bại:', err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleCancel = () => {
     if (customer) {
       setFormData({
         name: customer.name,
-        address: customer.address || "",
+        address: customer.address || '',
         gender: customer.gender,
-      })
+      });
     }
-    setEditing(false)
-  }
+    setEditing(false);
+  };
 
   const getRankColor = (rank: string) => {
     switch (rank.toLowerCase()) {
-      case "bronze":
-        return "#cd7f32"
-      case "silver":
-        return "#c0c0c0"
-      case "gold":
-        return "#ffd700"
-      case "platinum":
-        return "#e5e4e2"
-      case "diamond":
-        return "#b9f2ff"
+      case 'bronze':
+        return '#cd7f32';
+      case 'silver':
+        return '#c0c0c0';
+      case 'gold':
+        return '#ffd700';
+      case 'platinum':
+        return '#e5e4e2';
+      case 'diamond':
+        return '#b9f2ff';
       default:
-        return "#6b7280"
+        return '#6b7280';
     }
-  }
+  };
 
   const getRankIcon = (rank: string) => {
     switch (rank.toLowerCase()) {
-      case "bronze":
-        return "🥉"
-      case "silver":
-        return "🥈"
-      case "gold":
-        return "🥇"
-      case "platinum":
-        return "💎"
-      case "diamond":
-        return "💠"
+      case 'bronze':
+        return '🥉';
+      case 'silver':
+        return '🥈';
+      case 'gold':
+        return '🥇';
+      case 'platinum':
+        return '💎';
+      case 'diamond':
+        return '💠';
       default:
-        return "⭐"
+        return '⭐';
     }
-  }
+  };
 
   if (!customer) {
     return (
@@ -131,23 +131,25 @@ const ProfileUser: React.FC = () => {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <>
-      <Breadcrumbs title="Hồ sơ của tôi" items={[{ label: "Trang chủ", to: "/" }, { label: "Hồ sơ" }]} />
+      <Breadcrumbs
+        title="Hồ sơ của tôi"
+        items={[{ label: 'Trang chủ', to: '/' }, { label: 'Hồ sơ' }]}
+      />
 
       <div className="profile-user">
         <div className="container">
           <div className="profile-user__content">
-            {/* Avatar & Stats Section */}
             <div className="profile-user__sidebar">
               <div className="avatar-card">
                 <div className="avatar-section">
                   <div className="avatar-wrapper">
                     <img
-                      src={customer.image || "/placeholder.svg?height=120&width=120"}
+                      src={customer.image || '/placeholder.svg?height=120&width=120'}
                       alt="avatar"
                       className="avatar-img"
                     />
@@ -160,7 +162,9 @@ const ProfileUser: React.FC = () => {
                     <div
                       className="rank-badge"
                       style={{
-                        background: `linear-gradient(135deg, ${getRankColor(customer.rank)}20, ${getRankColor(customer.rank)}40)`,
+                        background: `linear-gradient(135deg, ${getRankColor(
+                          customer.rank
+                        )}20, ${getRankColor(customer.rank)}40)`,
                         border: `2px solid ${getRankColor(customer.rank)}60`,
                       }}
                     >
@@ -181,7 +185,7 @@ const ProfileUser: React.FC = () => {
                     <div className="stat-content">
                       <div className="stat-label">Ngày tham gia</div>
                       <div className="stat-value">
-                        {new Date(customer.registrationDate).toLocaleDateString("vi-VN")}
+                        {new Date(customer.registrationDate).toLocaleDateString('vi-VN')}
                       </div>
                     </div>
                   </div>
@@ -191,25 +195,25 @@ const ProfileUser: React.FC = () => {
                     </div>
                     <div className="stat-content">
                       <div className="stat-label">Tổng chi tiêu</div>
-                      <div className="stat-value">{customer.total.toLocaleString("vi-VN")}₫</div>
+                      <div className="stat-value">{customer.total.toLocaleString('vi-VN')}₫</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Profile Form Section */}
             <div className="profile-user__main">
               <div className="profile-form-card">
                 <div className="card-header">
                   <h3>Thông tin cá nhân</h3>
                   <div className="header-actions">
                     {!editing ? (
-                      <Button 
+                      <Button
                         variant="ghost"
-                        size="sm" 
-                        className="primaryBtn"  
-                        onClick={() => setEditing(true)}>
+                        size="sm"
+                        className="primaryBtn"
+                        onClick={() => setEditing(true)}
+                      >
                         <Edit3 size={16} />
                         Chỉnh sửa
                       </Button>
@@ -217,17 +221,22 @@ const ProfileUser: React.FC = () => {
                       <div className="edit-actions">
                         <Button
                           variant="ghost"
-                          size="sm" 
-                          className="secondaryBtn" onClick={handleCancel}>
+                          size="sm"
+                          className="secondaryBtn"
+                          onClick={handleCancel}
+                        >
                           <X size={16} className="" />
                           Hủy
                         </Button>
-                        <Button                           
+                        <Button
                           variant="ghost"
-                          size="sm" 
-                          className="primaryBtn" onClick={handleSave} disabled={loading}>
+                          size="sm"
+                          className="primaryBtn"
+                          onClick={handleSave}
+                          disabled={loading}
+                        >
                           <Save size={16} />
-                          {loading ? "Đang lưu..." : "Lưu"}
+                          {loading ? 'Đang lưu...' : 'Lưu'}
                         </Button>
                       </div>
                     )}
@@ -274,7 +283,12 @@ const ProfileUser: React.FC = () => {
                       <select
                         className="form-input"
                         value={formData.gender}
-                        onChange={(e) => setFormData({ ...formData, gender: e.target.value as "Nam" | "Nữ" | "Khác" })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            gender: e.target.value as 'Nam' | 'Nữ' | 'Khác',
+                          })
+                        }
                         disabled={!editing}
                       >
                         <option value="Nam">Nam</option>
@@ -287,14 +301,18 @@ const ProfileUser: React.FC = () => {
                       <label className="form-label">Ngày đăng ký</label>
                       <input
                         className="form-input"
-                        value={new Date(customer.registrationDate).toLocaleDateString("vi-VN")}
+                        value={new Date(customer.registrationDate).toLocaleDateString('vi-VN')}
                         disabled
                       />
                     </div>
 
                     <div className="form-group">
                       <label className="form-label">Tổng chi tiêu</label>
-                      <input className="form-input" value={customer.total.toLocaleString("vi-VN") + "₫"} disabled />
+                      <input
+                        className="form-input"
+                        value={customer.total.toLocaleString('vi-VN') + '₫'}
+                        disabled
+                      />
                     </div>
                   </div>
                 </div>
@@ -304,7 +322,7 @@ const ProfileUser: React.FC = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ProfileUser
+export default ProfileUser;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './FeedbackPage.scss'
-import Breadcrumbs from '@/components/littleComponent/Breadcrumbs/Breadcrumbs'
 import { Star, MessageSquare, Send } from 'lucide-react'
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs'
 
 const FeedbackPage: React.FC = () => {
   const { reservationCode } = useParams<{ reservationCode: string }>()
@@ -28,7 +28,6 @@ const FeedbackPage: React.FC = () => {
     setLoading(true)
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
       console.log('Feedback data:', { reservationCode, rating, comments })
       

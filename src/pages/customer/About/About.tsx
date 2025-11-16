@@ -1,18 +1,18 @@
-import React, { useEffect } from "react";
-import { Container, Row, Col, Card, CardTitle } from "react-bootstrap";
-import cafeImg1 from "@/assets/coffee4.jpg";
-import cafeImg2 from "@/assets/img5.jpg";
-import cafeImg3 from "@/assets/juice7.jpg";
-import cafeImg4 from "@/assets/img11.jpg";
-import cafeImg5 from "@/assets/img1.jpg";
-import about1 from "@/assets/bg8.jpg";
-import about2 from "@/assets/bg9.jpg";
-import about3 from "@/assets/juice9.jpg";
-import icons1 from "@/assets/coffee11.jpg";
-import icons2 from "@/assets/img9.jpg";
-import icons3 from "@/assets/img3.jpg";
-import Breadcrumbs from "@/components/littleComponent/Breadcrumbs/Breadcrumbs";
-import "./About.scss";
+import about1 from '@/assets/bg8.jpg';
+import about2 from '@/assets/bg9.jpg';
+import icons1 from '@/assets/coffee11.jpg';
+import cafeImg1 from '@/assets/coffee4.jpg';
+import cafeImg5 from '@/assets/img1.jpg';
+import cafeImg4 from '@/assets/img11.jpg';
+import icons3 from '@/assets/img3.jpg';
+import cafeImg2 from '@/assets/img5.jpg';
+import icons2 from '@/assets/img9.jpg';
+import cafeImg3 from '@/assets/juice7.jpg';
+import about3 from '@/assets/juice9.jpg';
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import { useEffect } from 'react';
+import { Card, CardTitle, Col, Container, Row } from 'react-bootstrap';
+import './About.scss';
 
 const About = () => {
   useEffect(() => {
@@ -23,26 +23,23 @@ const About = () => {
     <>
       <Breadcrumbs
         title="Giới thiệu"
-        items={[
-          { label: "Trang chủ", to: "/" },
-          { label: "Giới thiệu" }
-        ]}
+        items={[{ label: 'Trang chủ', to: '/' }, { label: 'Giới thiệu' }]}
       />
       <section className="about-section py-5">
         <Container>
-          {/* Giới thiệu */}
           <Row className="mb-5">
             <Col md="12" className="text-center">
               <h1 className="lead mt-3">CHÀO MỪNG ĐẾN VỚI QUÁN CÀ PHÊ CỦA CHÚNG TÔI</h1>
               <p className="lead px-5">
-                Một không gian ấm cúng, sáng tạo và đậm chất nghệ thuật — nơi cà phê, con người và cảm xúc giao hòa.
+                Một không gian ấm cúng, sáng tạo và đậm chất nghệ thuật — nơi cà phê, con người và
+                cảm xúc giao hòa.
                 <br />
-                Tại Cafe w Fen, chúng tôi không chỉ phục vụ cà phê — mà còn mang đến trải nghiệm độc đáo, kết nối cộng đồng và nuôi dưỡng cảm hứng sáng tạo.
+                Tại Cafe w Fen, chúng tôi không chỉ phục vụ cà phê — mà còn mang đến trải nghiệm độc
+                đáo, kết nối cộng đồng và nuôi dưỡng cảm hứng sáng tạo.
               </p>
             </Col>
           </Row>
 
-          {/* Dịch vụ nổi bật */}
           <Row className="mb-5 align-items-center">
             <Col md="4">
               <Card className="border-0 shadow-sm rounded-3 text-center">
@@ -50,18 +47,20 @@ const About = () => {
                   <img src={icons1} alt="Cà phê đặc sản" className="mb-3 img-fluid" />
                   <Card.Title className="fw-bold">Cà Phê Đặc Sản</Card.Title>
                   <p>
-                    Từ hạt cà phê tuyển chọn đến cách pha chế tinh tế, mỗi ly cà phê tại w Fen đều là một hành trình vị giác đầy cảm xúc.
+                    Từ hạt cà phê tuyển chọn đến cách pha chế tinh tế, mỗi ly cà phê tại w Fen đều
+                    là một hành trình vị giác đầy cảm xúc.
                   </p>
                 </Card.Body>
               </Card>
             </Col>
-            <Col md="4" >
+            <Col md="4">
               <Card className="border-0 shadow-sm rounded-3 text-center">
                 <Card.Body>
                   <img src={icons2} alt="Không gian sáng tạo" className="mb-3 img-fluid" />
                   <Card.Title className="fw-bold">Không Gian Sáng Tạo</Card.Title>
                   <p>
-                    Thiết kế mở, trang trí nghệ thuật, là nơi lý tưởng để làm việc, gặp gỡ bạn bè hay tìm kiếm cảm hứng cá nhân.
+                    Thiết kế mở, trang trí nghệ thuật, là nơi lý tưởng để làm việc, gặp gỡ bạn bè
+                    hay tìm kiếm cảm hứng cá nhân.
                   </p>
                 </Card.Body>
               </Card>
@@ -72,22 +71,24 @@ const About = () => {
                   <img src={icons3} alt="Sự kiện & triển lãm" className="mb-3 img-fluid" />
                   <Card.Title className="fw-bold">Sự Kiện & Triển Lãm</Card.Title>
                   <p>
-                    Thường xuyên tổ chức workshop, âm nhạc acoustic và triển lãm nghệ thuật độc lập từ các nghệ sĩ địa phương.
+                    Thường xuyên tổ chức workshop, âm nhạc acoustic và triển lãm nghệ thuật độc lập
+                    từ các nghệ sĩ địa phương.
                   </p>
                 </Card.Body>
               </Card>
             </Col>
           </Row>
 
-          {/* Lịch sử - Sứ mệnh - Giá trị */}
           <section className="about-section py-4">
             <Container>
-              {/* Lịch sử */}
               <Row className="align-items-center mb-5">
                 <Col md="6">
                   <Card.Title className="fw-bold">CÂU CHUYỆN HÌNH THÀNH</Card.Title>
                   <p>
-                    Cafe w Fen được thành lập từ niềm đam mê với cà phê nguyên bản và không gian sáng tạo. Ban đầu chỉ là một góc nhỏ trong khu phố cổ, nay w Fen đã trở thành điểm đến quen thuộc cho những ai yêu thích sự yên tĩnh, nghệ thuật và hương vị nguyên chất.
+                    Cafe w Fen được thành lập từ niềm đam mê với cà phê nguyên bản và không gian
+                    sáng tạo. Ban đầu chỉ là một góc nhỏ trong khu phố cổ, nay w Fen đã trở thành
+                    điểm đến quen thuộc cho những ai yêu thích sự yên tĩnh, nghệ thuật và hương vị
+                    nguyên chất.
                   </p>
                 </Col>
                 <Col md="6">
@@ -95,12 +96,13 @@ const About = () => {
                 </Col>
               </Row>
 
-              {/* Sứ mệnh */}
               <Row className="align-items-center mb-5">
                 <Col md="6" className="order-md-2">
                   <Card.Title className="fw-bold">SỨ MỆNH</Card.Title>
                   <p className="mb-4">
-                    Sứ mệnh của chúng tôi là kiến tạo một không gian nơi mọi người có thể tạm gác lại nhịp sống vội vã để thư giãn, kết nối và tái tạo cảm hứng. Không chỉ là cà phê, mà còn là trải nghiệm tinh tế của sự tĩnh lặng, sáng tạo và cộng đồng.
+                    Sứ mệnh của chúng tôi là kiến tạo một không gian nơi mọi người có thể tạm gác
+                    lại nhịp sống vội vã để thư giãn, kết nối và tái tạo cảm hứng. Không chỉ là cà
+                    phê, mà còn là trải nghiệm tinh tế của sự tĩnh lặng, sáng tạo và cộng đồng.
                   </p>
                 </Col>
                 <Col md="6" className="order-md-1">
@@ -113,18 +115,21 @@ const About = () => {
                 <Col md="6">
                   <Card.Title className="fw-bold mb-3 ">GIÁ TRỊ CỐT LÕI</Card.Title>
                   <p>
-                    <span className="fw-bold ">CHÂN THÀNH</span> trong từng ly cà phê và từng nụ cười trao đi.
+                    <span className="fw-bold ">CHÂN THÀNH</span> trong từng ly cà phê và từng nụ
+                    cười trao đi.
                   </p>
                   <p>
-                    <span className="fw-bold">CHẤT LƯỢNG</span> là ưu tiên hàng đầu, từ nguyên liệu đến dịch vụ.
+                    <span className="fw-bold">CHẤT LƯỢNG</span> là ưu tiên hàng đầu, từ nguyên liệu
+                    đến dịch vụ.
                   </p>
                   <p>
-                    <span className="fw-bold">SÁNG TẠO</span> trong không gian và hoạt động gắn kết cộng đồng.
+                    <span className="fw-bold">SÁNG TẠO</span> trong không gian và hoạt động gắn kết
+                    cộng đồng.
                   </p>
                   <p>
-                    <span className="fw-bold">BỀN VỮNG</span> với môi trường và phát triển địa phương.
+                    <span className="fw-bold">BỀN VỮNG</span> với môi trường và phát triển địa
+                    phương.
                   </p>
-
                 </Col>
                 <Col md="6">
                   <img src={about3} alt="Giá trị cốt lõi" className="img-fluid rounded shadow-sm" />
@@ -133,7 +138,6 @@ const About = () => {
             </Container>
           </section>
 
-          {/* Hình ảnh quán */}
           <Col md="12" className="text-center mb-4">
             <CardTitle className="fw-bold">Không Gian w Fen</CardTitle>
           </Col>
