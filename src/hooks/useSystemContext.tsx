@@ -33,7 +33,6 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
   const [isInitialized, setIsInitialized] = useState(false);
 
   const setAuth = (newToken: string, newRole: string, isNewUser = false) => {
-    const decoded: TokenPayload = jwtDecode(newToken);
     setToken(newToken);
     setRole(newRole);
     setIsLoggedIn(true);

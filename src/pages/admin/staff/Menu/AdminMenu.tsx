@@ -4,7 +4,7 @@ import { AutoComplete, Button, Form, Input, message, Modal, Pagination } from 'a
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminMenu.scss';
-import AdminProductCard from '@/app/pages/admin/staff/AdminCard/AdminProductCard';
+import AdminProductCard from '../AdminCard/AdminProductCard';
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
 
 const categories = ['All', 'Cà phê', 'Trà trái cây', 'Trà sữa', 'Nước ép', 'Bánh ngọt'];

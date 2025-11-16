@@ -1,9 +1,8 @@
 
-import { useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import AdminButton from "../AdminButton/AdminButton";
 import "./AdminPopConfirm.scss";
 import * as ReactDOM from 'react-dom';
-import React = require("react");
 
 interface AdminPopConfirmProps {
   title: React.ReactNode;
