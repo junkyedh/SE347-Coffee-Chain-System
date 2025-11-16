@@ -1,0 +1,55 @@
+@import "../../../scss/variables.scss";
+
+.inner-banner-wrap {
+  .inner-banner-container {
+    background-image: url("../../../assets/bg8.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    padding-top: 40px;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: #151515;
+      opacity: 0.65;
+    }
+
+    .inner-banner-content {
+      position: relative;
+      padding: 90px 0 75px;
+      text-align: center;
+    }
+  }
+}
+
+.navbar-link {
+  background-color: rgba(0, 0, 0, 0.83);
+
+  .breadcrumb {
+    margin: 0;
+    padding: 0;
+
+    .breadcrumb-item,
+    a {
+      color: white;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: white;
+      content: "/"; /* hoặc icon mong muốn */
+      padding: 0 0.5rem;
+    }
+
+    .breadcrumb-item.active a,
+    .breadcrumb-item.active {
+      cursor: default;
+      text-decoration: none;
+      color: white;
+    }
+  }
+}

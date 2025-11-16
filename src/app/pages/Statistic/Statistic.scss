@@ -1,0 +1,212 @@
+@import "../../scss/variables.scss";
+
+.container-fluid {
+  padding: 0;
+  background: get-color($background, "default");
+  min-height: 100vh;
+
+  .header {
+    background: white;
+    padding: 2rem 2.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 20px rgba(get-color($primary, "default"), 0.08);
+    border-bottom: 1px solid get-color($neutral, "200");
+
+    .header-custom {
+      font-size: 2rem;
+      font-weight: 700;
+      color: get-color($primary, "800");
+      margin: 0;
+      text-align: left;
+      letter-spacing: -0.025em;
+
+      @media (max-width: 768px) {
+        font-size: 1.5rem;
+        text-align: center;
+      }
+    }
+  }
+
+  .container-fluid1 {
+    padding: 0 2rem;
+    // Overview Cards
+  .stat-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .stat-cards .card {
+    background: #fff;
+    border-radius: 1.2em;
+    box-shadow: 0 2px 18px rgba(47,65,86,0.10);
+    padding: 1em 0.5em 0.5em 0.25em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    min-height: 112px;
+    border: none;
+    transition: box-shadow 0.13s;
+    cursor: pointer;
+    &:hover {
+      box-shadow: 0 6px 32px rgba(47,65,86,0.17);
+      transform: translateY(-2px) scale(1.02);
+    }
+  }
+
+.stat-cards .card-title,
+.stat-cards .card .card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #2f4156;
+  margin-bottom: 0.25em;
+  letter-spacing: 0.01em;
+}
+
+.stat-cards .card-text,
+.stat-cards .card .card-text {
+  font-size: 2.02rem;
+  font-weight: 800;
+  color: #e45b4c;
+  letter-spacing: 0.01em;
+  margin-top: 0.2em;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+@media (max-width: 1200px) {
+  .stat-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .stat-cards {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  .stat-cards .card {
+    padding: 1.1em 0.7em 1.1em 0.7em;
+    min-height: 86px;
+  }
+  .stat-cards .card-text {
+    font-size: 1.38rem;
+  }
+}
+
+// Main chart grid
+  .charts {
+    margin: 2rem 0;
+
+    .chart-full-width {
+      background: white;
+      border-radius: 1.2em;
+      padding: 2rem;
+      box-shadow: 0 4px 24px rgba(get-color($primary, "default"), 0.08);
+      border: 1px solid get-color($neutral, "200");
+      margin-bottom: 2.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      min-height: 330px;
+      @media (max-width: 900px) {
+        padding: 1.1rem 0.7rem;
+        min-height: 200px;
+      }
+    }
+  }
+
+  // Chart grid row: auto-fit, tự giãn, đều nhau, xuống dòng
+  .charts-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    align-items: stretch;
+
+    > * {
+      min-width: 0;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .chart-card,
+    .donut-chart {
+      background: #fff;
+      border-radius: 1.2em;
+      box-shadow: 0 4px 24px rgba(get-color($primary, "default"), 0.08);
+      border: 1px solid get-color($neutral, "200");
+      padding: 1.5rem 1.2rem;
+      margin: 0;
+      transition: box-shadow 0.15s, transform 0.14s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 220px;
+
+      &:hover {
+        transform: translateY(-3px) scale(1.015);
+        box-shadow: 0 10px 40px rgba(get-color($primary, "default"), 0.11);
+      }
+
+      h3, h4 {
+        color: get-color($primary, "800");
+        font-weight: 600;
+        margin-bottom: 1.15rem;
+        text-align: center;
+        font-size: 1.08rem;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    @media (max-width: 800px) {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+      > * {
+        min-height: 160px;
+      }
+      .chart-card, .donut-chart {
+        padding: 1.1rem 0.8rem;
+      }
+    }
+  }
+
+  }
+}
+
+// Chart Enhancements
+.recharts-wrapper {
+  .recharts-cartesian-grid-horizontal line,
+  .recharts-cartesian-grid-vertical line {
+    stroke: get-color($neutral, "300");
+    stroke-opacity: 0.6;
+  }
+
+  .recharts-text {
+    fill: get-color($primary, "600");
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .recharts-legend-wrapper {
+    .recharts-legend-item-text {
+      color: get-color($primary, "700") !important;
+      font-weight: 500;
+    }
+  }
+}

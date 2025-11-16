@@ -1,4 +1,4 @@
-import MainRoutes from "./app/routes/MainRoutes";
+import MainRoutes from "./routes/MainRoutes";
 
 export default function App() {
   return (
