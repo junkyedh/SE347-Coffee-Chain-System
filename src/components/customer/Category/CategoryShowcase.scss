@@ -1,0 +1,121 @@
+@import "../../../styles/variables.scss";
+.category-section {
+  padding: 0 2rem;
+
+  .category-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primaryText);
+    }
+
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.25rem;
+
+    @media (max-width: 1280px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .category-card {
+    cursor: pointer;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #fff;
+    border: 0.5px solid #e5e9ec; // light gray border
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .category-image-wrapper {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+        transition: transform 0.3s ease;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: 2;
+        transition: background-color 0.3s ease;
+      }
+
+      .category-text {
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+
+        h3 {
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+        }
+
+        p {
+            font-size: 0.875rem;
+            color: get-color($accent1, "300");
+            text-shadow: 2 1px 2px rgba(0, 0, 0, 0.8);
+            font-weight: 500;
+
+        }
+      }
+
+      &:hover img {
+        transform: scale(1.05);
+      }
+
+      &:hover .overlay {
+        background-color: rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    .category-description {
+      padding: 0.75rem;
+      text-align: center;
+
+      p {
+        font-size: 0.85rem;
+        color: get-color($accent1, "700");
+        text-shadow: 0 1px 2px rgba(249, 204, 39, 0.3);
+      }
+    }
+  }
+}
