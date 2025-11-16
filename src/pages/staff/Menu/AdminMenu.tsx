@@ -1,22 +1,23 @@
-import FloatingLabelInput from "@/components/FloatingInput/FloatingLabelInput";
-import AdminProductCard from "@/pages/brands/staff/AdminCard/AdminProductCard";
-import { AdminApiRequest } from "@/services/AdminApiRequest";
+import { useEffect, useState } from "react";
 import {
-  DeleteOutlined,
+  Button,
+  Input,
+  Modal,
+  message,
+  Pagination,
+  AutoComplete,
+  Form,
+} from "antd";
+import {
   ShoppingCartOutlined,
   UserAddOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
-import {
-  AutoComplete,
-  Button,
-  Form,
-  Input,
-  message,
-  Modal,
-  Pagination,
-} from "antd";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
+import FloatingLabelInput from "@/components/FloatingInput/FloatingLabelInput";
+import SearchInput from "@/components/Search/SearchInput";
+import AdminProductCard from "@/pages/brands/staff/AdminCard/AdminProductCard";
 import "./AdminMenu.scss";
 
 const categories = [
@@ -182,6 +183,7 @@ const AdminMenu = () => {
       let price = 0;
 
       if (product.category === "Bánh ngọt") {
+        // Lấy giá đúng cho "piece" hoặc "whole"
         if (size === "piece") {
           price = product.sizes[0]?.price || 0;
         } else if (size === "whole") {
@@ -281,16 +283,20 @@ const AdminMenu = () => {
         return;
       }
 
+      // 1. Chuẩn bị dữ liệu cho branch-order
+      // Lưu ý: orderInfo có thể chứa thông tin về tableID, serviceType, staffName...
       const payload = {
         phoneCustomer: phone || null,
-        serviceType: orderInfo?.serviceType || "DINE IN",
+        serviceType: orderInfo?.serviceType || "DINE IN", // hoặc "TAKE AWAY"
         totalPrice: finalTotal,
         tableID: orderInfo?.tableID || null,
         orderDate: new Date().toISOString(),
         status: "PENDING",
         staffName: orderInfo?.staffName || null,
+        // productIDs sẽ được thêm sau bằng endpoint detail
       };
 
+      // 2. Tạo đơn hàng branch-order
       const res = await AdminApiRequest.post("/branch-order", payload);
       if (!res?.data?.id) {
         message.error("Đặt đơn hàng thất bại! Không nhận được ID đơn hàng.");
@@ -299,6 +305,7 @@ const AdminMenu = () => {
 
       const orderId = res.data.id;
 
+      // 3. Thêm từng món vào chi tiết đơn hàng qua endpoint POST /branch-order/detail/{orderId}
       const orderItems = Object.keys(order).map((productKey) => {
         const item = order[productKey];
         const [id] = productKey.split("-");
@@ -311,6 +318,7 @@ const AdminMenu = () => {
         };
       });
 
+      // Gọi tuần tự, hoặc song song nếu muốn
       for (const item of orderItems) {
         await AdminApiRequest.post(`/branch-order/detail/${orderId}`, item);
       }
@@ -399,6 +407,16 @@ const AdminMenu = () => {
                   </Button>
                 ))}
               </div>
+
+              {/* <div className="search-section">
+                <SearchInput
+                  placeholder="Tìm kiếm sản phẩm..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onSearch={() => {}}
+                  allowClear
+                />
+              </div> */}
             </div>
           </div>
 

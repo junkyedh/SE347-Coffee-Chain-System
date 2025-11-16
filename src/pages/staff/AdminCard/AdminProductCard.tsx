@@ -1,7 +1,7 @@
-import AdminButton from "@/pages/admin/button/AdminButton";
-import { Button, Tag } from "antd";
 import React from "react";
+import { Button, Tag } from "antd";
 import "./AdminProductCard.scss";
+import AdminButton from "@/pages/admin/button/AdminButton";
 const drinkCategories = [
   "Cà phê",
   "Trà trái cây",
@@ -49,6 +49,7 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
   const isCake = product.category === "Bánh ngọt";
   const isCoffee = product.category === "Cà phê";
 
+  // Định nghĩa option size cho bánh ngọt
   const cakeSizes = [
     { label: "1 miếng", value: "piece", price: product.sizes[0]?.price },
     {
@@ -111,6 +112,7 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
               </div>
             </div>
 
+            {/* Mood Selection chỉ cho Cà phê */}
             {isCoffee && (
               <div className="selection-section">
                 <span className="selection-label">Nhiệt độ:</span>
@@ -137,6 +139,7 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
               </div>
             )}
 
+            {/* Footer: giá + nút chọn + số lượng trong cart */}
             <div className="product-footer">
               <div className="price-section">
                 <span className="price-value">

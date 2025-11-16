@@ -1,9 +1,24 @@
-import SearchInput from "@/components/Search/SearchInput";
 import { MainApiRequest } from "@/services/MainApiRequest";
-import { Form, message, Table } from "antd";
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  message,
+  Modal,
+  Popconfirm,
+  Select,
+  Space,
+  Table,
+} from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import "../../admin/adminPage.scss";
+import AdminButton from "@/pages/admin/button/AdminButton";
+import FloatingLabelInput from "@/components/FloatingInput/FloatingLabelInput";
+import AdminPopConfirm from "@/pages/admin/button/AdminPopConfirm";
+import { Search } from "lucide-react";
+import SearchInput from "@/components/Search/SearchInput";
 
 const StaffList = () => {
   const [form] = Form.useForm();
@@ -40,8 +55,8 @@ const StaffList = () => {
       data.birth = data.birth ? data.birth.format("YYYY-MM-DD") : null;
       data.startDate = moment().format("YYYY-MM-DD");
       data.typeStaff = data.typeStaff || "Nhân viên phục vụ";
-      data.workHours = data.workHours || 8;
-      //data.salary = data.minsalary * data.workHours;
+      data.workHours = data.workHours || 8; // Mặc định là 8 giờ nếu không nhập
+      //data.salary = data.minsalary * data.workHours; // Tính lương dựa trên giờ làm và lương cơ bản
       data.activestatus = true;
       data.roleid = 2;
       data.password = editingStaff ? editingStaff.password : "default123";
@@ -92,6 +107,7 @@ const StaffList = () => {
     try {
       await MainApiRequest.delete(`/staff/${id}`);
       fetchStaffList();
+      //message.success('Xóa nhân viên thành công!');
     } catch (error) {
       console.error("Error deleting staff:", error);
       message.error("Failed to delete staff. Please try again.");
@@ -145,7 +161,7 @@ const StaffList = () => {
           { title: "Loại nhân viên", dataIndex: "typeStaff", key: "typeStaff" },
           { title: "Số điện thoại", dataIndex: "phone", key: "phone" },
           { title: "Địa chỉ", dataIndex: "address", key: "address" },
-
+          // { title: 'Lương cơ bản', dataIndex: 'minsalary', key: 'minsalary' },
           {
             title: "Giờ làm việc",
             dataIndex: "workHours",
@@ -156,7 +172,10 @@ const StaffList = () => {
             title: "Lương",
             dataIndex: "salary",
             key: "salary",
-
+            // const formatCurrency = (value: number) =>
+            //     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+            //     .format(value)
+            //     .replace('₫', 'đ'); // Thay đổi ký hiệu để phù hợp với VNĐ
             render: (salary: number) =>
               new Intl.NumberFormat("vi-VN", {
                 style: "currency",
@@ -170,6 +189,33 @@ const StaffList = () => {
             render: (startDate: string) =>
               startDate ? moment(startDate).format("DD-MM-YYYY HH:mm:ss") : "-",
           },
+          //{ title: 'Status', dataIndex: 'activestatus', key: 'activestatus' },
+          // {
+          //     title: 'Hành động',
+          //     key: 'actions',
+          //     render: (_, record) => (
+          //         <Space size="middle">
+          //             <AdminButton
+          //                 variant='secondary'
+          //                 size='sm'
+          //                 onClick={() => onEditStaff(record)}
+          //                 icon={<i className="fas fa-edit"></i>}>
+          //             </AdminButton>
+          //             <AdminPopConfirm
+          //                 title="Bạn có chắc chắn muốn xóa nhân viên này không?"
+          //                 onConfirm={() => onDeleteStaff(record.id)}
+          //                 okText="Có"
+          //                 cancelText="Không"
+          //             >
+          //                 <AdminButton
+          //                     variant='destructive'
+          //                     size='sm'
+          //                     icon={<i className="fas fa-trash"></i>}>
+          //                 </AdminButton>
+          //             </AdminPopConfirm>
+          //         </Space>
+          //     ),
+          // },
         ]}
       />
     </div>

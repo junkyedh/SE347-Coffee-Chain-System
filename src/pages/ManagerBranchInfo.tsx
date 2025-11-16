@@ -1,18 +1,18 @@
-import { useSystemContext } from "@/hooks/useSystemContext";
-import { AdminApiRequest } from "@/services/AdminApiRequest";
+import React, { useEffect, useState } from "react";
 import {
-  Button,
   Card,
   Descriptions,
+  Spin,
+  message,
+  Button,
+  Modal,
   Form,
   Input,
-  Modal,
-  Spin,
   Tag,
-  message,
 } from "antd";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
+import { useSystemContext } from "@/hooks/useSystemContext";
 import "../admin/adminPage.scss";
 
 const ManagerBranchInfo = () => {

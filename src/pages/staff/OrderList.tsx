@@ -1,13 +1,22 @@
-import SearchInput from "@/components/Search/SearchInput";
-import StatusDropdown from "@/components/littleComponent/StatusDropdown/StatusDropdown";
-import AdminButton from "@/pages/admin/button/AdminButton";
 import { AdminApiRequest } from "@/services/AdminApiRequest";
+import {
+  Button,
+  Form,
+  message,
+  Table,
+  Tag,
+  Popconfirm,
+  Input,
+  Select,
+} from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
-import { Form, Input, message, Table, Tag } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../../admin/adminPage.scss";
+import SearchInput from "@/components/Search/SearchInput";
+import StatusDropdown from "@/components/littleComponent/StatusDropdown/StatusDropdown";
+import AdminButton from "@/pages/admin/button/AdminButton";
 
 export const OrderList = () => {
   const [managerOrderList, setManagerOrderList] = useState<any[]>([]);
@@ -17,7 +26,7 @@ export const OrderList = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [staffInput, setStaffInput] = useState<{ [orderId: number]: string }>(
     {}
-  );
+  ); // lưu staff tạm
 
   const fetchManagerOrderList = async () => {
     const res = await AdminApiRequest.get("/branch-order/list");
@@ -73,6 +82,7 @@ export const OrderList = () => {
     message.success("Xuất danh sách đơn hàng thành công.");
   };
 
+  // Hàm cập nhật trạng thái và lưu staffName
   const handleChangeStatus = async (id: number, newStatus: string) => {
     const staffName =
       staffInput[id] ||
@@ -95,6 +105,7 @@ export const OrderList = () => {
     }
   };
 
+  // Hàm hủy (truyền cả staffName nếu cần)
   const handleCancelOrder = async (id: number) => {
     const staffName =
       staffInput[id] ||
@@ -117,6 +128,7 @@ export const OrderList = () => {
     }
   };
 
+  // Cấu hình trạng thái
   const statusOptions = [
     { value: "PENDING", label: "Chờ xác nhận" },
     { value: "CONFIRMED", label: "Đã xác nhận" },
@@ -127,6 +139,7 @@ export const OrderList = () => {
     { value: "CANCELLED", label: "Đã hủy" },
   ];
 
+  // Map trạng thái sang label và màu sắc
   const statusMap: Record<string, { label: string; color: string }> = {
     PENDING: { label: "Chờ xác nhận", color: "orange" },
     CONFIRMED: { label: "Đã xác nhận", color: "blue" },

@@ -1,13 +1,25 @@
-import FloatingLabelInput from "@/components/FloatingInput/FloatingLabelInput";
-import SearchInput from "@/components/Search/SearchInput";
-import AdminButton from "@/pages/admin/button/AdminButton";
-import { AdminApiRequest } from "@/services/AdminApiRequest";
-import { DownloadOutlined } from "@ant-design/icons";
-import { Form, message, Modal, Space, Table } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Form,
+  Input,
+  DatePicker,
+  Modal,
+  Table,
+  Space,
+  Popconfirm,
+  message,
+  Select,
+} from "antd";
 import moment from "moment";
-import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../admin/adminPage.scss";
+import { DownloadOutlined } from "@ant-design/icons";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
+import SearchInput from "@/components/Search/SearchInput";
+import FloatingLabelInput from "@/components/FloatingInput/FloatingLabelInput";
+import AdminButton from "@/pages/admin/button/AdminButton";
+import AdminPopConfirm from "@/pages/admin/button/AdminPopConfirm";
 
 const ManagerMaterialList = () => {
   const [form] = Form.useForm();
@@ -120,7 +132,7 @@ const ManagerMaterialList = () => {
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();
     if (!keyword) {
-      fetchMaterialList();
+      fetchMaterialList(); // Lấy lại danh sách đầy đủ nếu không có từ khóa tìm kiếm
       return;
     }
 
@@ -137,7 +149,7 @@ const ManagerMaterialList = () => {
   };
   useEffect(() => {
     if (!searchKeyword.trim()) {
-      fetchMaterialList();
+      fetchMaterialList(); // Lấy lại danh sách đầy đủ nếu không có từ khóa tìm kiếm
     }
   }, [searchKeyword]);
 
@@ -145,7 +157,7 @@ const ManagerMaterialList = () => {
     <div className="container-fluid">
       <div className="sticky-header-wrapper">
         <h2 className="header-custom">QUẢN LÝ NGUYÊN LIỆU</h2>
-
+        {/* Tìm kiếm và Import + Export */}
         <div className="header-actions">
           <div className="search-form">
             <SearchInput
@@ -175,6 +187,7 @@ const ManagerMaterialList = () => {
         footer={null}
       >
         <Form form={form} layout="vertical">
+          {/* Chỉ hiển thị tên nguyên liệu và loại bảo quản, không chỉnh sửa */}
           <FloatingLabelInput
             name="name"
             label="Tên nguyên liệu"
@@ -194,6 +207,7 @@ const ManagerMaterialList = () => {
             disabled={!!editingMaterial}
           />
 
+          {/* Chỉ cho phép chỉnh sửa số lượng và ngày */}
           <div className="grid-2">
             <FloatingLabelInput
               name="quantityImported"
@@ -241,8 +255,9 @@ const ManagerMaterialList = () => {
         rowKey="id"
         dataSource={materialList}
         pagination={{
-          pageSize: 9,
-          showSizeChanger: true,
+          pageSize: 9, // Số lượng item trên mỗi trang
+          showSizeChanger: true, // Hiển thị tùy chọn thay đổi số item trên mỗi trang
+          // Các tùy chọn cho số item mỗi trang
         }}
         columns={[
           {
