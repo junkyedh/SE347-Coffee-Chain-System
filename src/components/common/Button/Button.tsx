@@ -1,58 +1,58 @@
-import { forwardRef } from "react"
-import "./Button.scss"
-import { cn } from "@/app/modules/utils"
+import { forwardRef } from 'react';
+import './Button.scss';
+import { cn } from '@/modules/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "accent" | "ghost" | "link" | "destructive" | "outline"
-  size?: "sm" | "md" | "lg"
-  loading?: boolean
-  icon?: React.ReactNode
-  iconPosition?: "left" | "right"
-  fullWidth?: boolean
+  variant?: 'primary' | 'secondary' | 'accent' | 'ghost' | 'link' | 'destructive' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
+  fullWidth?: boolean;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,
-      variant = "primary",
-      size = "md",
+      variant = 'primary',
+      size = 'md',
       loading = false,
       icon,
-      iconPosition = "left",
+      iconPosition = 'left',
       fullWidth = false,
       children,
       disabled,
       ...props
     },
-    ref,
+    ref
   ) => {
     return (
       <button
         className={cn(
-          "btn",
+          'btn',
           `btn-${variant}`,
           `btn-${size}`,
           {
-            "btn-loading": loading,
-            "btn-full-width": fullWidth,
-            "btn-icon-only": !children && icon,
+            'btn-loading': loading,
+            'btn-full-width': fullWidth,
+            'btn-icon-only': !children && icon,
           },
-          className,
+          className
         )}
         disabled={disabled || loading}
         ref={ref}
         {...props}
       >
         {loading && <div className="btn-spinner" />}
-        {!loading && icon && iconPosition === "left" && <span className="btn-icon">{icon}</span>}
+        {!loading && icon && iconPosition === 'left' && <span className="btn-icon">{icon}</span>}
         {children && <span className="btn-text">{children}</span>}
-        {!loading && icon && iconPosition === "right" && <span className="btn-icon">{icon}</span>}
+        {!loading && icon && iconPosition === 'right' && <span className="btn-icon">{icon}</span>}
       </button>
-    )
-  },
-)
+    );
+  }
+);
 
-Button.displayName = "Button"
+Button.displayName = 'Button';
 
-export { Button }
+export { Button };
