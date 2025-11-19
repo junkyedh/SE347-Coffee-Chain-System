@@ -1,5 +1,6 @@
 import { Button } from '@/components/common/Button/Button';
 import './AdminButton.scss';
+import { cn } from '@/modules/utils';
 
 export interface AdminButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'accent' | 'ghost' | 'destructive';

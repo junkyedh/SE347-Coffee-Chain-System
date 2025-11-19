@@ -1,0 +1,318 @@
+@import '../../../styles/variables';
+
+.container-fluid {
+  background: linear-gradient(135deg, 
+    get-color($background, "default"), 
+    rgba(get-color($primary2, "50"), 0.3)
+  );
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
+  z-index: 1;
+
+  .sticky-header-wrapper {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95), 
+      rgba(get-color($primary2, "50"), 0.8)
+    );
+    backdrop-filter: blur(20px);
+    position: sticky;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(get-color($primary2, "200"), 0.2);
+    box-shadow: 0 2px 8px rgba(get-color($primary, "default"), 0.1);
+    border-radius: 0rem 0rem 2rem 2rem;  
+    padding: 2rem 2rem;
+  }
+
+  .header-custom {
+    color: get-color($primary, "800");
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05rem;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(get-color($primary, "default"), 0.1);
+    
+
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .search-form {
+    min-width: 250px;
+    
+    @media (max-width: 768px) {
+      min-width: 200px;
+    }
+  }
+    .h3, .h4 {
+    color: get-color($primary, "900");
+    font-weight: bold;
+    margin-top: 5px;
+  }
+
+  .content-area {
+    backdrop-filter: blur(20px);
+    position: sticky;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 1.5rem;
+    box-shadow: 
+      0 8px 32px rgba(get-color($primary, "default"), 0.08),
+      0 2px 8px rgba(get-color($primary2, "default"), 0.04);
+    border: 1px solid rgba(get-color($primary2, "200"), 0.2);
+    position: relative;
+
+  }
+
+  
+  
+  // Grid layouts
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+  
+  // Enhanced Table Styles
+  .custom-table {
+    .ant-table {
+      z-index: 1;
+      background: transparent;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(get-color($primary, "default"), 0.06);
+      
+      .ant-table-thead > tr > th {
+        background: linear-gradient(135deg, 
+          get-color($primary, "700"), 
+          get-color($primary, "800")
+        ) !important;
+        color: white !important;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: none;
+        text-align: center;
+        position: relative;
+        
+      }
+      
+      .ant-table-tbody {
+        .ant-table-row {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          border: none;
+          
+          &:nth-child(odd) {
+            background: get-color($primary2,"50") !important;
+          }
+          
+          &:nth-child(even) {
+            background: get-color($primary2, "200")!important;
+          }
+          
+          
+          td {
+            padding: 1rem;
+            text-align: center;
+            border: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+          }
+        }
+      }
+      
+      .ant-table-pagination {
+        margin: 1.5rem 0 0;
+        
+        .ant-pagination-item {
+          border-radius: 8px;
+          border: 1px solid get-color($primary2, "200");
+          
+          &:hover {
+            border-color: get-color($primary, "400");
+          }
+          
+          &.ant-pagination-item-active {
+            background: get-color($primary, "600");
+            border-color: get-color($primary, "600");
+            
+            a {
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .sticky-header-wrapper {
+      padding: 1rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+    
+    .header-custom {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    
+    .header-actions {
+      justify-content: center;
+    }
+    
+    .content-area {
+      margin: 0 1rem 1rem;
+      padding: 1.5rem;
+    }
+  }
+}
+
+
+.custom-modal {
+  .ant-modal-content {
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+  }
+
+  .ant-modal-header {
+    border-radius: 16px 16px 0 0;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #eaeaea;
+    padding: 16px 24px;
+  }
+
+  .ant-modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2f4156;
+  }
+
+  .ant-form-item {
+    margin-bottom: 16px;
+
+    label {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .input,
+    .textarea,
+    .ant-input,
+    .ant-select-selector,
+    .ant-picker {
+      border-radius: 8px !important;
+      padding: 8px 12px;
+      transition: border-color 0.3s;
+
+        &:focus,
+        &:hover {
+          border-color: #2f4156 !important;
+          box-shadow: 0 0 5px rgba(47, 65, 86, 0.2);
+          
+        }
+      }
+    }
+
+  .ant-form-item-label {
+    padding: 0 !important;
+  }
+
+  .ant-modal-footer {
+    button {
+      width: 120px;
+      height: 40px;
+      font-size: 14px;
+    }
+  }
+  .modal-footer-custom {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid rgba(get-color($primary2, "200"), 0.3);
+  }
+}
+
+
+.custom-table .ant-table-tbody > tr:hover > td,
+.custom-table .ant-table-row:hover > td {
+  background: get-color($primary2, "600")!important;
+  color: get-color($primary, "foreground") !important;
+    box-shadow: 0 2px 8px rgba(get-color($primary, "default"), 0.1);
+    transform: translateY(-2px);
+    font-weight: 500;
+}
+
+  // Cho phép dropdown hiển thị tràn ra khỏi table
+.custom-table .ant-table,
+.custom-table .ant-table-content,
+.custom-table .ant-table-body {
+  overflow: visible !important;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: get-color($primary,"100");
+  border: 1px solid #e0e7ef;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-bottom: 8px;
+
+
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+  .ant-checkbox-wrapper {
+    font-weight: 500;
+    color: get-color($secondary, "800");
+    transition: color 0.2s;
+    &:hover {
+      color: get-color($secondary, "700");
+    }
+    .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: get-color($secondary, "600");
+      border-color: get-color($secondary, "500");
+
+    }
+  }
+}
