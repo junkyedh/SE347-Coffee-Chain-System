@@ -6,19 +6,12 @@ import {
   LinearScale,
   Title,
   Tooltip,
-} from "chart.js";
-import moment from "moment";
-import { useEffect, useState } from "react";
-import { Bar } from "react-chartjs-2";
+} from 'chart.js';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import { Bar } from 'react-chartjs-2';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const OrdersChart30 = ({ data }: { data: any }) => {
   const [chartData, setChartData] = useState<any>(null);
@@ -26,19 +19,17 @@ const OrdersChart30 = ({ data }: { data: any }) => {
 
   useEffect(() => {
     if (sampleData.length > 0) {
-      const labels = sampleData.map((item: any) =>
-        moment(item.date).format("DD/MM/YYYY")
-      );
+      const labels = sampleData.map((item: any) => moment(item.date).format('DD/MM/YYYY'));
       const values = sampleData.map((item: any) => item.amount);
 
       setChartData({
         labels: labels,
         datasets: [
           {
-            label: "Số lượng",
+            label: 'Số lượng',
             data: values,
-            backgroundColor: "rgba(184, 113, 249, 0.6)",
-            borderColor: "rgba(203, 154, 249, 0.6)",
+            backgroundColor: 'rgba(184, 113, 249, 0.6)',
+            borderColor: 'rgba(203, 154, 249, 0.6)',
             borderWidth: 1,
           },
         ],
@@ -55,24 +46,24 @@ const OrdersChart30 = ({ data }: { data: any }) => {
             responsive: true,
             plugins: {
               legend: {
-                position: "top",
+                position: 'top',
               },
               title: {
                 display: true,
-                text: "Số lượng đơn trong 30 ngày qua",
+                text: 'Số lượng đơn trong 30 ngày qua',
               },
             },
             scales: {
               x: {
                 title: {
                   display: true,
-                  text: "Ngày",
+                  text: 'Ngày',
                 },
               },
               y: {
                 title: {
                   display: true,
-                  text: "Số lượng sản phẩm được đặt",
+                  text: 'Số lượng sản phẩm được đặt',
                 },
                 beginAtZero: true,
               },

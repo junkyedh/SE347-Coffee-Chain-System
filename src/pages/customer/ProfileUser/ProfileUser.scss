@@ -20,7 +20,7 @@
     .loading-spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid #E4E7EB;
+      border: 3px solid #e4e7eb;
       border-top: 3px solid var(--primaryClr);
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -55,7 +55,7 @@
     background: var(--white);
     border-radius: 1.4rem;
     padding: 2rem;
-    box-shadow: 0 4px 18px rgba(47, 65, 86, 0.10);
+    box-shadow: 0 4px 18px rgba(47, 65, 86, 0.1);
     text-align: center;
 
     .avatar-section {
@@ -134,7 +134,7 @@
     background: var(--white);
     border-radius: 1.4rem;
     padding: 2rem;
-    box-shadow: 0 4px 18px rgba(47, 65, 86, 0.10);
+    box-shadow: 0 4px 18px rgba(47, 65, 86, 0.1);
 
     h3 {
       font-size: var(--subTitle);
@@ -188,7 +188,7 @@
     .profile-form-card {
       background: var(--white);
       border-radius: 1.4rem;
-      box-shadow: 0 4px 18px rgba(47, 65, 86, 0.10);
+      box-shadow: 0 4px 18px rgba(47, 65, 86, 0.1);
       overflow: hidden;
 
       .card-header {
@@ -283,7 +283,7 @@
             .form-input {
               width: 100%;
               padding: 0.75rem 1rem;
-              border: 2px solid #E4E7EB;
+              border: 2px solid #e4e7eb;
               border-radius: 0.75rem;
               font-size: var(--bodyText);
               color: var(--primaryText);
@@ -297,7 +297,7 @@
               }
 
               &:disabled {
-                background: #F8FAFC;
+                background: #f8fafc;
                 color: var(--subTextClr);
                 cursor: not-allowed;
               }
@@ -322,8 +322,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 992px) {

@@ -32,17 +32,17 @@
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    background: get-color($primary, "50");
-    color: get-color($primary, "700");
+    background: get-color($primary, '50');
+    color: get-color($primary, '700');
   }
 
   &.pagination-current {
-    background: get-color($primary, "500");
+    background: get-color($primary, '500');
     color: $white;
-    box-shadow: 0 2px 8px rgba(get-color($primary, "500"), 0.3);
+    box-shadow: 0 2px 8px rgba(get-color($primary, '500'), 0.3);
 
     &:hover {
-      background: get-color($primary, "600");
+      background: get-color($primary, '600');
       color: $white;
     }
   }
@@ -53,11 +53,10 @@
 
     &:hover {
       background: transparent;
-      color: get-color($neutral, "400");
+      color: get-color($neutral, '400');
     }
   }
 
-  // Icon-only buttons
   &.pagination-prev,
   &.pagination-next {
     svg {
@@ -73,7 +72,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  color: get-color($neutral, "400");
+  color: get-color($neutral, '400');
 
   svg {
     width: 16px;
@@ -83,7 +82,7 @@
 
 .pagination-info {
   font-size: get-font-size($body-font-size, sm);
-  color: get-color($neutral, "600");
+  color: get-color($neutral, '600');
   font-weight: get-font-weight($font-weight, medium);
   text-align: center;
 

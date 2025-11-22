@@ -14,11 +14,10 @@ import OrderRevenue30 from '@/components/Statistic/OrderRevenue30';
 
 const ManagerStatistic: React.FC = () => {
   const [chartData, setChartData] = useState<any>({});
-  const { branchId } = useSystemContext(); // bạn cần truyền branchId qua context
+  const { branchId } = useSystemContext();
 
   const fetchData = async () => {
     try {
-      //const branchId = userInfo?.branchId;
       if (!branchId) return;
 
       const res = await MainApiRequest.get(`/report/branch/${branchId}`);
@@ -30,7 +29,10 @@ const ManagerStatistic: React.FC = () => {
       const totalTable = document.getElementById('totalTable');
 
       if (res.data.totalPayment && totalPayment) {
-        totalPayment.innerText = res.data.totalPayment.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        totalPayment.innerText = res.data.totalPayment.toLocaleString('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        });
       }
       if (res.data.totalProduct && totalProduct) {
         totalProduct.innerText = res.data.totalProduct;
@@ -53,7 +55,7 @@ const ManagerStatistic: React.FC = () => {
   return (
     <div className="container-fluid">
       <div className="sticky-header-wrapper">
-        <h2 className='h2 header-custom'>THỐNG KÊ CHI NHÁNH</h2>
+        <h2 className="h2 header-custom">THỐNG KÊ CHI NHÁNH</h2>
       </div>
       <div className="container-fluid1">
         <div className="stat-cards">

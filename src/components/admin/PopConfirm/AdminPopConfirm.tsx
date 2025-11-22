@@ -31,13 +31,12 @@ const AdminPopConfirm: React.FC<AdminPopConfirmProps> = ({
       const margin = 6;
       setPosition({
         top: rect.bottom + window.scrollY + margin,
-        left: rect.right + window.scrollX - 280, // điều chỉnh nếu thay đổi width
+        left: rect.right + window.scrollX - 280,
         width: rect.width,
       });
     }
   }, [open]);
 
-  // Click ngoài popup để đóng
   React.useEffect(() => {
     if (!open) return;
     const handleClick = (e: MouseEvent) => {
@@ -54,7 +53,6 @@ const AdminPopConfirm: React.FC<AdminPopConfirmProps> = ({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  // Dropdown chính, dùng Portal
   const Dropdown = open
     ? ReactDOM.createPortal(
       <div
@@ -67,7 +65,7 @@ const AdminPopConfirm: React.FC<AdminPopConfirmProps> = ({
           minWidth: 280,
           zIndex: 10001,
         }}
-        onClick={e => e.stopPropagation()} // Quan trọng: chặn nổi bọt lên document!
+        onClick={e => e.stopPropagation()}
       >
         <div className="admin-popconfirm-title">{title}</div>
         <div className="admin-popconfirm-actions">
@@ -85,7 +83,7 @@ const AdminPopConfirm: React.FC<AdminPopConfirmProps> = ({
             variant="destructive"
             size="sm"
             onClick={e => {
-              e.stopPropagation(); // CHẶN nổi bọt!
+              e.stopPropagation();
               onConfirm();
               setOpen(false);
             }}

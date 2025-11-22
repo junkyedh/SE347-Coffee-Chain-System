@@ -1,22 +1,20 @@
-@import "../../styles/variables";
+@import '../../styles/variables';
 
-// Sidebar chung
 .sidebar {
-  min-width: 270px; // tăng chiều rộng sidebar
+  min-width: 270px;
   max-width: 330px;
   width: 100%;
-  background: linear-gradient(135deg, get-color($primary, "800"), get-color($primary, "900"));
+  background: linear-gradient(135deg, get-color($primary, '800'), get-color($primary, '900'));
   color: white;
   height: 100vh;
   position: relative;
-  box-shadow: 0 4px 32px rgba(get-color($primary, "900"), 0.07);
+  box-shadow: 0 4px 32px rgba(get-color($primary, '900'), 0.07);
   display: flex;
   flex-direction: column;
   z-index: 2;
-  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
-  border-right: 1px solid rgba(get-color($primary, "900"), 0.2);
-  padding: 1rem 1rem; // Thêm padding tổng thể
-  // Responsive
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  border-right: 1px solid rgba(get-color($primary, '900'), 0.2);
+  padding: 1rem 1rem;
   @media (max-width: 900px) {
     min-width: 60px;
     max-width: 70px;
@@ -27,7 +25,9 @@
       }
     }
     .side-pills {
-      .title { display: none; }
+      .title {
+        display: none;
+      }
     }
   }
   @media (max-width: 600px) {
@@ -48,7 +48,7 @@
   .side-pills {
     list-style: none;
     margin: 0;
-    padding: 0; // BỎ padding menu tổng
+    padding: 0;
 
     .logo {
       display: flex;
@@ -64,16 +64,18 @@
 
     .side-item {
       width: 100%;
-      &.dropdown > .side-link { justify-content: space-between; }
-      padding: 0.5rem 0; // Giảm padding item
-      margin: 0.1rem 0; // Giảm margin item
+      &.dropdown > .side-link {
+        justify-content: space-between;
+      }
+      padding: 0.5rem 0;
+      margin: 0.1rem 0;
     }
 
     .side-link {
       display: flex;
       align-items: center;
-      padding: 0.74rem 1rem 0.74rem 1.5rem; // padding trái lớn, phải nhỏ lại
-      color: get-color($neutral, "50");
+      padding: 0.74rem 1rem 0.74rem 1.5rem;
+      color: get-color($neutral, '50');
       font-size: 1.05rem;
       text-decoration: none;
       font-weight: 500;
@@ -95,40 +97,55 @@
         letter-spacing: 0.01em;
         transition: color 0.11s;
       }
-      .arrow { margin-left: 0.48rem; }
+      .arrow {
+        margin-left: 0.48rem;
+      }
 
-      &:hover, &:focus-visible {
-        background: linear-gradient(90deg, get-color($primary, "700") 60%, get-color($accent1, "100") 100%);
-        color: get-color($accent1, "500");
-        border-left: 4px solid get-color($accent1, "400");
-        .title { color: get-color($accent1, "500"); }
+      &:hover,
+      &:focus-visible {
+        background: linear-gradient(
+          90deg,
+          get-color($primary, '700') 60%,
+          get-color($accent1, '100') 100%
+        );
+        color: get-color($accent1, '500');
+        border-left: 4px solid get-color($accent1, '400');
+        .title {
+          color: get-color($accent1, '500');
+        }
       }
       &.side-link-active {
-        background: get-color($primary, "700");
-        color: get-color($accent1, "500");
-        border-left: 4px solid get-color($accent1, "500");
+        background: get-color($primary, '700');
+        color: get-color($accent1, '500');
+        border-left: 4px solid get-color($accent1, '500');
         font-weight: 600;
-        .title { color: get-color($accent1, "500"); }
+        .title {
+          color: get-color($accent1, '500');
+        }
       }
     }
 
     // Sub menu - children
     .side-children {
-      background: get-color($primary, "900");
-      margin: 0 0 0 8px; // Lùi nhẹ vào
-      padding: 0.35rem 0.5rem 0.35rem 1.3rem; // ÍT padding
-      border-left: 2px solid get-color($accent1, "300");
+      background: get-color($primary, '900');
+      margin: 0 0 0 8px;
+      padding: 0.35rem 0.5rem 0.35rem 1.3rem;
+      border-left: 2px solid get-color($accent1, '300');
       border-radius: 0 0 8px 8px;
       .side-item {
         .side-link {
           font-size: 0.97rem;
-          padding: 0.5rem 1.3rem 0.5rem 1.5rem; // rất gọn
+          padding: 0.5rem 1.3rem 0.5rem 1.5rem;
           border-left: 3px solid transparent;
-          .icon { margin-right: 0.6rem; font-size: 1rem; }
-          &:hover, &.side-link-active {
-            color: get-color($accent1, "400");
-            background: get-color($primary, "800");
-            border-left: 3px solid get-color($accent1, "400");
+          .icon {
+            margin-right: 0.6rem;
+            font-size: 1rem;
+          }
+          &:hover,
+          &.side-link-active {
+            color: get-color($accent1, '400');
+            background: get-color($primary, '800');
+            border-left: 3px solid get-color($accent1, '400');
           }
         }
       }
@@ -137,17 +154,17 @@
 
   // Logout
   .logout-box {
-    bottom:0;
+    bottom: 0;
     margin: 1.5rem 1.2rem 1.3rem 1.2rem;
     width: calc(100% - 2.4rem);
-    background: linear-gradient(90deg, get-color($accent1, "400"), get-color($accent1, "500"));
+    background: linear-gradient(90deg, get-color($accent1, '400'), get-color($accent1, '500'));
     color: #fff;
     border: none;
     border-radius: 12px;
     font-size: 1.05rem;
     font-weight: 600;
     padding: 0.7rem 1.25rem;
-    box-shadow: 0 3px 12px rgba(get-color($accent1, "400"), 0.13);
+    box-shadow: 0 3px 12px rgba(get-color($accent1, '400'), 0.13);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -158,7 +175,7 @@
       margin-right: 0.7rem;
     }
     &:hover {
-      background: linear-gradient(90deg, get-color($accent1, "600"), get-color($accent1, "500"));
+      background: linear-gradient(90deg, get-color($accent1, '600'), get-color($accent1, '500'));
     }
   }
 }
