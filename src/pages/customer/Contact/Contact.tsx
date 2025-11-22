@@ -1,8 +1,8 @@
 import image from '@/assets/service2.jpg';
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import { useEffect } from 'react';
 import { Card, Col, Container, FloatingLabel, Form, ListGroup, Row } from 'react-bootstrap';
 import './Contact.scss';
-import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 
 const Contact = () => {
   useEffect(() => {

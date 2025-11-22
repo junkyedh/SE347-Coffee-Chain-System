@@ -1,30 +1,47 @@
-import React from "react"
-import { forwardRef } from "react"
-import "./Select.scss"
-import { ChevronDown } from "lucide-react"
-import { cn } from "@/modules/utils"
+import React from 'react';
+import { forwardRef } from 'react';
+import './Select.scss';
+import { ChevronDown } from 'lucide-react';
+import { cn } from '@/modules/utils';
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string
-  error?: string
-  helperText?: string
-  fullWidth?: boolean
-  placeholder?: string
+  label?: string;
+  error?: string;
+  helperText?: string;
+  fullWidth?: boolean;
+  placeholder?: string;
 }
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, helperText, fullWidth = false, required, placeholder, children, ...props }, ref) => {
+  (
+    {
+      className,
+      label,
+      error,
+      helperText,
+      fullWidth = false,
+      required,
+      placeholder,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     return (
-      <div className={cn("select-group", { "select-full-width": fullWidth })}>
-        {label && <label className={cn("select-label", { "select-label-required": required })}>{label}</label>}
+      <div className={cn('select-group', { 'select-full-width': fullWidth })}>
+        {label && (
+          <label className={cn('select-label', { 'select-label-required': required })}>
+            {label}
+          </label>
+        )}
         <div className="select-wrapper">
           <select
             className={cn(
-              "select",
+              'select',
               {
-                "select-error": error,
+                'select-error': error,
               },
-              className,
+              className
             )}
             ref={ref}
             {...props}
@@ -41,10 +58,10 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {error && <div className="select-error-text">{error}</div>}
         {helperText && !error && <div className="select-helper-text">{helperText}</div>}
       </div>
-    )
-  },
-)
+    );
+  }
+);
 
-Select.displayName = "Select"
+Select.displayName = 'Select';
 
-export { Select }
+export { Select };

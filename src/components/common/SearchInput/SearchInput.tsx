@@ -18,23 +18,19 @@ const SearchInput: React.FC<SearchInputProps> = ({
 }) => {
   return (
     <div className="custom-search-input" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <Typography.Text className="search-label" style={{ color: '#2F4156', fontSize: '16px', whiteSpace: 'nowrap', fontWeight: '400' }}>
+      <Typography.Text
+        className="search-label"
+        style={{ color: '#2F4156', fontSize: '16px', whiteSpace: 'nowrap', fontWeight: '400' }}
+      >
         Tìm kiếm
       </Typography.Text>
       <Input
-        style={{ width: 350, height: 35}}
+        style={{ width: 350, height: 35 }}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         onPressEnter={onSearch}
         allowClear={allowClear}
-        // suffix={
-        //   <SearchOutlined
-        //     className="search-icon"
-        //     onClick={onSearch}
-        //     style={{ cursor: 'pointer', color: value ? '#2F4156' : '#557C8D' }}
-        //   />
-        // }
       />
     </div>
   );
