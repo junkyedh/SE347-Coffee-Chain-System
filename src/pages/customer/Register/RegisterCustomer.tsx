@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaPhoneAlt, FaLock, FaUser, FaMapMarkerAlt, FaVenusMars } from 'react-icons/fa';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
-import './AdminLogin.scss';
+import '../../admin/AdminLogin/AdminLogin.scss';
 import { message } from 'antd';
 
 const RegisterCustomer: React.FC = () => {

@@ -7,7 +7,7 @@ import { Form, Input, message, Table, Tag } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
-import '../../admin/adminPage.scss';
+import '../adminPage.scss';
 
 export const OrderList = () => {
   const [managerOrderList, setManagerOrderList] = useState<any[]>([]);

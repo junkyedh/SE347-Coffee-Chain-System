@@ -8,7 +8,7 @@ import { Form, message, Modal, Space, Table } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
-import '../../admin/adminPage.scss';
+import '../adminPage.scss';
 
 const CustomerList = () => {
   const [customerList, setCustomerList] = useState<any[]>([]);
