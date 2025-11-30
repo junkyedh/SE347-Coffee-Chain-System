@@ -1,0 +1,43 @@
+.admin-popconfirm-dropdown {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(47,65,86,0.18), 0 1px 7px rgba(255,111,97,0.11);
+  padding: 1.25em 1.35em 1.25em 1.35em;
+  min-width: 280px;
+  max-width: 320px;
+  position: absolute;
+  font-size: 1rem;
+  border: 1.5px solid #ffd2cc;
+  animation: fadein 0.16s cubic-bezier(0.33,0.92,0.6,1.0);
+
+  .admin-popconfirm-title {
+    font-weight: 700;
+    color: #e45b4c;
+    font-size: 1.1rem;
+    margin-bottom: 1.1em;
+    text-align: left;
+  }
+  .admin-popconfirm-actions {
+    display: flex;
+    gap: 0.8em;
+    justify-content: flex-end;
+  }
+
+  .admin-popconfirm-arrow {
+    display: block;
+    z-index: 1;
+  }
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(18px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+.admin-popconfirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0,0,0,0.04);
+  pointer-events: auto;
+}
