@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Form, Modal, Table, Space, message } from 'antd';
 import moment from 'moment';
 import * as XLSX from 'xlsx';
-import '../admin/adminPage.scss';
+import '../adminPage.scss';
 import { DownloadOutlined } from '@ant-design/icons';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import SearchInput from '@/components/common/SearchInput/SearchInput';

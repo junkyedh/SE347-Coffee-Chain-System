@@ -3,7 +3,7 @@ import { MainApiRequest } from '@/services/MainApiRequest';
 import { Form, message, Table } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import '../../admin/adminPage.scss';
+import '../adminPage.scss';
 
 const StaffList = () => {
   const [form] = Form.useForm();

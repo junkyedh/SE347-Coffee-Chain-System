@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Rate, Image, Select, message } from 'antd';
 import moment from 'moment';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
-import './manager.scss';
+import './adminPage.scss';
 
 const AdminCustomerRating = () => {
   const [ratingsList, setRatingsList] = useState<any[]>([]);
