@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import '../admin/adminPage.scss';
+import '../adminPage.scss';
 import imgDefault from '@/assets/cup10.jpg';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';

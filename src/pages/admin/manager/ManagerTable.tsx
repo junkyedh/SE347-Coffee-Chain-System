@@ -4,7 +4,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
-import '../admin/adminPage.scss';
+import '../adminPage.scss';
 import AdminButton from '@/components/admin/AdminButton/AdminButton';
 import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
 

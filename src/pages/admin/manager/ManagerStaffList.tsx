@@ -3,7 +3,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
-import '../admin/adminPage.scss';
+import '../adminPage.scss';
 import SearchInput from '@/components/common/SearchInput/SearchInput';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';

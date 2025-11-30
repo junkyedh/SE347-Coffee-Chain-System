@@ -1,7 +1,7 @@
 import { Form, Input, message, Modal, Table, Tag } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import '../admin/adminPage.scss';
+import '../adminPage.scss';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
 import AdminButton from '@/components/admin/AdminButton/AdminButton';
