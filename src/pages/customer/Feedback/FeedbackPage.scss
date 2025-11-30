@@ -1,0 +1,210 @@
+@import '../../../styles/variables.scss';
+
+.feedback-page {
+  padding: 2rem;
+  background: var(--bgClr);
+  min-height: 100vh;
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  &__content {
+    .feedback-card {
+      background: var(--white);
+      border-radius: 1.4rem;
+      padding: 2.5rem;
+      box-shadow: 0 4px 18px rgba(47, 65, 86, 0.1);
+
+      .feedback-header {
+        text-align: center;
+        margin-bottom: 2rem;
+
+        .feedback-icon {
+          width: 48px;
+          height: 48px;
+          color: var(--primaryClr);
+          margin-bottom: 1rem;
+        }
+
+        h2 {
+          font-size: var(--heading);
+          color: var(--primaryText);
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
+
+        p {
+          font-size: var(--bodyText);
+          color: var(--subTextClr);
+
+          strong {
+            color: var(--primaryClr);
+            font-weight: 600;
+          }
+        }
+      }
+
+      .feedback-form {
+        .form-group {
+          margin-bottom: 2rem;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .form-label {
+            display: block;
+            font-size: var(--bodyText);
+            color: var(--primaryText);
+            font-weight: 600;
+            margin-bottom: 1rem;
+          }
+
+          .rating-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+
+            .star-btn {
+              background: none;
+              border: none;
+              cursor: pointer;
+              padding: 0.25rem;
+              border-radius: 50%;
+              transition: all 0.3s ease;
+              color: #e4e7eb;
+
+              &:hover {
+                transform: scale(1.1);
+                background: rgba(255, 111, 97, 0.1);
+              }
+
+              &.active {
+                color: #ffd700;
+                transform: scale(1.05);
+              }
+
+              svg {
+                fill: currentColor;
+                stroke: currentColor;
+                stroke-width: 1;
+              }
+            }
+          }
+
+          .rating-text {
+            text-align: center;
+            font-size: var(--bodyText);
+            color: var(--primaryClr);
+            font-weight: 600;
+            min-height: 1.5rem;
+          }
+
+          .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e4e7eb;
+            border-radius: 0.75rem;
+            font-size: var(--bodyText);
+            color: var(--primaryText);
+            background: var(--white);
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+
+            &:focus {
+              outline: none;
+              border-color: var(--primaryClr);
+              box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.1);
+            }
+
+            &::placeholder {
+              color: var(--subTextClr);
+            }
+          }
+        }
+
+        .submit-btn {
+          width: 100%;
+          padding: 1rem 2rem;
+          font-size: 1.1rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .feedback-page {
+    padding: 1.5rem;
+
+    &__content {
+      .feedback-card {
+        padding: 2rem;
+
+        .feedback-header {
+          .feedback-icon {
+            width: 40px;
+            height: 40px;
+          }
+
+          h2 {
+            font-size: var(--subTitle);
+          }
+        }
+
+        .feedback-form {
+          .form-group {
+            .rating-container {
+              .star-btn {
+                svg {
+                  width: 28px;
+                  height: 28px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .feedback-page {
+    padding: 1rem;
+
+    &__content {
+      .feedback-card {
+        padding: 1.5rem;
+
+        .feedback-form {
+          .form-group {
+            .rating-container {
+              .star-btn {
+                svg {
+                  width: 24px;
+                  height: 24px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

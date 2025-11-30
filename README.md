@@ -47,8 +47,6 @@ Cafe W Fen is a centralized management platform designed for coffee shop chains.
   ```
 2. **Install dependencies:**
   ```bash
-  npm install
-  # or
   yarn install
   ```
 3. **Configure environment variables:**  
@@ -57,14 +55,12 @@ Cafe W Fen is a centralized management platform designed for coffee shop chains.
 ## How to Run
 - **Development mode:**
   ```bash
-  npm run dev
-  # or
   yarn dev
   ```
 - **Production build:**
   ```bash
-  npm run build
-  npm start
+  yarn run build
+  yarn start
   ```
 - **Docker (optional):**
   ```bash
