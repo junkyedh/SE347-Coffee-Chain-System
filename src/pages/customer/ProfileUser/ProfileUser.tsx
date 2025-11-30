@@ -4,6 +4,7 @@ import { MainApiRequest } from '@/services/MainApiRequest';
 import { Award, Calendar, Camera, Edit3, Phone, Save, User, X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import { useSystemContext } from '@/hooks/useSystemContext';
 import { useNavigate } from 'react-router-dom';
 import './ProfileUser.scss';
 
@@ -29,16 +30,20 @@ const ProfileUser: React.FC = () => {
     gender: 'Nam' as 'Nam' | 'Nữ' | 'Khác',
   });
   const navigate = useNavigate();
+  const { token } = useSystemContext();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await MainApiRequest.get<{ data: { phone: string } }>('/auth/callback');
+        const res = await MainApiRequest.get<{ data: { phone: string } }>('/auth/callback', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const phone = res.data.data.phone;
         if (!phone) throw new Error('No phone in callback');
 
         const customerRes = await MainApiRequest.get<Customer>(
-          `/customer/${encodeURIComponent(phone)}`
+          `/customer/${encodeURIComponent(phone)}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         setCustomer(customerRes.data);
         setFormData({
@@ -59,9 +64,13 @@ const ProfileUser: React.FC = () => {
     if (!customer) return;
     setLoading(true);
     try {
-      await MainApiRequest.put(`/customer/${customer.id}`, formData);
+      await MainApiRequest.put(`/customer/${customer.id}`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      const updated = await MainApiRequest.get<Customer>(`/customer/${customer.phone}`);
+      const updated = await MainApiRequest.get<Customer>(`/customer/${customer.phone}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setCustomer(updated.data);
       setFormData({
         name: updated.data.name,

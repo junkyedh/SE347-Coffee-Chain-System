@@ -234,7 +234,7 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('isBrand');
-    window.location.href = '/login';
+    window.location.href = '/admin/login';
   };
 
   const renderNavigationList = () => {

@@ -20,11 +20,18 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await MainApiRequest.post('/auth/signin', { phone, password });
-      if (res.status === 200) {
+      const res = await MainApiRequest.post('/auth/signin', { phone, password, userType: 'customer' });
+      if (res.status === 200 || res.status === 201) {
         const data = res.data;
-        setAuth(data.token, 'ROLE_CUSTOMER');
-        navigate('/');
+        const token = data.token;
+        // prefer role from response if provided, otherwise fallback to 'CUSTOMER'
+        const role = data.user?.role || 'CUSTOMER';
+        if (token) {
+          setAuth(token, role);
+          navigate('/');
+        } else {
+          message.error('Đăng nhập thất bại: không nhận được token.');
+        }
       }
     } catch (error) {
       message.error('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin đăng nhập.');
@@ -100,6 +107,16 @@ const Login: React.FC = () => {
           <button type="button" className="btn btn-primary w-100" onClick={handleLogin}>
             Đăng nhập
           </button>
+          <div className="text-center mt-3">
+            <span className="text-muted">Chưa có tài khoản? </span>
+            <span
+              className="text-primary"
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate('/register')}
+            >
+              Đăng ký
+            </span>
+          </div>
         </form>
       </motion.div>
     </div>

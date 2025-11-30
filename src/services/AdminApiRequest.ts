@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create an instance of Axios
 export const AdminApiRequest = axios.create({
-  baseURL: 'https://doan2cafe-production.up.railway.app/', // Replace with your desired base URL
+  baseURL: 'http://localhost:3000', // Replace with your desired base URL
   timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
@@ -32,13 +32,6 @@ AdminApiRequest.interceptors.response.use(
   },
   (error) => {
     // Handle response error here
-    if (error.response.status === 401) {
-      window.location.href = '/login';
-    }
-
-    if (error.response.status === 403) {
-      window.location.href = '/login';
-    }
 
     if (error.response.status === 404) {
       message.error('404 Not Found');
