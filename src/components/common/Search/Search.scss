@@ -1,0 +1,125 @@
+@import '../../../styles/variables.scss';
+
+.search-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  &.search-full-width {
+    width: 100%;
+
+    .search-input-wrapper {
+      flex: 1;
+    }
+  }
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 200px;
+
+  .search-full-width & {
+    min-width: 0;
+  }
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px 12px 48px;
+  border: 2px solid get-color($neutral, '200');
+  border-radius: 12px;
+  font-size: get-font-size($body-font-size, rg);
+  font-family: $font-family;
+  background: get-color($neutral, '50');
+  transition: all 0.3s ease;
+  color: get-color($neutral, '800');
+
+  &::placeholder {
+    color: get-color($neutral, '400');
+  }
+
+  &:hover:not(:disabled) {
+    border-color: get-color($primary, '300');
+    background: $white;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: get-color($primary, '500');
+    background: $white;
+    box-shadow: 0 0 0 3px rgba(get-color($primary, '500'), 0.1);
+  }
+
+  &:disabled {
+    background: get-color($neutral, '100');
+    color: get-color($neutral, '500');
+    cursor: not-allowed;
+    border-color: get-color($neutral, '200');
+
+    &::placeholder {
+      color: get-color($neutral, '300');
+    }
+  }
+
+  // Adjust padding when clear button is present
+  .search-clear + & {
+    padding-right: 48px;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: get-color($neutral, '400');
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  z-index: 1;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.search-button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+// Focus within for icon color change
+.search-input-wrapper:focus-within .search-icon {
+  color: get-color($primary, '500');
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .search-wrapper {
+    flex-direction: column;
+    gap: 8px;
+
+    .search-button {
+      width: 100%;
+    }
+  }
+
+  .search-input-wrapper {
+    width: 100%;
+    min-width: 0;
+  }
+}

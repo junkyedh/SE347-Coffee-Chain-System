@@ -1,0 +1,251 @@
+//---------------- COLORS -----------------------
+
+//Navy lạnh: màu thương hiệu chính, header, nút chính (primary button), link
+$primary: (
+  'default': #2f4156,
+  'foreground': #ffffff,
+  '50': #f7f9fa,
+  '100': #e9eef1,
+  '200': #d6dee5,
+  '300': #b3c5d2,
+  '400': #8da9ba,
+  '500': #6f8fa4,
+  '600': #4f6f86,
+  '700': #3b566b,
+  '800': #2f4156,
+  '900': #1f2b3b,
+);
+// Steel Blue: màu chính, dùng cho các nút chính (primary button), link, viền, border
+$primary2: (
+  'default': #4682b4,
+  'foreground': #ffffff,
+  '50': #f3f8fb,
+  '100': #c7e5fe,
+  '200': #bfd9ec,
+  '300': #97c1df,
+  '400': #6fa5ce,
+  '500': #4682b4,
+  '600': #3a719e,
+  '700': #2f5e84,
+  '800': #254a6b,
+  '900': #1a354d,
+);
+
+//Pastel xanh: màu phụ, dùng cho các nút phụ (secondary button), viền, border, placeholder text
+$secondary: (
+  'default': #a4dad4,
+  'foreground': #2f4156,
+  '50': #f4fbfa,
+  '100': #e2f5f3,
+  '200': #c8ece9,
+  '300': #a4dad4,
+  '400': #83c5be,
+  '500': #66b2ac,
+  '600': #509b95,
+  '700': #3d7f7b,
+  '800': #2f6461,
+  '900': #214845,
+);
+
+// Coral ấm: Call to action, highlight quan trọng, error nhẹ, badge nổi bật
+$accent1: (
+  'default': #ff6f61,
+  'foreground': #ffffff,
+  '50': #fff5f4,
+  '100': #ffe8e6,
+  '200': #ffd1cc,
+  '300': #ffb3ab,
+  '400': #ff8a7a,
+  '500': #ff6f61,
+  '600': #e55a4a,
+  '700': #c44a3a,
+  '800': #a33d2f,
+  '900': #8a342a,
+);
+
+// Lavender xanh ấm: thông tin phụ quan trọng, tag, trạng thái info, hover nhẹ
+$accent2: (
+  'default': #cabbe9,
+  'foreground': #2f4156,
+  '50': #faf9fd,
+  '100': #f3f1fa,
+  '200': #e4dbf5,
+  '300': #d6c7f0,
+  '400': #cabbe9,
+  '500': #b8a5e0,
+  '600': #9b88c7,
+  '700': #8370ac,
+  '800': #6c5c91,
+  '900': #54466d,
+);
+
+// Xám lạnh trung tính: văn bản, icon, đường viền, nền tổng thể
+$neutral: (
+  'default': #d6dee5,
+  'foreground': #2f4156,
+  '50': #f7f9fa,
+  '100': #edf2f5,
+  '200': #d6dee5,
+  '300': #b8c7d3,
+  '400': #9bafbe,
+  '500': #7d96a8,
+  '600': #607a8c,
+  '700': #495e6e,
+  '800': #354552,
+  '900': #24323c,
+);
+
+//Xám ấm: nền phụ, card, section mềm mại hơn neutral gốc
+$neutral2: (
+  'default': #d8cfc8,
+  'foreground': #3f3a37,
+  '50': #faf9f8,
+  '100': #f3f1ef,
+  '200': #e7e2de,
+  '300': #d8cfc8,
+  '400': #c3b9b2,
+  '500': #aea39d,
+  '600': #958b86,
+  '700': #776f6a,
+  '800': #5a5450,
+  '900': #3f3a37,
+);
+
+$muted: (
+  'default': #f5f3f2,
+  'foreground': #6b6a68,
+);
+
+$destructive: (
+  'default': #e55a4a,
+  'foreground': #ffffff,
+);
+
+$popover: (
+  'default': #ffffff,
+  'foreground': #3f3a37,
+);
+
+$card: (
+  'default': #f8f6f5,
+  'foreground': #54466d,
+);
+
+// Custom solid color variables (đồng bộ tone pastel mới)
+$softorange: #f8d8c1;
+$lightblue: #b5d7e6;
+$green: #419798;
+$brown: #8e4917;
+$softpurple: #e0daf5;
+$purple: #9c94f6;
+$white: #ffffff;
+$black: #000000;
+$textclr: #3f3a37;
+
+$background: (
+  'default': #f9f8f7,
+);
+
+// Function to get color value from color map
+@function get-color($colors, $key) {
+  @return map-get($colors, $key);
+}
+
+//-------------------------TYPO------------------------------
+// Import Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+// Font Family
+$font-family: 'Barlow', sans-serif;
+
+// Title Font Size
+$title-font-size: (
+  'lg': 40px,
+  'md': 32px,
+  'sm': 28px,
+);
+
+// Body Font Size
+$body-font-size: (
+  'lg': 24px,
+  'md': 20px,
+  'rg': 16px,
+  'sm': 12px,
+);
+
+// Font Weight
+$font-weight: (
+  'bold': 700,
+  'semibold': 600,
+  'medium': 500,
+  'regular': 400,
+  'light': 300,
+);
+
+// Function to get font size value from font size map
+@function get-font-size($font-sizes, $key) {
+  @return map-get($font-sizes, $key);
+}
+
+// Function to get font weight value from font weight map
+@function get-font-weight($font-weight, $key) {
+  @return map-get($font-weight, $key);
+}
+
+//------------------------BUTTON----------------------------
+
+$btn-font-family: 'Barlow', sans-serif;
+$btn-font-size: get-font-size($body-font-size, md);
+$btn-link-font-size: get-font-size($body-font-size, rg);
+$btn-font-weight: get-font-weight($font-weight, medium);
+$btn-line-height: 54px;
+$btn-white-space: null;
+
+// Padding
+$btn-padding-x-lg: 28px;
+$btn-padding-y-lg: 16px;
+$btn-font-size-lg: $btn-font-size;
+
+$btn-padding-x-md: 20px;
+$btn-padding-y-md: 12px;
+$btn-font-size-md: $btn-font-size;
+
+$btn-padding-x-sm: 16px;
+$btn-padding-y-sm: 10px;
+$btn-font-size-sm: $btn-font-size;
+
+$btn-link-padding-x: 16px;
+$btn-link-padding-y: 8px;
+
+$btn-border-width: 1px;
+$btn-border-radius: 16px;
+
+//primary button
+$btn-primary-default-color: $white;
+$btn-primary-default-bg: get-color($primary, '100');
+
+$btn-primary-hover-color: $white;
+$btn-primary-hover-bg: get-color($neutral, '100');
+
+$btn-primary-disabled-color: get-color($secondary, '100');
+$btn-primary-disabled-bg: get-color($secondary, '200');
+
+//secondary button
+$btn-second-bg: $white;
+
+$btn-second-default-color: get-color($primary, '200');
+$btn-second-default-border-color: get-color($primary, '200');
+
+$btn-second-hover-color: get-color($primary, '100');
+$btn-second-hover-border-color: get-color($primary, '100');
+
+$btn-second-disabled-color: get-color($secondary, '100');
+$btn-second-disabled-border-color: get-color($secondary, '200');
+
+//link
+$btn-link-default-color: get-color($primary, '100');
+
+$btn-link-hover-color: get-color($primary, '100');
+$btn-link-hover-bg: get-color($primary, '100');
+
+$btn-link-disabled-color: get-color($secondary, '200');
