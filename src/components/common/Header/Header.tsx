@@ -1,99 +1,99 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import { Container, Navbar, Offcanvas, Nav, NavDropdown } from "react-bootstrap"
-import { NavLink, useNavigate } from "react-router-dom"
-import "./Header.scss"
-import { User, Settings, Clock, LogOut, Home, Info, Coffee, Phone } from "lucide-react"
-import { useSystemContext } from "../../../hooks/useSystemContext"
-import { MainApiRequest } from "../../../services/MainApiRequest"
-import React from "react";
+import { useEffect, useState } from 'react';
+import { Container, Navbar, Offcanvas, Nav, NavDropdown } from 'react-bootstrap';
+import { NavLink, useNavigate } from 'react-router-dom';
+import './Header.scss';
+import { User, Settings, Clock, LogOut, Home, Info, Coffee, Phone } from 'lucide-react';
+import { useSystemContext } from '../../../hooks/useSystemContext';
+import { MainApiRequest } from '../../../services/MainApiRequest';
+import React from 'react';
 
 const Header: React.FC = () => {
-  const [open, setOpen] = useState(false)
-  const { token, logout } = useSystemContext()
-  const navigate = useNavigate()
-  const [userInfo, setUserInfo] = useState<any>(null)
+  const [open, setOpen] = useState(false);
+  const { token, logout } = useSystemContext();
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<any>(null);
 
-  const toggleMenu = () => setOpen(!open)
+  const toggleMenu = () => setOpen(!open);
 
   const isSticky = () => {
-    const header = document.querySelector(".header-section")
-    if (!header) return
-    const scrollTop = window.scrollY
-    scrollTop >= 120 ? header.classList.add("is-sticky") : header.classList.remove("is-sticky")
-  }
+    const header = document.querySelector('.header-section');
+    if (!header) return;
+    const scrollTop = window.scrollY;
+    scrollTop >= 120 ? header.classList.add('is-sticky') : header.classList.remove('is-sticky');
+  };
 
   useEffect(() => {
-    window.addEventListener("scroll", isSticky)
+    window.addEventListener('scroll', isSticky);
     return () => {
-      window.removeEventListener("scroll", isSticky)
-    }
-  }, [])
+      window.removeEventListener('scroll', isSticky);
+    };
+  }, []);
 
   const closeMenu = () => {
     if (window.innerWidth <= 991) {
-      setOpen(false)
+      setOpen(false);
     }
-  }
+  };
 
   const fetchUserInfo = async () => {
     if (!token) {
-      setUserInfo(null)
-      return
+      setUserInfo(null);
+      return;
     }
     try {
-      const response = await MainApiRequest.get("/auth/callback", {
+      const response = await MainApiRequest.get('/auth/callback', {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      setUserInfo(response.data.data)
+      });
+      setUserInfo(response.data.data);
     } catch (error) {
-      setUserInfo(null)
-      localStorage.removeItem("token")
+      setUserInfo(null);
+      localStorage.removeItem('token');
     }
-  }
+  };
 
   useEffect(() => {
-    fetchUserInfo()
-  }, [token])
+    fetchUserInfo();
+  }, [token]);
 
   const handleLogout = async () => {
     try {
-      await logout()
-      setUserInfo(null)
-      navigate("/login")
+      await logout();
+      setUserInfo(null);
+      navigate('/login');
     } catch (error) {
-      console.error("Logout failed:", error)
+      console.error('Logout failed:', error);
     }
-  }
+  };
 
   // Navigation items with icons
   const navItems = [
-    { to: "/", icon: Home, label: "Trang chủ" },
-    { to: "/about-us", icon: Info, label: "Giới thiệu" },
-    { to: "/menu", icon: Coffee, label: "Thực đơn" },
-    { to: "/contact-us", icon: Phone, label: "Liên hệ" },
-  ]
+    { to: '/', icon: Home, label: 'Trang chủ' },
+    { to: '/about-us', icon: Info, label: 'Giới thiệu' },
+    { to: '/menu', icon: Coffee, label: 'Thực đơn' },
+    { to: '/contact-us', icon: Phone, label: 'Liên hệ' },
+  ];
 
   // User dropdown items (synchronized between desktop and mobile)
   const userDropdownItems = [
     {
       icon: Settings,
-      label: "Hồ sơ của tôi",
-      action: () => navigate("/profile-user"),
+      label: 'Hồ sơ của tôi',
+      action: () => navigate('/profile-user'),
     },
     {
       icon: Clock,
-      label: "Lịch sử đơn hàng",
-      action: () => navigate("/history"),
+      label: 'Lịch sử đơn hàng',
+      action: () => navigate('/history'),
     },
     {
       icon: LogOut,
-      label: "Đăng xuất",
+      label: 'Đăng xuất',
       action: handleLogout,
       isDanger: true,
     },
-  ]
+  ];
 
   return (
     <header className="header-section d-flex align-items-center">
@@ -109,7 +109,7 @@ const Header: React.FC = () => {
 
           {/* Toggle button (mobile) */}
           <button className="toggle-btn d-lg-none" onClick={toggleMenu} aria-label="Toggle menu">
-            <i className={open ? "bi bi-x-lg" : "bi bi-list"} />
+            <i className={open ? 'bi bi-x-lg' : 'bi bi-list'} />
           </button>
 
           {/* Offcanvas slide-out menu (mobile only) */}
@@ -152,10 +152,10 @@ const Header: React.FC = () => {
                       {userDropdownItems.map(({ icon: Icon, label, action, isDanger }, index) => (
                         <button
                           key={index}
-                          className={`offcanvas-nav-item ${isDanger ? "danger" : ""}`}
+                          className={`offcanvas-nav-item ${isDanger ? 'danger' : ''}`}
                           onClick={() => {
-                            action()
-                            closeMenu()
+                            action();
+                            closeMenu();
                           }}
                         >
                           <Icon className="offcanvas-nav-icon" />
@@ -165,16 +165,16 @@ const Header: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <NavLink to="/login" className="offcanvas-login-btn d-block text-center" onClick={closeMenu}>
+                  <NavLink
+                    to="/login"
+                    className="offcanvas-login-btn d-block text-center"
+                    onClick={closeMenu}
+                  >
                     <LogOut className="me-2" />
                     Đăng nhập
                   </NavLink>
                 )}
               </div>
-
-              {/* <div className="offcanvas-cart-section mt-4">
-                <CartDrawer />
-              </div> */}
             </Offcanvas.Body>
           </Navbar.Offcanvas>
 
@@ -200,7 +200,10 @@ const Header: React.FC = () => {
                 >
                   {userDropdownItems.map(({ icon: Icon, label, action, isDanger }, index) => (
                     <React.Fragment key={index}>
-                      <NavDropdown.Item onClick={action} className={isDanger ? "dropdown-item-danger" : ""}>
+                      <NavDropdown.Item
+                        onClick={action}
+                        className={isDanger ? 'dropdown-item-danger' : ''}
+                      >
                         <Icon className="dropdown-icon" />
                         {label}
                       </NavDropdown.Item>
@@ -215,13 +218,11 @@ const Header: React.FC = () => {
                 </NavLink>
               )}
             </Nav>
-
-            {/* <CartDrawer /> */}
           </div>
         </Navbar>
       </Container>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

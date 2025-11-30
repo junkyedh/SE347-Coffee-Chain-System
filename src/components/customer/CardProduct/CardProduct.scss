@@ -1,0 +1,229 @@
+@import '../../../styles/variables.scss';
+
+.cardProduct {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: get-color($accent2, '50');
+  border-radius: 16px;
+  border: 1px solid get-color($neutral, '100');
+  box-shadow: rgba(0, 0, 0, 0.13) 0px 4px 12px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  max-height: 420px;
+  min-height: 420px;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.13);
+    border: 1px solid get-color($neutral, '100');
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .cardProductImageWrapper {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    height: 250px;
+    width: 100%;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  .cardProductBadge,
+  .cardProductDiscount {
+    position: absolute;
+    top: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: get-color($primary, 'foreground');
+    z-index: 2;
+  }
+
+  .badgePopular {
+    left: 12px;
+    background: linear-gradient(135deg, #f6d365, #fda085);
+  }
+
+  .badgeNew {
+    left: 12px;
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+  }
+
+  .cardProductDiscount {
+    right: 12px;
+    background: linear-gradient(135deg, #fca5a5, #f87171);
+  }
+
+  .cardProductContent {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex-grow: 1;
+  }
+
+  .cardProductHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .cardProductCategory {
+      font-size: 0.75rem;
+      background: linear-gradient(
+        135deg,
+        get-color($accent2, '100'),
+        get-color($accent2, '200')
+      ); // pastel peach-pink gradient
+      color: get-color($accent2, '800'); // deeper warm brown for better contrast
+      font-weight: 600;
+      border-radius: 20px;
+      padding: 4px 8px;
+    }
+
+    .cardProductRating {
+      display: flex;
+      align-items: center;
+      color: #fbbf24;
+      font-size: 0.875rem;
+      gap: 4px;
+
+      .ratingIcon {
+        color: #fbbf24;
+      }
+    }
+  }
+
+  .cardProductTitle {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--primaryText);
+    cursor: pointer;
+    line-height: 1.4;
+
+    &:hover {
+      color: get-color($secondary, '800');
+    }
+  }
+
+  .cardProductDescription {
+    font-size: 0.8rem;
+    color: var(--subTextClr);
+    line-height: 1.25;
+  }
+
+  .cardProductFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid get-color($neutral, '300');
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .cardProductPriceGroup {
+    display: flex;
+    flex-direction: column;
+
+    .cardProductPrice {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: get-color($accent1, '700');
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .cardProductOldPrice {
+      font-size: 0.75rem;
+      color: get-color($accent1, 'foreground');
+      text-decoration: line-through;
+    }
+  }
+
+  .cardProductActions {
+    display: flex;
+    gap: 0.5rem;
+
+    .cardProductBtn {
+      padding: 0.5rem 1rem;
+      background: get-color($primary2, '100');
+      color: get-color($primary2, 'default');
+      font-weight: 500;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+
+      &:hover {
+        background-color: get-color($primary2, '600');
+        color: get-color($primary2, 'foreground');
+      }
+    }
+
+    .cardProductCartBtn {
+      background-color: rgba(get-color($accent1, '200'), 0.9);
+      color: get-color($accent1, '500');
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+
+      &:hover {
+        background-color: get-color($accent1, '500');
+        color: get-color($accent1, 'foreground');
+      }
+
+      &:disabled {
+        background-color: get-color($neutral, '200');
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .cardProduct {
+    .cardProductFooter {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .cardProductActions {
+      width: 100%;
+      flex-direction: row;
+
+      .cardProductBtn {
+        flex: 1;
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
-import React from "react";
-import "./Loading.scss";
+import React from 'react';
+import './Loading.scss';
 
 interface LoadingIndicatorProps {
   text?: string;
@@ -7,8 +7,8 @@ interface LoadingIndicatorProps {
 }
 
 const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
-  text = "Đang tải dữ liệu...",
-  className = "",
+  text = 'Đang tải dữ liệu...',
+  className = '',
 }) => (
   <div className={`loading-indicator ${className}`}>
     <div className="loading-spinner"></div>

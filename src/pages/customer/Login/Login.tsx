@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useSystemContext } from '@/hooks/useSystemContext';
-import { FaPhoneAlt, FaLock } from 'react-icons/fa';
-import './Login.scss';
-import { message } from 'antd';
 import { MainApiRequest } from '@/services/MainApiRequest';
+import { message } from 'antd';
+import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { FaLock, FaPhoneAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import './Login.scss';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -23,9 +23,7 @@ const Login: React.FC = () => {
       const res = await MainApiRequest.post('/auth/signin', { phone, password });
       if (res.status === 200) {
         const data = res.data;
-        // Lưu token và role vào context
         setAuth(data.token, 'ROLE_CUSTOMER');
-        // Điều hướng về trang chủ
         navigate('/');
       }
     } catch (error) {
@@ -99,11 +97,7 @@ const Login: React.FC = () => {
               Quên mật khẩu?
             </a>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary w-100"
-            onClick={handleLogin}
-          >
+          <button type="button" className="btn btn-primary w-100" onClick={handleLogin}>
             Đăng nhập
           </button>
         </form>
