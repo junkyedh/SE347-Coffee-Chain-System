@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { MainApiRequest } from '@/services/MainApiRequest';
-import { Product } from '@/components/customer/CardProduct/CardProduct';
+import { useEffect, useState } from "react";
+import { MainApiRequest } from "@/services/MainApiRequest";
+import { Product } from "@/components/customer/CardProduct/CardProduct";
 
 const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -10,11 +10,11 @@ const useProducts = () => {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const res = await MainApiRequest.get('/product/list');
+        const res = await MainApiRequest.get("/product/list");
 
         const rawProducts = res.data?.data || res.data;
         if (!Array.isArray(rawProducts)) {
-          console.error('Unexpected API format', res);
+          console.error("Unexpected API format", res);
           return;
         }
 
@@ -35,16 +35,16 @@ const useProducts = () => {
           materials: Array.isArray(item.materials)
             ? item.materials.map((m: any) => ({ name: m.name }))
             : [],
-          description: item.description || '',
+          description: item.description || "",
           isPopular: item.isPopular === true,
           rating: item.rating || 0,
           discount: item.discount || 0,
         }));
 
-        console.log('Mapped products:', mappedProducts);
+        console.log("Mapped products:", mappedProducts);
         setProducts(mappedProducts);
       } catch (error) {
-        console.error('Error fetching product list:', error);
+        console.error("Error fetching product list:", error);
       } finally {
         setIsLoading(false);
       }
