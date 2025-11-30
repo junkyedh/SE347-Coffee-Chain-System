@@ -9,10 +9,6 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { isLoggedIn, role, isInitialized } = useSystemContext();
-  console.log('--- ProtectedRoute ---');
-  console.log('isLoggedIn:', isLoggedIn);
-  console.log('role:', role);
-  console.log('isInitialized:', isInitialized);
 
   if (!isInitialized) {
     return null;

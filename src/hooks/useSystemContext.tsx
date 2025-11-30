@@ -38,6 +38,16 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
     setIsLoggedIn(true);
   };
 
+  // Persist auth to localStorage so axios interceptors can read it
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem('token', token);
+    }
+    if (role) {
+      localStorage.setItem('role', role);
+    }
+  }, [token, role]);
+
   const logout = () => {
     setIsLoggedIn(false);
     setToken('');

@@ -3,7 +3,7 @@ import { Card, Descriptions, Spin, message, Button, Modal, Form, Input, Tag } fr
 import moment from 'moment';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { useSystemContext } from '@/hooks/useSystemContext';
-import '../admin/adminPage.scss';
+import '../adminPage.scss';
 
 const ManagerBranchInfo = () => {
   const [branch, setBranch] = useState<any>(null);

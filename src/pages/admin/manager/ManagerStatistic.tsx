@@ -1,7 +1,7 @@
 import { MainApiRequest } from '@/services/MainApiRequest';
 import React, { useEffect, useState } from 'react';
 import { Card } from 'react-bootstrap';
-import '../Statistic/Statistic.scss';
+import '../Statistic.scss';
 import { useSystemContext } from '@/hooks/useSystemContext';
 import Revenue30Days from '@/components/Statistic/Revenue30Days';
 import DrinkChart from '@/components/Statistic/DrinkChart';
