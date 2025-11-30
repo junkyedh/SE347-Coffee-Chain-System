@@ -1,0 +1,743 @@
+@import '../../../../styles/variables.scss';
+
+.admin-menu-container {
+  height: 100vh;
+  background: linear-gradient(
+    135deg,
+    get-color($background, 'default') 0%,
+    get-color($neutral, '50') 100%
+  );
+  font-family: $font-family;
+}
+
+.admin-menu-layout {
+  display: flex;
+  height: 100%;
+  gap: 16px;
+
+  .admin-menu-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(get-color($primary, '800'), 0.08),
+      0 2px 8px rgba(get-color($primary, '800'), 0.04);
+    border: 1px solid rgba(get-color($neutral, '200'), 0.6);
+
+    .menu-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(get-color($neutral, '200'), 0.5);
+      background: linear-gradient(
+        135deg,
+        get-color($neutral, '50') 0%,
+        rgba(get-color($primary2, '50'), 0.3) 100%
+      );
+
+      .menu-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: get-color($primary, '800');
+        margin: 0 0 20px 0;
+        text-align: center;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 2px rgba(get-color($primary, '800'), 0.1);
+      }
+
+      .menu-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .category-section {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          flex-wrap: wrap;
+
+          .category-btn {
+            height: 36px;
+            padding: 0 20px;
+            border-radius: 18px;
+            border: 1.5px solid get-color($neutral, '300');
+            background: linear-gradient(145deg, #ffffff 0%, get-color($neutral, '50') 100%);
+            color: get-color($primary, '600');
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(get-color($primary, '800'), 0.06);
+
+            &:hover {
+              border-color: get-color($primary2, '400');
+              color: get-color($primary2, '600');
+              background: linear-gradient(
+                145deg,
+                get-color($primary2, '50') 0%,
+                get-color($primary2, '100') 100%
+              );
+              transform: translateY(-1px);
+              box-shadow: 0 4px 8px rgba(get-color($primary2, '400'), 0.15);
+            }
+
+            &.active {
+              background: linear-gradient(
+                135deg,
+                get-color($primary2, '500') 0%,
+                get-color($primary2, '600') 100%
+              );
+              border-color: get-color($primary2, '600');
+              color: white;
+              box-shadow: 0 4px 12px rgba(get-color($primary2, '500'), 0.3);
+              transform: translateY(-1px);
+            }
+          }
+        }
+
+        .search-section {
+          display: flex;
+          flex: 1;
+          justify-content: center;
+
+          .ant-input-search {
+            max-width: 350px;
+
+            .ant-input {
+              height: 40px;
+              border-radius: 12px;
+              border: 1.5px solid get-color($neutral, '300');
+              background: linear-gradient(145deg, #ffffff 0%, get-color($neutral, '50') 100%);
+              font-size: 14px;
+              transition: all 0.3s ease;
+              box-shadow: 0 2px 4px rgba(get-color($primary, '800'), 0.04);
+
+              &:focus {
+                border-color: get-color($primary2, '400');
+                box-shadow: 0 0 0 3px rgba(get-color($primary2, '400'), 0.1);
+              }
+            }
+
+            .ant-input-search-button {
+              border-radius: 0 12px 12px 0;
+              background: linear-gradient(
+                135deg,
+                get-color($primary2, '500') 0%,
+                get-color($primary2, '600') 100%
+              );
+              border-color: get-color($primary2, '600');
+            }
+          }
+        }
+      }
+    }
+
+    .products-section {
+      flex: 1;
+      padding: 14px 32px;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: get-color($neutral, '100');
+        border-radius: 3px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          135deg,
+          get-color($primary2, '300') 0%,
+          get-color($primary2, '400') 100%
+        );
+        border-radius: 3px;
+
+        &:hover {
+          background: linear-gradient(
+            135deg,
+            get-color($primary2, '400') 0%,
+            get-color($primary2, '500') 100%
+          );
+        }
+      }
+
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+
+        @media (max-width: 1200px) {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+
+        .ant-pagination {
+          .ant-pagination-item {
+            border-radius: 10px;
+            border: 1.5px solid get-color($neutral, '300');
+            margin: 0 4px;
+            background: linear-gradient(145deg, #ffffff 0%, get-color($neutral, '50') 100%);
+            transition: all 0.3s ease;
+
+            &:hover {
+              border-color: get-color($primary2, '400');
+              background: linear-gradient(
+                145deg,
+                get-color($primary2, '50') 0%,
+                get-color($primary2, '100') 100%
+              );
+            }
+
+            &.ant-pagination-item-active {
+              background: linear-gradient(
+                135deg,
+                get-color($primary2, '500') 0%,
+                get-color($primary2, '600') 100%
+              );
+              border-color: get-color($primary2, '600');
+              box-shadow: 0 3px 8px rgba(get-color($primary2, '500'), 0.3);
+
+              a {
+                color: white;
+                font-weight: 600;
+              }
+            }
+          }
+
+          .ant-pagination-prev,
+          .ant-pagination-next {
+            border-radius: 10px;
+            border: 1.5px solid get-color($neutral, '300');
+            background: linear-gradient(145deg, #ffffff 0%, get-color($neutral, '50') 100%);
+
+            &:hover {
+              border-color: get-color($primary2, '400');
+              background: linear-gradient(
+                145deg,
+                get-color($primary2, '50') 0%,
+                get-color($primary2, '100') 100%
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .invoice-sidebar {
+    width: 380px;
+    background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(get-color($primary, '800'), 0.08),
+      0 2px 8px rgba(get-color($primary, '800'), 0.04);
+    border: 1px solid rgba(get-color($neutral, '200'), 0.6);
+
+    .invoice-header {
+      padding: 20px 10px 0px 24px;
+      border-bottom: 1px solid rgba(get-color($neutral, '200'), 0.5);
+      background: linear-gradient(
+        135deg,
+        get-color($accent2, '50') 0%,
+        rgba(get-color($accent2, '100'), 0.5) 100%
+      );
+
+      .invoice-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 20px;
+        font-weight: 700;
+        color: get-color($primary, '800');
+        margin-bottom: 16px;
+        letter-spacing: 0.5px;
+      }
+
+      .invoice-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .info-item {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 4px;
+
+          .label {
+            font-size: 11px;
+            color: get-color($primary, '500');
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            align-items: center;
+          }
+
+          .value {
+            font-size: 13px;
+            font-weight: 600;
+            color: get-color($primary, '800');
+          }
+        }
+      }
+    }
+
+    .customer-section {
+      padding: 10px 24px;
+      border-bottom: 1px solid rgba(get-color($neutral, '200'), 0.5);
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        span {
+          font-size: 14px;
+          font-weight: 600;
+          color: get-color($primary, '800');
+          letter-spacing: 0.3px;
+        }
+
+        .ant-btn {
+          border-radius: 8px;
+          border: 1.5px solid get-color($primary2, '400');
+          background: linear-gradient(
+            145deg,
+            get-color($primary2, '50') 0%,
+            get-color($primary2, '100') 100%
+          );
+          color: get-color($primary2, '600');
+
+          &:hover {
+            background: linear-gradient(
+              135deg,
+              get-color($primary2, '500') 0%,
+              get-color($primary2, '600') 100%
+            );
+            color: white;
+          }
+        }
+      }
+
+      .customer-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .customer-input {
+          height: 36px;
+          border-radius: 10px;
+          border: 1.5px solid get-color($neutral, '300');
+          background: linear-gradient(145deg, #ffffff 0%, get-color($neutral, '50') 100%);
+          transition: all 0.3s ease;
+
+          &:focus {
+            border-color: get-color($primary2, '400');
+            box-shadow: 0 0 0 3px rgba(get-color($primary2, '400'), 0.1);
+          }
+        }
+      }
+    }
+
+    .order-items {
+      flex: 1;
+      padding: 10px 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: get-color($primary, '800');
+        letter-spacing: 0.3px;
+      }
+
+      .order-list {
+        flex: 1;
+        overflow-y: auto;
+        margin-right: -8px;
+        padding-right: 8px;
+
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: get-color($neutral, '100');
+          border-radius: 2px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: linear-gradient(
+            135deg,
+            get-color($primary2, '300') 0%,
+            get-color($primary2, '400') 100%
+          );
+          border-radius: 2px;
+        }
+
+        .empty-order {
+          text-align: center;
+          padding: 48px 20px;
+          color: get-color($neutral, '500');
+          font-size: 13px;
+          font-style: italic;
+          background: linear-gradient(
+            135deg,
+            get-color($neutral, '50') 0%,
+            get-color($neutral, '100') 100%
+          );
+          border-radius: 12px;
+          border: 1px dashed rgba(get-color($neutral, '300'), 0.8);
+        }
+
+        .order-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          padding: 0 0;
+          border-bottom: 1px solid rgba(get-color($neutral, '200'), 0.5);
+          transition: all 0.3s ease;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &:hover {
+            background: linear-gradient(
+              135deg,
+              get-color($neutral, '50') 0%,
+              rgba(get-color($primary2, '50'), 0.3) 100%
+            );
+            margin: 0 -12px;
+            padding: 12px;
+            border-radius: 8px;
+          }
+
+          .item-info {
+            flex: 1;
+
+            .item-name {
+              font-size: 13px;
+              font-weight: 600;
+              color: get-color($primary, '800');
+              margin-bottom: 4px;
+              letter-spacing: 0.2px;
+            }
+
+            .item-details {
+              font-size: 11px;
+              color: get-color($primary, '500');
+              margin-bottom: 4px;
+            }
+
+            .item-price {
+              font-size: 12px;
+              font-weight: 600;
+              color: get-color($accent1, '600');
+            }
+          }
+
+          .item-controls {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+
+            .quantity-controls {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+
+              .ant-btn {
+                width: 22px;
+                height: 22px;
+                padding: 0;
+                font-size: 12px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 6px;
+                border: 1.5px solid get-color($neutral, '300');
+                background: linear-gradient(145deg, #ffffff 0%, get-color($neutral, '50') 100%);
+                transition: all 0.3s ease;
+
+                &:hover {
+                  border-color: get-color($primary2, '400');
+                  background: linear-gradient(
+                    145deg,
+                    get-color($primary2, '50') 0%,
+                    get-color($primary2, '100') 100%
+                  );
+                  color: get-color($primary2, '600');
+                }
+              }
+
+              .quantity {
+                font-size: 12px;
+                font-weight: 600;
+                min-width: 20px;
+                text-align: center;
+                color: get-color($primary, '800');
+              }
+            }
+
+            .ant-btn-dangerous {
+              border-color: get-color($accent1, '400');
+              color: get-color($accent1, '600');
+
+              &:hover {
+                background: linear-gradient(
+                  135deg,
+                  get-color($accent1, '500') 0%,
+                  get-color($accent1, '600') 100%
+                );
+                color: white;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .order-summary {
+      padding: 20px 24px;
+      display: flex;
+      align-items: stretch;
+      border-top: 1px solid rgba(get-color($neutral, '200'), 0.5);
+      background: linear-gradient(
+        135deg,
+        get-color($neutral, '50') 0%,
+        rgba(get-color($accent2, '50'), 0.3) 100%
+      );
+
+      .discount-section {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+
+        .coupon-input {
+          flex: 1;
+          height: 36px;
+          border-radius: 10px;
+          border: 1.5px solid get-color($neutral, '300');
+          background: linear-gradient(145deg, #ffffff 0%, get-color($neutral, '50') 100%);
+
+          &:focus {
+            border-color: get-color($primary2, '400');
+            box-shadow: 0 0 0 3px rgba(get-color($primary2, '400'), 0.1);
+          }
+        }
+
+        .ant-btn {
+          height: 36px;
+          padding: 0 16px;
+          font-size: 12px;
+          font-weight: 600;
+          border-radius: 10px;
+          background: linear-gradient(
+            135deg,
+            get-color($secondary, '400') 0%,
+            get-color($secondary, '500') 100%
+          );
+          border-color: get-color($secondary, '500');
+          color: white;
+
+          &:hover {
+            background: linear-gradient(
+              135deg,
+              get-color($secondary, '500') 0%,
+              get-color($secondary, '600') 100%
+            );
+          }
+        }
+      }
+
+      .summary-details {
+        margin-bottom: 20px;
+
+        .summary-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+          font-size: 13px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          span:first-child {
+            color: get-color($primary, '600');
+            font-weight: 500;
+          }
+
+          span:last-child {
+            font-weight: 600;
+            color: get-color($primary, '800');
+          }
+
+          &.discount {
+            span:last-child {
+              color: get-color($accent1, '600');
+            }
+          }
+
+          &.total {
+            font-size: 16px;
+            font-weight: 700;
+            padding-top: 12px;
+            border-top: 2px solid rgba(get-color($neutral, '300'), 0.5);
+            margin-top: 12px;
+
+            span:first-child {
+              color: get-color($primary, '800');
+            }
+
+            span:last-child {
+              color: get-color($accent1, '600');
+            }
+          }
+        }
+      }
+
+      .payment-btn {
+        height: 44px;
+        font-size: 15px;
+        font-weight: 700;
+        border-radius: 12px;
+        background: linear-gradient(
+          135deg,
+          get-color($accent1, '500') 0%,
+          get-color($accent1, '600') 100%
+        );
+        border: none;
+        color: white;
+        letter-spacing: 0.5px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(get-color($accent1, '500'), 0.3);
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(
+            135deg,
+            get-color($accent1, '600') 0%,
+            get-color($accent1, '700') 100%
+          );
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(get-color($accent1, '500'), 0.4);
+        }
+
+        &:disabled {
+          background: linear-gradient(
+            145deg,
+            get-color($neutral, '300') 0%,
+            get-color($neutral, '400') 100%
+          );
+          color: get-color($neutral, '500');
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+}
+
+// Modal styles
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(get-color($neutral, '200'), 0.5);
+
+  .ant-btn {
+    height: 36px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-weight: 600;
+
+    &:not(.ant-btn-primary) {
+      border: 1.5px solid get-color($neutral, '300');
+      background: linear-gradient(145deg, #ffffff 0%, get-color($neutral, '50') 100%);
+    }
+
+    &.ant-btn-primary {
+      background: linear-gradient(
+        135deg,
+        get-color($primary2, '500') 0%,
+        get-color($primary2, '600') 100%
+      );
+      border-color: get-color($primary2, '600');
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+  .admin-menu-layout {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+
+    .admin-menu-main {
+      margin: 0;
+    }
+
+    .invoice-sidebar {
+      width: auto;
+      max-height: 400px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-menu-layout {
+    padding: 8px;
+    gap: 8px;
+
+    .admin-menu-main .menu-header {
+      padding: 20px 16px;
+
+      .menu-title {
+        font-size: 24px;
+      }
+    }
+
+    .admin-menu-main .products-section {
+      padding: 20px 16px;
+    }
+
+    .invoice-sidebar {
+      .invoice-header,
+      .customer-section,
+      .order-items,
+      .order-summary {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    }
+  }
+}

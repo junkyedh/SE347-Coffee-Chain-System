@@ -1,8 +1,8 @@
-import React from "react";
-import { Dropdown, Menu } from "antd";
-import { ArrowDownOutlined } from "@ant-design/icons";
-import AdminButton from "@/pages/admin/button/AdminButton";
-import "./StatusDropdown.scss";
+import { ArrowDownOutlined } from '@ant-design/icons';
+import { Dropdown, Menu } from 'antd';
+import React from 'react';
+import './StatusDropdown.scss';
+import AdminButton from '@/components/admin/AdminButton/AdminButton';
 
 interface StatusDropdownProps {
   value: string;
@@ -28,7 +28,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ value, onChange, status
         size="sm"
         icon={<ArrowDownOutlined />}
       >
-        {statusMap[value]?.label || "Chọn trạng thái"}
+        {statusMap[value]?.label || 'Chọn trạng thái'}
       </AdminButton>
     </Dropdown>
   );

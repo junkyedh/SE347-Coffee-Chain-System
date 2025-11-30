@@ -1,4 +1,4 @@
-@import '../../../scss/variables.scss';
+@import '../../../styles/variables.scss';
 
 .history-order-container {
   background: var(--bgClr);
@@ -167,7 +167,7 @@
 .order-card {
   background: var(--white);
   border-radius: 1.4rem;
-  box-shadow: 0 4px 18px rgba(47, 65, 86, 0.10), 0 2px 6px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 18px rgba(47, 65, 86, 0.1), 0 2px 6px rgba(0, 0, 0, 0.03);
   overflow: hidden;
   margin-bottom: 2rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -378,21 +378,21 @@
       gap: 6px;
       padding: 8px 16px;
       font-size: var(--smallText);
-      
+
       &.btn-secondary {
         background: var(--white);
         color: var(--primaryText);
         border: 2px solid #e2e8f0;
-        
+
         &:hover {
           background: #f8fafc;
           border-color: var(--primaryClr);
         }
       }
-      
+
       &.btn-accent {
         background: var(--secondaryClr);
-        
+
         &:hover {
           background: #445e7c;
         }
@@ -435,7 +435,7 @@
       }
 
       &:hover {
-        color: #FF8978;
+        color: #ff8978;
         background: #f1f5f9;
       }
     }
@@ -639,8 +639,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 // Responsive design

@@ -1,29 +1,44 @@
-import React from "react"
-import { forwardRef } from "react"
-import "./Textarea.scss"
-import { cn } from "@/modules/utils"
+import { cn } from '@/modules/utils';
+import React, { forwardRef } from 'react';
+import './Textarea.scss';
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string
-  error?: string
-  helperText?: string
-  fullWidth?: boolean
-  resize?: "none" | "vertical" | "horizontal" | "both"
+  label?: string;
+  error?: string;
+  helperText?: string;
+  fullWidth?: boolean;
+  resize?: 'none' | 'vertical' | 'horizontal' | 'both';
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, label, error, helperText, fullWidth = false, resize = "vertical", required, ...props }, ref) => {
+  (
+    {
+      className,
+      label,
+      error,
+      helperText,
+      fullWidth = false,
+      resize = 'vertical',
+      required,
+      ...props
+    },
+    ref
+  ) => {
     return (
-      <div className={cn("textarea-group", { "textarea-full-width": fullWidth })}>
-        {label && <label className={cn("textarea-label", { "textarea-label-required": required })}>{label}</label>}
+      <div className={cn('textarea-group', { 'textarea-full-width': fullWidth })}>
+        {label && (
+          <label className={cn('textarea-label', { 'textarea-label-required': required })}>
+            {label}
+          </label>
+        )}
         <textarea
           className={cn(
-            "textarea",
+            'textarea',
             `textarea-resize-${resize}`,
             {
-              "textarea-error": error,
+              'textarea-error': error,
             },
-            className,
+            className
           )}
           ref={ref}
           {...props}
@@ -31,10 +46,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {error && <div className="textarea-error-text">{error}</div>}
         {helperText && !error && <div className="textarea-helper-text">{helperText}</div>}
       </div>
-    )
-  },
-)
+    );
+  }
+);
 
-Textarea.displayName = "Textarea"
+Textarea.displayName = 'Textarea';
 
-export { Textarea }
+export { Textarea };

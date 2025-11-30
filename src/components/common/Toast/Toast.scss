@@ -1,4 +1,4 @@
-@import '../../../scss/variables.scss';
+@import '../../../styles/variables.scss';
 
 .toast-container {
   position: fixed;
@@ -22,53 +22,53 @@
 .toast {
   background: $white;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(get-color($neutral, "900"), 0.15);
+  box-shadow: 0 8px 32px rgba(get-color($neutral, '900'), 0.15);
   padding: 16px 20px;
   display: flex;
   align-items: flex-start;
   gap: 12px;
   transform: translateX(100%);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-left: 4px solid get-color($neutral, "300");
+  border-left: 4px solid get-color($neutral, '300');
   animation: slideIn 0.3s ease-out forwards;
 
   &.toast-success {
-    border-left-color: get-color($secondary, "500");
-    
+    border-left-color: get-color($secondary, '500');
+
     .toast-icon {
-      color: get-color($secondary, "500");
+      color: get-color($secondary, '500');
     }
   }
 
   &.toast-error {
-    border-left-color: get-color($accent1, "500");
-    
+    border-left-color: get-color($accent1, '500');
+
     .toast-icon {
-      color: get-color($accent1, "500");
+      color: get-color($accent1, '500');
     }
   }
 
   &.toast-warning {
     border-left-color: #f59e0b;
-    
+
     .toast-icon {
       color: #f59e0b;
     }
   }
 
   &.toast-info {
-    border-left-color: get-color($primary, "500");
-    
+    border-left-color: get-color($primary, '500');
+
     .toast-icon {
-      color: get-color($primary, "500");
+      color: get-color($primary, '500');
     }
   }
 
   &.toast-loading {
-    border-left-color: get-color($primary, "500");
-    
+    border-left-color: get-color($primary, '500');
+
     .toast-icon {
-      color: get-color($primary, "500");
+      color: get-color($primary, '500');
     }
   }
 
@@ -92,14 +92,14 @@
 
     .toast-title {
       font-weight: get-font-weight($font-weight, semibold);
-      color: get-color($neutral, "800");
+      color: get-color($neutral, '800');
       margin-bottom: 4px;
       font-size: get-font-size($body-font-size, rg);
     }
 
     .toast-message {
       font-size: get-font-size($body-font-size, sm);
-      color: get-color($neutral, "600");
+      color: get-color($neutral, '600');
       line-height: 1.4;
       word-wrap: break-word;
     }

@@ -1,12 +1,8 @@
-@import '../../scss/variables.scss';
+@import '../../../styles/variables.scss';
 
 .header-section {
   height: 80px;
-  background: linear-gradient(
-    180deg,
-    get-color($secondary, "100"),
-    get-color($accent1, "300")
-  );
+  background: linear-gradient(180deg, get-color($secondary, '100'), get-color($accent1, '300'));
   backdrop-filter: blur(12px);
   position: relative;
   z-index: 1000;
@@ -14,7 +10,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  box-shadow: 0 2px 20px rgba(get-color($neutral, "900"), 0.08);
+  box-shadow: 0 2px 20px rgba(get-color($neutral, '900'), 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.is-sticky {
@@ -24,17 +20,17 @@
     right: 0;
     background: linear-gradient(
       170deg,
-      rgba(get-color($secondary, "100"), 0.95),
-      rgba(get-color($accent1, "300"), 0.9)
+      rgba(get-color($secondary, '100'), 0.95),
+      rgba(get-color($accent1, '300'), 0.9)
     );
     z-index: 1000;
     backdrop-filter: blur(16px);
-    box-shadow: 0 4px 32px rgba(get-color($neutral, "900"), 0.12);
+    box-shadow: 0 4px 32px rgba(get-color($neutral, '900'), 0.12);
     border-radius: 0 0 1rem 1rem;
     animation: slideDown 0.3s ease;
 
     .logo a {
-      color: get-color($primary, "800") !important;
+      color: get-color($primary, '800') !important;
     }
   }
 
@@ -44,7 +40,7 @@
       align-items: center;
       gap: 0.5rem;
       font-size: 1.5rem;
-      color: get-color($primary, "800");
+      color: get-color($primary, '800');
       font-weight: get-font-weight($font-weight, bold);
       text-decoration: none;
       transition: all 0.3s ease;
@@ -52,11 +48,11 @@
       .logo-icon {
         width: 24px;
         height: 24px;
-        color: get-color($accent1, "default");
+        color: get-color($accent1, 'default');
       }
 
       &:hover {
-        color: get-color($primary, "900");
+        color: get-color($primary, '900');
         transform: scale(1.02);
       }
     }
@@ -64,18 +60,18 @@
 
   .toggle-btn {
     background: transparent;
-    border: 2px solid get-color($primary, "600");
+    border: 2px solid get-color($primary, '600');
     border-radius: 8px;
     padding: 8px;
-    color: get-color($primary, "700");
+    color: get-color($primary, '700');
     cursor: pointer;
     transition: all 0.3s ease;
 
     &:hover {
-      background: get-color($primary, "100");
-      color: get-color($primary, "600");
-      box-shadow: 0 2px 8px rgba(get-color($primary, "600"), 0.2);
-      border-color: get-color($primary, "500");
+      background: get-color($primary, '100');
+      color: get-color($primary, '600');
+      box-shadow: 0 2px 8px rgba(get-color($primary, '600'), 0.2);
+      border-color: get-color($primary, '500');
     }
 
     i {
@@ -96,7 +92,7 @@
 
       .nav-link {
         font-size: get-font-size($body-font-size, rg);
-        color: get-color($primary, "700");
+        color: get-color($primary, '700');
         font-weight: get-font-weight($font-weight, semibold);
         text-transform: uppercase;
         padding: 0.75rem 1rem;
@@ -106,8 +102,8 @@
 
         &:hover,
         &.active {
-          color: get-color($accent1, "default");
-          background: rgba(get-color($accent1, "default"), 0.1);
+          color: get-color($accent1, 'default');
+          background: rgba(get-color($accent1, 'default'), 0.1);
           transform: translateY(-2px);
         }
       }
@@ -116,15 +112,15 @@
         .dropdown-toggle {
           background: none !important;
           border: none !important;
-          color: get-color($primary, "700") !important;
+          color: get-color($primary, '700') !important;
           font-weight: get-font-weight($font-weight, semibold);
           padding: 0.75rem 1rem;
           border-radius: 8px;
           transition: all 0.3s ease;
 
           &:hover {
-            background: rgba(get-color($accent1, "default"), 0.1) !important;
-            color: get-color($accent1, "default") !important;
+            background: rgba(get-color($accent1, 'default'), 0.1) !important;
+            color: get-color($accent1, 'default') !important;
           }
 
           .user-dropdown-title {
@@ -146,7 +142,7 @@
         .dropdown-menu {
           border: none;
           border-radius: 12px;
-          box-shadow: 0 8px 32px rgba(get-color($neutral, "900"), 0.15);
+          box-shadow: 0 8px 32px rgba(get-color($neutral, '900'), 0.15);
           padding: 0.5rem 0;
           margin-top: 0.5rem;
 
@@ -155,7 +151,7 @@
             align-items: center;
             gap: 0.75rem;
             padding: 0.75rem 1.25rem;
-            color: get-color($primary, "700");
+            color: get-color($primary, '700');
             font-weight: get-font-weight($font-weight, medium);
             transition: all 0.2s ease;
 
@@ -165,16 +161,16 @@
             }
 
             &:hover {
-              background: get-color($primary, "50");
-              color: get-color($primary, "800");
+              background: get-color($primary, '50');
+              color: get-color($primary, '800');
             }
 
             &.dropdown-item-danger {
-              color: get-color($destructive, "default");
+              color: get-color($destructive, 'default');
 
               &:hover {
-                background: rgba(get-color($destructive, "default"), 0.1);
-                color: get-color($destructive, "default");
+                background: rgba(get-color($destructive, 'default'), 0.1);
+                color: get-color($destructive, 'default');
               }
             }
           }
@@ -185,7 +181,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        background: get-color($primary, "800");
+        background: get-color($primary, '800');
         color: white !important;
         padding: 0.75rem 1.25rem;
         border-radius: 25px;
@@ -199,9 +195,9 @@
         }
 
         &:hover {
-          background: get-color($primary, "900");
+          background: get-color($primary, '900');
           transform: translateY(-2px);
-          box-shadow: 0 4px 16px rgba(get-color($primary, "800"), 0.3);
+          box-shadow: 0 4px 16px rgba(get-color($primary, '800'), 0.3);
         }
       }
     }
@@ -212,15 +208,15 @@
 .offcanvas-menu-panel {
   width: 320px;
   background: white;
-  box-shadow: 0 4px 32px rgba(get-color($neutral, "900"), 0.15);
+  box-shadow: 0 4px 32px rgba(get-color($neutral, '900'), 0.15);
 
   .offcanvas-menu-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 1.25rem;
-    border-bottom: 1px solid get-color($neutral, "200");
-    background: linear-gradient(135deg, get-color($secondary, "50"), get-color($accent1, "50"));
+    border-bottom: 1px solid get-color($neutral, '200');
+    background: linear-gradient(135deg, get-color($secondary, '50'), get-color($accent1, '50'));
 
     .offcanvas-logo {
       display: flex;
@@ -228,12 +224,12 @@
       gap: 0.5rem;
       font-size: 1.25rem;
       font-weight: get-font-weight($font-weight, bold);
-      color: get-color($primary, "800");
+      color: get-color($primary, '800');
 
       .offcanvas-logo-icon {
         width: 24px;
         height: 24px;
-        color: get-color($accent1, "default");
+        color: get-color($accent1, 'default');
       }
     }
 
@@ -245,12 +241,12 @@
       transition: all 0.2s ease;
 
       &:hover {
-        background: get-color($neutral, "100");
+        background: get-color($neutral, '100');
       }
 
       i {
         font-size: 1.25rem;
-        color: get-color($primary, "700");
+        color: get-color($primary, '700');
       }
     }
   }
@@ -270,7 +266,7 @@
       gap: 1rem;
       padding: 1rem 1.25rem;
       border-radius: 12px;
-      color: get-color($primary, "700");
+      color: get-color($primary, '700');
       font-weight: get-font-weight($font-weight, medium);
       text-decoration: none;
       background: none;
@@ -282,45 +278,45 @@
       .offcanvas-nav-icon {
         width: 20px;
         height: 20px;
-        color: get-color($primary, "500");
+        color: get-color($primary, '500');
         flex-shrink: 0;
       }
 
       &:hover {
-        background: get-color($secondary, "50");
-        color: get-color($primary, "800");
+        background: get-color($secondary, '50');
+        color: get-color($primary, '800');
         transform: translateX(4px);
 
         .offcanvas-nav-icon {
-          color: get-color($accent1, "default");
+          color: get-color($accent1, 'default');
         }
       }
 
       &.active {
-        background: get-color($accent1, "50");
-        color: get-color($accent1, "default");
+        background: get-color($accent1, '50');
+        color: get-color($accent1, 'default');
 
         .offcanvas-nav-icon {
-          color: get-color($accent1, "default");
+          color: get-color($accent1, 'default');
         }
       }
 
       &.danger {
-        color: get-color($destructive, "default");
+        color: get-color($destructive, 'default');
 
         .offcanvas-nav-icon {
-          color: get-color($destructive, "default");
+          color: get-color($destructive, 'default');
         }
 
         &:hover {
-          background: rgba(get-color($destructive, "default"), 0.1);
-          color: get-color($destructive, "default");
+          background: rgba(get-color($destructive, 'default'), 0.1);
+          color: get-color($destructive, 'default');
         }
       }
     }
 
     .offcanvas-user-section {
-      border-top: 1px solid get-color($neutral, "200");
+      border-top: 1px solid get-color($neutral, '200');
       padding-top: 1.5rem;
 
       .offcanvas-user-menu {
@@ -329,20 +325,24 @@
           align-items: center;
           gap: 1rem;
           padding: 1.25rem;
-          background: linear-gradient(135deg, get-color($secondary, "50"), get-color($accent1, "50"));
+          background: linear-gradient(
+            135deg,
+            get-color($secondary, '50'),
+            get-color($accent1, '50')
+          );
           border-radius: 12px;
           margin-bottom: 1rem;
-          border: 1px solid get-color($neutral, "200");
+          border: 1px solid get-color($neutral, '200');
 
           .user-avatar-icon {
             width: 28px;
             height: 28px;
-            color: get-color($accent1, "default");
+            color: get-color($accent1, 'default');
           }
 
           .user-name {
             font-weight: get-font-weight($font-weight, semibold);
-            color: get-color($primary, "800");
+            color: get-color($primary, '800');
             font-size: 1.1rem;
           }
         }
@@ -359,7 +359,7 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        background: get-color($primary, "800");
+        background: get-color($primary, '800');
         color: white;
         padding: 1.25rem;
         border-radius: 12px;
@@ -368,7 +368,7 @@
         transition: all 0.3s ease;
 
         &:hover {
-          background: get-color($primary, "900");
+          background: get-color($primary, '900');
           color: white;
           transform: translateY(-2px);
         }
@@ -376,7 +376,7 @@
     }
 
     .offcanvas-cart-section {
-      border-top: 1px solid get-color($neutral, "200");
+      border-top: 1px solid get-color($neutral, '200');
       padding-top: 1.5rem;
     }
   }
@@ -404,12 +404,12 @@
 @media (max-width: 576px) {
   .header-section {
     padding: 0 1rem;
-    
+
     .logo a {
       font-size: 1.25rem;
     }
   }
-  
+
   .offcanvas-menu-panel {
     width: 100vw;
   }

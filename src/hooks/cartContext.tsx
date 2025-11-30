@@ -88,7 +88,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const auth = await MainApiRequest.get<{ data: { phoneCustomer?: string; phone?: string}}>('/auth/callback')
         const phoneCustomer = auth.data.data.phoneCustomer || auth.data.data.phone
         if (phoneCustomer) {
-          //merge cart vao cart của user
           try {
             query = `?phoneCustomer=${encodeURIComponent(phoneCustomer)}`
           } catch (err) {
@@ -109,11 +108,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (isCake && ci.size === 'whole') {
             price = p.sizes[0].price * 8
           } else {
-            // Tính giá tương ứng với size
             const sz = p.sizes.find((s) => s.sizeName === ci.size)
             price = sz?.price ?? 0
           }
-          // Nếu không có size tương ứng, dùng giá đầu tiên
           if (price === 0 && p.sizes.length > 0) {
             price = p.sizes[0].price
           }
@@ -246,9 +243,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  // Hàm xóa các sản phẩm trong giỏ hàng sau khi đã đặt hàng
   const removeCartItemsAfterOrder = async (items: { productId: number|string; size: string; mood?: string }[]) => {
-  // items là mảng các sản phẩm đã đặt (cùng productId, size, mood)
   for (const it of items) {
     const cartItem = cart.find(
       c =>
@@ -271,7 +266,6 @@ const clearSessionId = () => {
     fetchCart()
   }, []) 
 
-  // Tính tổng số lượng và giá trị của giỏ hàng
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0)
   const totalPrice = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
 

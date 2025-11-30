@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
-import { Col, Container, Row, Card, ListGroup, Form, FloatingLabel } from "react-bootstrap";
-import image from "@/assets/service2.jpg";
-import "./Contact.scss";
-import Breadcrumbs from "@/components/littleComponent/Breadcrumbs/Breadcrumbs";
+import image from '@/assets/service2.jpg';
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import { useEffect } from 'react';
+import { Card, Col, Container, FloatingLabel, Form, ListGroup, Row } from 'react-bootstrap';
+import './Contact.scss';
 
 const Contact = () => {
   useEffect(() => {
@@ -11,22 +11,19 @@ const Contact = () => {
 
   return (
     <>
-      <Breadcrumbs 
+      <Breadcrumbs
         title="Liên hệ"
-        items={[
-          { label: "Trang chủ", to: "/" },
-          { label: "Liên hệ" }
-        ]}
+        items={[{ label: 'Trang chủ', to: '/' }, { label: 'Liên hệ' }]}
       />
       <section className="contact pt-5">
         <Container>
           <Row>
             <Col md="12">
-              <h1 className="mb-2 h1 font-bold">
-                Liên hệ với chúng tôi
-              </h1>
+              <h1 className="mb-2 h1 font-bold">Liên hệ với chúng tôi</h1>
               <p className="body-text mt-1 align-items-center px-3 text-center">
-                Chúng tôi rất vui được nghe ý kiến của bạn! Nếu bạn có bất kỳ câu hỏi, đề xuất hoặc phản hồi nào về cửa hàng thức uống của chúng tôi, hãy để lại thông tin liên hệ bên dưới. Chúng tôi sẽ cố gắng trả lời bạn trong thời gian sớm nhất.
+                Chúng tôi rất vui được nghe ý kiến của bạn! Nếu bạn có bất kỳ câu hỏi, đề xuất hoặc
+                phản hồi nào về cửa hàng thức uống của chúng tôi, hãy để lại thông tin liên hệ bên
+                dưới. Chúng tôi sẽ cố gắng trả lời bạn trong thời gian sớm nhất.
               </p>
             </Col>
           </Row>
@@ -41,7 +38,9 @@ const Contact = () => {
                     </div>
                   </div>
                   <Card.Title className="fw-bold h5">Phone</Card.Title>
-                  <p className="mb-3 body-text">Gọi cho chúng tôi để được hỗ trợ nhanh chóng và hiệu quả.</p>
+                  <p className="mb-3 body-text">
+                    Gọi cho chúng tôi để được hỗ trợ nhanh chóng và hiệu quả.
+                  </p>
                   <div className="d-block justify-content-between">
                     <a type="button" className="btn btn-light me-2 btn-sm">
                       <i className="bi bi-phone me-1"></i>
@@ -138,11 +137,18 @@ const Contact = () => {
 
                       <Col md="12">
                         <FloatingLabel controlId="message" label="Message">
-                          <Form.Control as="textarea" placeholder="Message" style={{ height: "126px" }} />
+                          <Form.Control
+                            as="textarea"
+                            placeholder="Message"
+                            style={{ height: '126px' }}
+                          />
                         </FloatingLabel>
                       </Col>
                     </Row>
-                    <button className="primaryBtn mt-3" type="button"> Send Message</button>
+                    <button className="primaryBtn mt-3" type="button">
+                      {' '}
+                      Send Message
+                    </button>
                   </Form>
                 </div>
               </Card>

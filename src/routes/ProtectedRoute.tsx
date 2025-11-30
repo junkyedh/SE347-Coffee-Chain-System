@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   console.log('isInitialized:', isInitialized);
 
   if (!isInitialized) {
-    return null; // or a loading spinner
+    return null;
   }
 
   if (!isLoggedIn) {

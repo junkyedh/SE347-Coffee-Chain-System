@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 interface ContextValue {
   isLoggedIn: boolean;
   token: string;
@@ -23,7 +23,7 @@ export const useSystemContext = () => {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error('useSystemContext must be used within AppSystemProvider');
   return ctx;
-}
+};
 
 export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   const [token, setToken] = useState('');
@@ -33,11 +33,10 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
   const [isInitialized, setIsInitialized] = useState(false);
 
   const setAuth = (newToken: string, newRole: string, isNewUser = false) => {
-    const decoded: TokenPayload = jwtDecode(newToken);
     setToken(newToken);
     setRole(newRole);
     setIsLoggedIn(true);
-  }
+  };
 
   const logout = () => {
     setIsLoggedIn(false);
@@ -45,10 +44,9 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
     setRole('');
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    localStorage.removeItem('sessionId'); // remove sessionId on logout
+    localStorage.removeItem('sessionId');
   };
 
-  // Khởi tạo từ localStorage
   useEffect(() => {
     const t = localStorage.getItem('token');
     const r = localStorage.getItem('role');
@@ -63,7 +61,9 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
   }, []);
 
   return (
-    <AppContext.Provider value={{ isLoggedIn, token, role, branchId, setAuth, logout, isInitialized }}>
+    <AppContext.Provider
+      value={{ isLoggedIn, token, role, branchId, setAuth, logout, isInitialized }}
+    >
       {children}
     </AppContext.Provider>
   );
