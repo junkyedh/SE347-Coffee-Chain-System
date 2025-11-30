@@ -1,11 +1,11 @@
+import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { DeleteOutlined, ShoppingCartOutlined, UserAddOutlined } from '@ant-design/icons';
 import { AutoComplete, Button, Form, Input, message, Modal, Pagination } from 'antd';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './AdminMenu.scss';
 import AdminProductCard from '../AdminCard/AdminProductCard';
-import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
+import './AdminMenu.scss';
 
 const categories = ['All', 'Cà phê', 'Trà trái cây', 'Trà sữa', 'Nước ép', 'Bánh ngọt'];
 
@@ -238,7 +238,7 @@ const AdminMenu = () => {
 
       const payload = {
         phoneCustomer: phone || null,
-        serviceType: orderInfo?.serviceType || 'DINE IN', // hoặc "TAKE AWAY"
+        serviceType: orderInfo?.serviceType || 'DINE IN',
         totalPrice: finalTotal,
         tableID: orderInfo?.tableID || null,
         orderDate: new Date().toISOString(),
@@ -557,7 +557,7 @@ const AdminMenu = () => {
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <div className="form-grid">
-            <FloatingLabelInput 
+            <FloatingLabelInput
               label="Tên khách hàng"
               name="name"
               component="input"

@@ -19,10 +19,16 @@
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
 
-    .icon { font-size: 1.25rem; }
-    .label { color: var(--color-text); }
+    .icon {
+      font-size: 1.25rem;
+    }
+    .label {
+      color: var(--color-text);
+    }
 
-    &:hover { background: #f3f4f6; }
+    &:hover {
+      background: #f3f4f6;
+    }
 
     &.active {
       background: var(--color-accent);

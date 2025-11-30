@@ -1,11 +1,11 @@
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
 import { useCart, type CartItem } from '@/hooks/cartContext';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { CheckCircle, Clock, CreditCard, MapPin, Tag, Wallet } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Checkout.scss';
-import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
-import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 
 interface LocationStateItem {
   productId: number;
@@ -56,25 +56,19 @@ export const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const { cart, fetchCart, removeCartItemsAfterOrder } = useCart();
 
-  // Order items
   const [items, setItems] = useState<(OrderItem | CartItem)[]>([]);
-  // Customer info
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [note, setNote] = useState('');
-  // Methods
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer'>('cash');
-  // Coupons
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
-  // Branches
   const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<number | null>(null);
-  // Membership
   const [membershipList, setMembershipList] = useState<Membership[]>([]);
   const [membershipDiscount, setMembershipDiscount] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -98,7 +92,6 @@ export const Checkout: React.FC = () => {
       .catch((err) => console.error('Failed to fetch membership:', err));
   }, []);
 
-  // Load items from state or cart
   useEffect(() => {
     const loadItems = async () => {
       if (state?.initialItems) {
@@ -141,7 +134,6 @@ export const Checkout: React.FC = () => {
     loadItems();
   }, [state, cart, fetchCart]);
 
-  // Auto-fill user info
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -165,7 +157,6 @@ export const Checkout: React.FC = () => {
     fetchUserInfo();
   }, []);
 
-  // Load available branches
   useEffect(() => {
     if (!items.length) return;
     const loadBranches = async () => {
@@ -285,7 +276,6 @@ export const Checkout: React.FC = () => {
     }
   };
 
-  // loading indicator
   if (!items.length) {
     return (
       <div className="checkout__empty">

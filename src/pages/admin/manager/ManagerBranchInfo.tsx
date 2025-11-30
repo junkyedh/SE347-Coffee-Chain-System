@@ -55,9 +55,7 @@ const ManagerBranchInfo = () => {
 
   return (
     <div className="container-fluid">
-      <h3 className="h3 mb-4" >
-        Thông tin Chi nhánh
-      </h3>
+      <h3 className="h3 mb-4">Thông tin Chi nhánh</h3>
 
       {loading ? (
         <Spin size="large" />
@@ -73,9 +71,16 @@ const ManagerBranchInfo = () => {
               </Button>
             }
           >
-            <Descriptions bordered column={1} size="middle" labelStyle={{ fontWeight: 600, backgroundColor: '#fafafa' }}>
+            <Descriptions
+              bordered
+              column={1}
+              size="middle"
+              labelStyle={{ fontWeight: 600, backgroundColor: '#fafafa' }}
+            >
               <Descriptions.Item label="Tên chi nhánh">
-                <Tag color="geekblue" style={{ fontSize: 16 }}>{branch.name}</Tag>
+                <Tag color="geekblue" style={{ fontSize: 16 }}>
+                  {branch.name}
+                </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="Địa chỉ">
                 <span style={{ color: '#333' }}>{branch.address}</span>
@@ -88,7 +93,9 @@ const ManagerBranchInfo = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Quản lý chi nhánh">
                 {branch.manager ? (
-                  <Tag color="blue-inverse">{branch.manager.name} ({branch.manager.phone})</Tag>
+                  <Tag color="blue-inverse">
+                    {branch.manager.name} ({branch.manager.phone})
+                  </Tag>
                 ) : (
                   <Tag color="red-inverse">Chưa có quản lý</Tag>
                 )}

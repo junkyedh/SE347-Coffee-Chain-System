@@ -33,8 +33,6 @@ const AdminTableOrder = () => {
   const [tableList, setTableList] = useState<any[]>([]);
   const [filteredTableList, setFilteredTableList] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTable, setSelectedTable] = useState<any | null>(null);
-  const [openBookingModal, setOpenBookingModal] = useState(false);
   const [selectedSeats, setSelectedSeats] = useState<string | number>('');
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingTable, setEditingTable] = useState<any | null>(null);

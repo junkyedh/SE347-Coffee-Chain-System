@@ -1,21 +1,21 @@
-@import "../../styles/variables.scss";
+@import '../../styles/variables.scss';
 
 .container-fluid {
   padding: 0;
-  background: get-color($background, "default");
+  background: get-color($background, 'default');
   min-height: 100vh;
 
   .header {
     background: white;
     padding: 2rem 2.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 20px rgba(get-color($primary, "default"), 0.08);
-    border-bottom: 1px solid get-color($neutral, "200");
+    box-shadow: 0 2px 20px rgba(get-color($primary, 'default'), 0.08);
+    border-bottom: 1px solid get-color($neutral, '200');
 
     .header-custom {
       font-size: 2rem;
       font-weight: 700;
-      color: get-color($primary, "800");
+      color: get-color($primary, '800');
       margin: 0;
       text-align: left;
       letter-spacing: -0.025em;
@@ -111,8 +111,8 @@
         background: white;
         border-radius: 1.2em;
         padding: 2rem;
-        box-shadow: 0 4px 24px rgba(get-color($primary, "default"), 0.08);
-        border: 1px solid get-color($neutral, "200");
+        box-shadow: 0 4px 24px rgba(get-color($primary, 'default'), 0.08);
+        border: 1px solid get-color($neutral, '200');
         margin-bottom: 2.2rem;
         display: flex;
         flex-direction: column;
@@ -145,8 +145,8 @@
       .donut-chart {
         background: #fff;
         border-radius: 1.2em;
-        box-shadow: 0 4px 24px rgba(get-color($primary, "default"), 0.08);
-        border: 1px solid get-color($neutral, "200");
+        box-shadow: 0 4px 24px rgba(get-color($primary, 'default'), 0.08);
+        border: 1px solid get-color($neutral, '200');
         padding: 1.5rem 1.2rem;
         margin: 0;
         transition: box-shadow 0.15s, transform 0.14s;
@@ -157,12 +157,12 @@
 
         &:hover {
           transform: translateY(-3px) scale(1.015);
-          box-shadow: 0 10px 40px rgba(get-color($primary, "default"), 0.11);
+          box-shadow: 0 10px 40px rgba(get-color($primary, 'default'), 0.11);
         }
 
         h3,
         h4 {
-          color: get-color($primary, "800");
+          color: get-color($primary, '800');
           font-weight: 600;
           margin-bottom: 1.15rem;
           text-align: center;
@@ -193,19 +193,19 @@
 .recharts-wrapper {
   .recharts-cartesian-grid-horizontal line,
   .recharts-cartesian-grid-vertical line {
-    stroke: get-color($neutral, "300");
+    stroke: get-color($neutral, '300');
     stroke-opacity: 0.6;
   }
 
   .recharts-text {
-    fill: get-color($primary, "600");
+    fill: get-color($primary, '600');
     font-size: 0.875rem;
     font-weight: 500;
   }
 
   .recharts-legend-wrapper {
     .recharts-legend-item-text {
-      color: get-color($primary, "700") !important;
+      color: get-color($primary, '700') !important;
       font-weight: 500;
     }
   }

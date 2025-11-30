@@ -4,7 +4,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
-import '../admin/adminPage.scss';
+import '../adminPage.scss';
 import SearchInput from '@/components/common/SearchInput/SearchInput';
 import AdminButton from '@/components/admin/AdminButton/AdminButton';
 import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
@@ -30,7 +30,7 @@ export const ManagerOrderList = () => {
       fetchManagerOrderList();
       return;
     }
-    const filtered = originalManagerOrderList.filter(order => {
+    const filtered = originalManagerOrderList.filter((order) => {
       const id = String(order.id ?? '').toLowerCase();
       const phoneCustomer = (order.phoneCustomer ?? '').toLowerCase();
       const staffName = (order.staffName ?? '').toLowerCase();
@@ -40,7 +40,6 @@ export const ManagerOrderList = () => {
     setManagerOrderList(filtered);
   };
 
-  // Reset search when keyword is empty
   useEffect(() => {
     if (!searchKeyword.trim()) {
       fetchManagerOrderList();
@@ -49,14 +48,14 @@ export const ManagerOrderList = () => {
 
   const handleExportManagerOrderList = () => {
     const worksheet = XLSX.utils.json_to_sheet(
-      managerOrderList.map(order => ({
+      managerOrderList.map((order) => ({
         'Mã đơn': order.id,
         'Số điện thoại': order.phoneCustomer,
         'Loại phục vụ': order.serviceType,
         'Tổng tiền': order.totalPrice,
         'Ngày đặt': moment(order.orderDate).format('DD-MM-YYYY HH:mm:ss'),
         'Nhân viên': order.staffName,
-        'Trạng thái': order.status
+        'Trạng thái': order.status,
       }))
     );
     const workbook = XLSX.utils.book_new();
@@ -87,10 +86,9 @@ export const ManagerOrderList = () => {
     }
   };
 
-
   return (
     <div className="container-fluid">
-      <div className='sticky-header-wrapper'>
+      <div className="sticky-header-wrapper">
         <h2 className="header-custom">DANH SÁCH ĐƠN HÀNG</h2>
         {/* Tìm kiếm và  Export */}
         <div className="header-actions">
@@ -103,17 +101,17 @@ export const ManagerOrderList = () => {
               allowClear
             />
           </div>
-          <div className="d-flex" >
+          <div className="d-flex">
             <AdminButton
-              variant="primary" icon={<DownloadOutlined />}
+              variant="primary"
+              icon={<DownloadOutlined />}
               onClick={handleExportManagerOrderList}
-              title='Tải xuống danh sách'
+              title="Tải xuống danh sách"
             />
           </div>
         </div>
       </div>
 
-      {/* Bảng đơn hàng */}
       <Table
         className="custom-table"
         dataSource={managerOrderList}
@@ -123,37 +121,37 @@ export const ManagerOrderList = () => {
             title: 'Mã đơn',
             dataIndex: 'id',
             key: 'id',
-            sorter: (a, b) => a.id - b.id
+            sorter: (a, b) => a.id - b.id,
           },
           {
             title: 'Số điện thoại',
             dataIndex: 'phoneCustomer',
-            key: 'phoneCustomer'
+            key: 'phoneCustomer',
           },
           {
             title: 'Loại phục vụ',
             dataIndex: 'serviceType',
             key: 'serviceType',
-            sorter: (a, b) => a.serviceType.localeCompare(b.serviceType)
+            sorter: (a, b) => a.serviceType.localeCompare(b.serviceType),
           },
           {
             title: 'Tổng tiền',
             dataIndex: 'totalPrice',
             key: 'totalPrice',
-            sorter: (a, b) => a.totalPrice - b.totalPrice
+            sorter: (a, b) => a.totalPrice - b.totalPrice,
           },
           {
             title: 'Ngày đặt',
             dataIndex: 'orderDate',
             key: 'orderDate',
             render: (date: string) => moment(date).format('DD-MM-YYYY HH:mm:ss'),
-            sorter: (a, b) => moment(a.orderDate).unix() - moment(b.orderDate).unix()
+            sorter: (a, b) => moment(a.orderDate).unix() - moment(b.orderDate).unix(),
           },
           {
             title: 'Nhân viên',
             dataIndex: ['staff', 'name'],
             key: 'staffName',
-            sorter: (a, b) => a.staffName.localeCompare(b.staffName)
+            sorter: (a, b) => a.staffName.localeCompare(b.staffName),
           },
           {
             title: 'Trạng thái',
@@ -166,7 +164,7 @@ export const ManagerOrderList = () => {
               else if (status === 'Đã hủy') color = 'red';
               return <Tag color={color}>{status}</Tag>;
             },
-            sorter: (a, b) => a.status.localeCompare(b.status)
+            sorter: (a, b) => a.status.localeCompare(b.status),
           },
           {
             title: 'Hành động',
@@ -181,30 +179,27 @@ export const ManagerOrderList = () => {
                     variant="primary"
                     size="sm"
                     disabled={isCompleted || isCanceled}
-                    icon={<i className='fas fa-check'></i>}
+                    icon={<i className="fas fa-check"></i>}
                     onClick={() => handleCompleteOrder(record.id)}
-                  >
-                  </AdminButton>
+                  ></AdminButton>
 
                   <AdminPopConfirm
                     title="Bạn có chắc chắn muốn hủy đơn hàng này?"
                     onConfirm={() => handleCancelOrder(record.id)}
                     okText="Đồng ý"
                     cancelText="Hủy"
-                    //disabled={isCompleted || isCanceled}
                   >
                     <AdminButton
                       variant="destructive"
                       size="sm"
-                      icon={<i className='fas fa-stop'></i>}
+                      icon={<i className="fas fa-stop"></i>}
                       disabled={isCompleted || isCanceled}
-                    >
-                    </AdminButton>
+                    ></AdminButton>
                   </AdminPopConfirm>
                 </div>
               );
-            }
-          }
+            },
+          },
         ]}
       />
     </div>

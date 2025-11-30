@@ -19,9 +19,13 @@
 
     &.active {
       background: var(--color-primary);
-      svg { color: #fff; }
+      svg {
+        color: #fff;
+      }
     }
 
-    svg { color: var(--color-text); }
+    svg {
+      color: var(--color-text);
+    }
   }
 }
