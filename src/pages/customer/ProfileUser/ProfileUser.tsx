@@ -1,11 +1,11 @@
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import { Button } from '@/components/common/Button/Button';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { Award, Calendar, Camera, Edit3, Phone, Save, User, X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ProfileUser.scss';
-import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
-import { Button } from '@/components/common/Button/Button';
 
 interface Customer {
   id: number;

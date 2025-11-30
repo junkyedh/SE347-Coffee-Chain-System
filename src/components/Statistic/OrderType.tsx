@@ -1,6 +1,6 @@
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
-import { useEffect, useState } from "react";
-import { Doughnut } from "react-chartjs-2";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
+import { useEffect, useState } from 'react';
+import { Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -16,8 +16,8 @@ const OrderType = ({ data }: { data: any }) => {
       const dineInPercentage = ((dineIn / total) * 100).toFixed(2);
 
       const sampleData = [
-        { type: "Take away", percentage: parseFloat(takeAwayPercentage) },
-        { type: "Dine in", percentage: parseFloat(dineInPercentage) },
+        { type: 'Take away', percentage: parseFloat(takeAwayPercentage) },
+        { type: 'Dine in', percentage: parseFloat(dineInPercentage) },
       ];
 
       const labels = sampleData.map((item) => item.type);
@@ -27,13 +27,10 @@ const OrderType = ({ data }: { data: any }) => {
         labels: labels,
         datasets: [
           {
-            label: "Phần trăm",
+            label: 'Phần trăm',
             data: values,
-            backgroundColor: [
-              "rgba(54, 162, 235, 0.6)",
-              "rgba(255, 206, 86, 0.6)",
-            ],
-            borderColor: ["rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)"],
+            backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)'],
+            borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
             borderWidth: 1,
           },
         ],
@@ -50,11 +47,11 @@ const OrderType = ({ data }: { data: any }) => {
             responsive: true,
             plugins: {
               legend: {
-                position: "top",
+                position: 'top',
               },
               title: {
                 display: true,
-                text: "Thống kê loại phục vụ",
+                text: 'Thống kê loại phục vụ',
               },
             },
           }}

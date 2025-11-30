@@ -1,7 +1,7 @@
-import React from 'react';
-import { Button, Tag } from 'antd';
-import './AdminProductCard.scss';
 import AdminButton from '@/components/admin/AdminButton/AdminButton';
+import { Button, Tag } from 'antd';
+import React from 'react';
+import './AdminProductCard.scss';
 
 interface Product {
   id: string;
@@ -94,7 +94,6 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
               </div>
             </div>
 
-            {/* Mood Selection chỉ cho Cà phê */}
             {isCoffee && (
               <div className="selection-section">
                 <span className="selection-label">Nhiệt độ:</span>
@@ -121,7 +120,6 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
               </div>
             )}
 
-            {/* Footer: giá + nút chọn + số lượng trong cart */}
             <div className="product-footer">
               <div className="price-section">
                 <span className="price-value">

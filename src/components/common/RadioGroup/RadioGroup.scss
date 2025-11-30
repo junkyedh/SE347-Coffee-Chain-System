@@ -8,12 +8,12 @@
 
 .radio-group-label {
   font-weight: get-font-weight($font-weight, semibold);
-  color: get-color($neutral, "700");
+  color: get-color($neutral, '700');
   font-size: get-font-size($body-font-size, rg);
 
   &.radio-group-label-required::after {
     content: ' *';
-    color: get-color($accent, "500");
+    color: get-color($accent, '500');
   }
 }
 
@@ -36,7 +36,7 @@
   align-items: flex-start;
   gap: 12px;
   padding: 16px;
-  border: 2px solid get-color($neutral, "200");
+  border: 2px solid get-color($neutral, '200');
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -44,17 +44,17 @@
   position: relative;
 
   &:hover:not(.radio-option-disabled) {
-    border-color: get-color($primary, "300");
-    background: get-color($primary, "50");
+    border-color: get-color($primary, '300');
+    background: get-color($primary, '50');
   }
 
   &.radio-option-selected {
-    border-color: get-color($primary, "500");
-    background: get-color($primary, "50");
+    border-color: get-color($primary, '500');
+    background: get-color($primary, '50');
 
     .radio-input {
-      border-color: get-color($primary, "500");
-      background: get-color($primary, "500");
+      border-color: get-color($primary, '500');
+      background: get-color($primary, '500');
 
       &::after {
         opacity: 1;
@@ -63,7 +63,7 @@
     }
 
     .radio-label {
-      color: get-color($primary, "700");
+      color: get-color($primary, '700');
       font-weight: get-font-weight($font-weight, semibold);
     }
   }
@@ -71,7 +71,7 @@
   &.radio-option-disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    background: get-color($neutral, "50");
+    background: get-color($neutral, '50');
 
     .radio-input {
       cursor: not-allowed;
@@ -79,15 +79,15 @@
   }
 
   &.radio-option-error {
-    border-color: get-color($accent, "500");
-    background: get-color($accent, "50");
+    border-color: get-color($accent, '500');
+    background: get-color($accent, '50');
   }
 }
 
 .radio-input {
   width: 20px;
   height: 20px;
-  border: 2px solid get-color($neutral, "300");
+  border: 2px solid get-color($neutral, '300');
   border-radius: 50%;
   background: $white;
   cursor: pointer;
@@ -113,12 +113,12 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(get-color($primary, "500"), 0.1);
+    box-shadow: 0 0 0 3px rgba(get-color($primary, '500'), 0.1);
   }
 }
 
 .radio-icon {
-  color: get-color($primary, "500");
+  color: get-color($primary, '500');
   flex-shrink: 0;
   margin-top: 2px;
 
@@ -128,11 +128,11 @@
   }
 
   .radio-option-selected & {
-    color: get-color($primary, "600");
+    color: get-color($primary, '600');
   }
 
   .radio-option-disabled & {
-    color: get-color($neutral, "400");
+    color: get-color($neutral, '400');
   }
 }
 
@@ -143,19 +143,19 @@
 
 .radio-label {
   font-weight: get-font-weight($font-weight, medium);
-  color: get-color($neutral, "800");
+  color: get-color($neutral, '800');
   margin-bottom: 4px;
   font-size: get-font-size($body-font-size, rg);
 }
 
 .radio-description {
   font-size: get-font-size($body-font-size, sm);
-  color: get-color($neutral, "600");
+  color: get-color($neutral, '600');
   line-height: 1.4;
 }
 
 .radio-group-error {
-  color: get-color($accent, "600");
+  color: get-color($accent, '600');
   font-size: get-font-size($body-font-size, sm);
   font-weight: get-font-weight($font-weight, medium);
 }

@@ -15,7 +15,7 @@
       background: var(--white);
       border-radius: 1.4rem;
       padding: 2.5rem;
-      box-shadow: 0 4px 18px rgba(47, 65, 86, 0.10);
+      box-shadow: 0 4px 18px rgba(47, 65, 86, 0.1);
 
       .feedback-header {
         text-align: center;
@@ -75,7 +75,7 @@
               padding: 0.25rem;
               border-radius: 50%;
               transition: all 0.3s ease;
-              color: #E4E7EB;
+              color: #e4e7eb;
 
               &:hover {
                 transform: scale(1.1);
@@ -83,7 +83,7 @@
               }
 
               &.active {
-                color: #FFD700;
+                color: #ffd700;
                 transform: scale(1.05);
               }
 
@@ -106,7 +106,7 @@
           .form-textarea {
             width: 100%;
             padding: 1rem;
-            border: 2px solid #E4E7EB;
+            border: 2px solid #e4e7eb;
             border-radius: 0.75rem;
             font-size: var(--bodyText);
             color: var(--primaryText);
