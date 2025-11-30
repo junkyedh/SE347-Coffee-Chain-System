@@ -1,0 +1,17 @@
+.sort-dropdown {
+  .sort-dropdown__select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius);
+    background: #fff;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+  }
+}

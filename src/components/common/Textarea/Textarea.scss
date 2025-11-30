@@ -1,0 +1,99 @@
+@import '../../../styles/variables.scss';
+
+.textarea-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &.textarea-full-width {
+    width: 100%;
+  }
+}
+
+.textarea-label {
+  font-weight: get-font-weight($font-weight, semibold);
+  color: get-color($neutral, '700');
+  font-size: get-font-size($body-font-size, rg);
+
+  &.textarea-label-required::after {
+    content: ' *';
+    color: get-color($accent1, '500');
+  }
+}
+
+.textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px 16px;
+  border: 2px solid get-color($neutral, '200');
+  border-radius: 12px;
+  font-size: get-font-size($body-font-size, rg);
+  font-family: $font-family;
+  background: get-color($neutral, '50');
+  transition: all 0.3s ease;
+  color: get-color($neutral, '800');
+  line-height: 1.5;
+
+  &::placeholder {
+    color: get-color($neutral, '400');
+  }
+
+  &:hover:not(:disabled) {
+    border-color: get-color($primary, '300');
+    background: $white;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: get-color($primary, '500');
+    background: $white;
+    box-shadow: 0 0 0 3px rgba(get-color($primary, '500'), 0.1);
+  }
+
+  &:disabled {
+    background: get-color($neutral, '100');
+    color: get-color($neutral, '500');
+    cursor: not-allowed;
+    border-color: get-color($neutral, '200');
+
+    &::placeholder {
+      color: get-color($neutral, '300');
+    }
+  }
+
+  &.textarea-error {
+    border-color: get-color($accent1, '500');
+    background: get-color($accent1, '50');
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(get-color($accent1, '500'), 0.1);
+    }
+  }
+
+  &.textarea-resize-none {
+    resize: none;
+  }
+
+  &.textarea-resize-vertical {
+    resize: vertical;
+  }
+
+  &.textarea-resize-horizontal {
+    resize: horizontal;
+  }
+
+  &.textarea-resize-both {
+    resize: both;
+  }
+}
+
+.textarea-error-text {
+  color: get-color($accent1, '600');
+  font-size: get-font-size($body-font-size, sm);
+  font-weight: get-font-weight($font-weight, medium);
+}
+
+.textarea-helper-text {
+  color: get-color($neutral, '500');
+  font-size: get-font-size($body-font-size, sm);
+}
