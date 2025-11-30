@@ -10,7 +10,7 @@
     width: 52px;
     height: 52px;
     border: 6px solid #eaeaea;
-    border-top: 6px solid #ff6f61; // màu primary hoặc tuỳ biến
+    border-top: 6px solid #ff6f61;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1.2rem;
@@ -24,7 +24,6 @@
     text-align: center;
   }
 }
-
 
 @keyframes spin {
   to {

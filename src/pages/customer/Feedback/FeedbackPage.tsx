@@ -1,57 +1,53 @@
-import React, { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import './FeedbackPage.scss'
-import Breadcrumbs from '@/components/littleComponent/Breadcrumbs/Breadcrumbs'
-import { Star, MessageSquare, Send } from 'lucide-react'
+import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import { MessageSquare, Send, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import './FeedbackPage.scss';
 
 const FeedbackPage: React.FC = () => {
-  const { reservationCode } = useParams<{ reservationCode: string }>()
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
-  const [rating, setRating] = useState(0)
-  const [hoverRating, setHoverRating] = useState(0)
-  const [comments, setComments] = useState('')
+  const { reservationCode } = useParams<{ reservationCode: string }>();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comments, setComments] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (rating === 0) {
-      alert('Vui lòng chọn đánh giá!')
-      return
-    }
-    
-    if (!comments.trim()) {
-      alert('Vui lòng nhập nhận xét!')
-      return
+      alert('Vui lòng chọn đánh giá!');
+      return;
     }
 
-    setLoading(true)
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      console.log('Feedback data:', { reservationCode, rating, comments })
-      
-      alert('Gửi phản hồi thành công!')
-      navigate('/history')
-    } catch (error) {
-      console.error('Failed to submit feedback:', error)
-      alert('Gửi phản hồi thất bại, vui lòng thử lại!')
-    } finally {
-      setLoading(false)
+    if (!comments.trim()) {
+      alert('Vui lòng nhập nhận xét!');
+      return;
     }
-  }
+
+    setLoading(true);
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log('Feedback data:', { reservationCode, rating, comments });
+
+      alert('Gửi phản hồi thành công!');
+      navigate('/history');
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      alert('Gửi phản hồi thất bại, vui lòng thử lại!');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
-      <Breadcrumbs 
+      <Breadcrumbs
         title="Đánh giá dịch vụ"
-        items={[
-          { label: 'Trang chủ', to: '/' },
-          { label: 'Đánh giá' }
-        ]}
+        items={[{ label: 'Trang chủ', to: '/' }, { label: 'Đánh giá' }]}
       />
-      
+
       <div className="feedback-page">
         <div className="container">
           <div className="feedback-page__content">
@@ -59,14 +55,14 @@ const FeedbackPage: React.FC = () => {
               <div className="feedback-header">
                 <MessageSquare className="feedback-icon" />
                 <h2>Đánh giá dịch vụ</h2>
-                <p>Mã đơn hàng: <strong>{reservationCode}</strong></p>
+                <p>
+                  Mã đơn hàng: <strong>{reservationCode}</strong>
+                </p>
               </div>
 
               <form onSubmit={handleSubmit} className="feedback-form">
                 <div className="form-group">
-                  <label className="form-label">
-                    Đánh giá của bạn *
-                  </label>
+                  <label className="form-label">Đánh giá của bạn *</label>
                   <div className="rating-container">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -95,9 +91,7 @@ const FeedbackPage: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">
-                    Nhận xét của bạn *
-                  </label>
+                  <label className="form-label">Nhận xét của bạn *</label>
                   <textarea
                     value={comments}
                     onChange={(e) => setComments(e.target.value)}
@@ -107,11 +101,7 @@ const FeedbackPage: React.FC = () => {
                   />
                 </div>
 
-                <button 
-                  type="submit" 
-                  className="primaryBtn submit-btn"
-                  disabled={loading}
-                >
+                <button type="submit" className="primaryBtn submit-btn" disabled={loading}>
                   <Send size={16} />
                   {loading ? 'Đang gửi...' : 'Gửi đánh giá'}
                 </button>
@@ -121,7 +111,7 @@ const FeedbackPage: React.FC = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default FeedbackPage
+export default FeedbackPage;
