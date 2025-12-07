@@ -1,12 +1,12 @@
 import { message } from 'antd';
 import axios from 'axios';
+import { envConfig } from '../config/env.config';
 
-// Create an instance of Axios
 export const MainApiRequest = axios.create({
-  baseURL: 'http://localhost:3000', // Replace with your desired base URL
-  timeout: 60000,
+  baseURL: envConfig.apiUrl,
+  timeout: envConfig.apiTimeout,
   headers: {
-    'Content-Type': 'application/json', // Set the Content-Type header to JSON
+    'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'ngrok-skip-browser-warning': 'true',
@@ -15,12 +15,14 @@ export const MainApiRequest = axios.create({
 
 MainApiRequest.interceptors.request.use(
   (config) => {
-    if (localStorage.getItem('token')) {
-      config.headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    console.error('Request Error:', error);
     return Promise.reject(error);
   }
 );
@@ -30,35 +32,43 @@ MainApiRequest.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle response error hereif (response.status === 401) {
-    // if (error.response.status === 401) {
-    //     window.location.href = '/login';
-    // }
+    if (error.response) {
+      const { status } = error.response;
 
-    // if (error.response.status === 403) {
-    //     window.location.href = '/login';
-    // }
-
-    if (error.response.status === 404) {
-      message.error('404 Not Found');
+      switch (status) {
+        case 400:
+          message.error('Yêu cầu không hợp lệ');
+          break;
+        case 401:
+          message.error('Phiên đăng nhập hết hạn');
+          // Có thể chuyển hướng đến trang login nếu cần
+          // window.location.href = '/dang-nhap';
+          break;
+        case 403:
+          message.error('Không có quyền truy cập');
+          break;
+        case 404:
+          message.error('Không tìm thấy tài nguyên');
+          break;
+        case 500:
+          message.error('Lỗi máy chủ nội bộ');
+          break;
+        case 503:
+          message.error('Dịch vụ không khả dụng');
+          break;
+        case 504:
+          message.error('Hết thời gian chờ');
+          break;
+        default:
+          message.error(`Lỗi: ${status}`);
+      }
+    } else if (error.request) {
+      message.error('Không thể kết nối đến máy chủ');
+    } else {
+      message.error('Có lỗi xảy ra');
     }
 
-    if (error.response.status === 500) {
-      message.error('500 Internal Server Error');
-    }
-
-    if (error.response.status === 503) {
-      message.error('503 Service Unavailable');
-    }
-
-    if (error.response.status === 504) {
-      message.error('504 Gateway Timeout');
-    }
-
-    if (error.response.status === 400) {
-      message.error('400 Bad Request');
-    }
-
+    console.error('Response Error:', error);
     return Promise.reject(error);
   }
 );

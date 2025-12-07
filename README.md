@@ -35,37 +35,124 @@ Cafe W Fen is a centralized management platform designed for coffee shop chains.
 
 ## Prerequisites
 - [Node.js](https://nodejs.org/) >= 14.x
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- [MongoDB](https://www.mongodb.com/) or your configured database
-- (Optional) [Docker](https://www.docker.com/) for containerized deployment
+- [Yarn](https://yarnpkg.com/) package manager
+- Backend API server (SE347 Coffee Chain API)
 
 ## Installation
+
 1. **Clone the repository:**
-  ```bash
-  git clone https://github.com/junkyedh/SE347-Coffee-Chain-System.git
-  cd cafe-w-fen
-  ```
+   ```bash
+   git clone https://github.com/junkyedh/SE347-Coffee-Chain-System.git
+   cd SE347-web
+   ```
+
 2. **Install dependencies:**
+   ```bash
+   yarn install
+   ```
+
+3. **Configure environment variables:**
+   
+  Copy `.env.example` to `.env` and update it with your settings:
   ```bash
-  yarn install
+  cp .env.example .env
   ```
-3. **Configure environment variables:**  
-  Copy `.env.example` to `.env` and update with your settings.
+
+  Then edit the `.env` file with your configuration:
+  ```env
+  REACT_APP_API_URL=http://localhost:3000
+  REACT_APP_BASE_URL=http://localhost:3000
+  REACT_APP_VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  REACT_APP_VNPAY_RETURN_URL=http://localhost:3000/vnpay-callback
+  ```
+
+  📖 **See detailed instructions:** [ENVIRONMENT_SETUP.md](./docs/ENVIRONMENT_SETUP.md)
 
 ## How to Run
-- **Development mode:**
-  ```bash
-  yarn dev
-  ```
-- **Production build:**
-  ```bash
-  yarn run build
-  yarn start
-  ```
-- **Docker (optional):**
-  ```bash
-  docker-compose up --build
-  ```
+
+### Development Mode
+```bash
+yarn start
+```
+The application will run on [http://localhost:3000](http://localhost:3000)
+
+### Production Build
+```bash
+yarn build
+```
+This will create an optimized production build in the `build/` folder.
+
+### Running Tests
+```bash
+yarn test
+```
+
+## Project Structure
+```
+SE347-web/
+├── public/              # Static files
+├── src/
+│   ├── assets/         # Images, fonts, etc.
+│   ├── components/     # Reusable components
+│   │   ├── admin/      # Admin-specific components
+│   │   ├── common/     # Shared components
+│   │   └── customer/   # Customer-facing components
+│   ├── hooks/          # Custom React hooks
+│   ├── layouts/        # Layout components
+│   ├── pages/          # Page components
+│   │   ├── admin/      # Admin pages
+│   │   └── customer/   # Customer pages
+│   ├── routes/         # Route configuration
+│   ├── services/       # API services
+│   ├── styles/         # Global styles
+│   └── utils/          # Utility functions
+├── .env.example        # Environment variables template
+└── package.json        # Project dependencies
+```
+
+## Available Scripts
+
+- **`yarn start`** - Runs the app in development mode
+- **`yarn build`** - Builds the app for production
+- **`yarn test`** - Launches the test runner
+- **`yarn eject`** - Ejects from Create React App (one-way operation)
+
+## Deployment
+
+### Build for Production
+```bash
+yarn build
+```
+
+The build folder will contain the optimized production files ready to be deployed.
+
+### Deploy to Static Hosting
+The production build can be deployed to any static hosting service:
+- Vercel
+- Netlify
+- GitHub Pages
+- Firebase Hosting
+
+Example deployment to a web server:
+```bash
+# After building
+yarn build
+
+# Copy the build folder to your web server
+scp -r build/* user@server:/var/www/html/
+```
+
+## Environment Variables
+
+The following environment variables are supported:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `REACT_APP_API_URL` | Backend API endpoint | `http://localhost:5000/api` |
+| `REACT_APP_BASE_URL` | Frontend base URL | `http://localhost:3000` |
+| `REACT_APP_VNPAY_URL` | VNPay payment gateway URL | `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html` |
+| `REACT_APP_VNPAY_RETURN_URL` | VNPay callback URL | `http://localhost:3000/vnpay-callback` |
+| `REACT_APP_ENVIRONMENT` | Environment mode | `development` or `production` |
 
 ## How to Contribute
 1. Fork this repository.
