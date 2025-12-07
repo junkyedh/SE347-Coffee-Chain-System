@@ -8,6 +8,7 @@ import SEO from '@/components/common/SEO';
 import { useCart } from '@/hooks/cartContext';
 import useProducts from '@/hooks/useProducts';
 import { useAuth } from '@/hooks/useAuth';
+import { ROUTES } from '@/constants';
 import { message } from 'antd';
 import { createProductUrl } from '@/utils/slugify';
 import { useState } from 'react';
@@ -81,7 +82,7 @@ const Home = () => {
           <Container>
             <Row className="align-items-center">
               <Col sx={12} md={4} className="text-center mt-3 mt-md-0">
-                <Link to="/lien-he" className="secondary_btn bounce">
+                <Link to={ROUTES.CONTACT} className="secondary_btn bounce">
                   Liên hệ với chúng tôi!
                 </Link>
               </Col>

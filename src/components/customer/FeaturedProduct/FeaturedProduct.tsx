@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
+import { ROUTES } from '../../../constants';
 import CardProduct, { Product as ProductType } from '../CardProduct/CardProduct';
 import './FeaturedProduct.scss';
 
@@ -34,7 +35,7 @@ const FeaturedList: React.FC<FeaturedListProps> = ({
   const navigate = useNavigate();
 
   const handleShowMore = () => {
-    navigate('/thuc-don');
+    navigate(ROUTES.MENU);
   };
   console.log('Popular products:', popularProducts);
   return (

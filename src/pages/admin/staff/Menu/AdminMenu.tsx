@@ -1,5 +1,6 @@
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
+import { ROUTES } from '@/constants';
 import { DeleteOutlined, ShoppingCartOutlined, UserAddOutlined } from '@ant-design/icons';
 import { AutoComplete, Button, Form, Input, message, Modal, Pagination } from 'antd';
 import { useEffect, useState } from 'react';
@@ -274,7 +275,7 @@ const AdminMenu = () => {
       setOrder({});
       setCouponCode('');
       setDiscountAmount(0);
-      navigate('/nhan-vien/danh-sach-don-hang');
+      navigate(ROUTES.STAFF.ORDER_LIST);
     } catch (error) {
       console.error('Error during payment:', error);
       message.error('Có lỗi xảy ra khi thanh toán!');

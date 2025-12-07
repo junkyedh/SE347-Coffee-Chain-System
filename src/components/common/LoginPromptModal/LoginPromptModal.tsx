@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../../constants';
 import './LoginPromptModal.scss';
 
 interface LoginPromptModalProps {
@@ -14,7 +15,7 @@ const LoginPromptModal: React.FC<LoginPromptModalProps> = ({ isOpen, onClose }) 
 
   const handleLogin = () => {
     onClose();
-    navigate('/dang-nhap');
+    navigate(ROUTES.LOGIN);
   };
 
   const handleContinueBrowsing = () => {

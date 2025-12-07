@@ -1,5 +1,6 @@
 import emptyCart from '@/assets/empty-cart.png';
 import { useCart, type CartItem } from '@/hooks/cartContext';
+import { ROUTES } from '@/constants';
 import React, { useState } from 'react';
 import { Col, Form, Image, Offcanvas, Row } from 'react-bootstrap';
 import {
@@ -28,7 +29,7 @@ const CartDrawer: React.FC = () => {
 
   const handleCheckout = () => {
     close();
-    navigate('/thanh-toan', {
+    navigate(ROUTES.CHECKOUT, {
       state: {
         initialItems: cart.map((i) => ({
           productId: i.productId,

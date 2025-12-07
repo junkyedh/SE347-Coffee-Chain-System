@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSystemContext } from '../../hooks/useSystemContext';
 import { comparePathname } from '../../utils/uri';
+import { ROUTES } from '../../constants';
 import './Sidebar.scss';
 
 type Route = {
@@ -32,55 +33,55 @@ const Sidebar: React.FC = () => {
     routes = [
       {
         title: 'THỐNG KÊ',
-        link: '/quan-tri/thong-ke',
+        link: ROUTES.ADMIN.STATISTICS,
         icon: 'fa-solid fa-chart-line',
         roles: ['ADMIN_SYSTEM'],
       },
       {
         title: 'DANH SÁCH CHI NHÁNH',
-        link: '/quan-tri/danh-sach-chi-nhanh',
+        link: ROUTES.ADMIN.BRANCHES,
         icon: 'fa-solid fa-building',
         roles: ['ADMIN_SYSTEM'],
       },
       {
         title: 'DANH SÁCH NGUYÊN LIỆU',
-        link: '/quan-tri/danh-sach-nguyen-lieu',
+        link: ROUTES.ADMIN.MATERIALS,
         icon: 'fa-solid fa-boxes-stacked',
         roles: ['ADMIN_SYSTEM'],
       },
       {
         title: 'DANH SÁCH SẢN PHẨM',
-        link: '/quan-tri/danh-sach-san-pham',
+        link: ROUTES.ADMIN.PRODUCTS,
         icon: 'fa-solid fa-box',
         roles: ['ADMIN_SYSTEM'],
       },
       {
         title: 'DANH SÁCH ĐƠN HÀNG',
-        link: '/quan-tri/danh-sach-don-hang',
+        link: ROUTES.ADMIN.ORDERS,
         icon: 'fa-solid fa-receipt',
         roles: ['ADMIN_SYSTEM'],
       },
       {
         title: 'DANH SÁCH NHÂN VIÊN',
-        link: '/quan-tri/danh-sach-nhan-vien',
+        link: ROUTES.ADMIN.EMPLOYEES,
         icon: 'fa-solid fa-users',
         roles: ['ADMIN_SYSTEM'],
       },
       {
         title: 'DANH SÁCH KHÁCH HÀNG',
-        link: '/quan-tri/danh-sach-khach-hang',
+        link: ROUTES.ADMIN.CUSTOMERS,
         icon: 'fa-solid fa-user',
         roles: ['ADMIN_SYSTEM'],
       },
       {
         title: 'KHUYẾN MÃI',
-        link: '/quan-tri/khuyen-mai',
+        link: ROUTES.ADMIN.PROMOTIONS,
         icon: 'fa-solid fa-ticket',
         roles: ['ADMIN_SYSTEM'],
       },
       {
         title: 'ĐÁNH GIÁ',
-        link: '/quan-tri/danh-gia',
+        link: ROUTES.ADMIN.RATINGS,
         icon: 'fa-solid fa-star',
         roles: ['ADMIN_SYSTEM'],
       },
@@ -89,61 +90,61 @@ const Sidebar: React.FC = () => {
     routes = [
       {
         title: 'Thống kê',
-        link: '/quan-ly/thong-ke',
+        link: ROUTES.MANAGER.STATISTICS,
         icon: 'fa-solid fa-chart-line',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Nguyên liệu',
-        link: '/quan-ly/danh-sach-nguyen-lieu',
+        link: ROUTES.MANAGER.MATERIALS,
         icon: 'fa-solid fa-boxes-stacked',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Sản phẩm',
-        link: '/quan-ly/danh-sach-san-pham',
+        link: ROUTES.MANAGER.PRODUCTS,
         icon: 'fa-solid fa-box',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Đơn hàng',
-        link: '/quan-ly/danh-sach-don-hang',
+        link: ROUTES.MANAGER.ORDERS,
         icon: 'fa-solid fa-receipt',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Nhân viên',
-        link: '/quan-ly/danh-sach-nhan-vien',
+        link: ROUTES.MANAGER.EMPLOYEES,
         icon: 'fa-solid fa-users',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Bàn ghế',
-        link: '/quan-ly/danh-sach-ban-ghe',
+        link: ROUTES.MANAGER.TABLES,
         icon: 'fa-solid fa-table',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Khách hàng',
-        link: '/quan-ly/danh-sach-khach-hang',
+        link: ROUTES.MANAGER.CUSTOMERS,
         icon: 'fa-solid fa-user',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Khuyến mãi',
-        link: '/quan-ly/khuyen-mai',
+        link: ROUTES.MANAGER.PROMOTIONS,
         icon: 'fa-solid fa-ticket',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Đánh giá',
-        link: '/quan-ly/danh-gia',
+        link: ROUTES.MANAGER.RATINGS,
         icon: 'fa-solid fa-star',
         roles: ['ADMIN_BRAND'],
       },
       {
         title: 'Thông tin quán',
-        link: '/quan-ly/thong-tin-quan',
+        link: ROUTES.MANAGER.BRANCH_INFO,
         icon: 'fa-solid fa-building',
         roles: ['ADMIN_BRAND'],
       },
@@ -178,43 +179,43 @@ const Sidebar: React.FC = () => {
       },
       {
         title: 'Danh sách nhân viên',
-        link: '/nhan-vien/danh-sach-nhan-vien',
+        link: ROUTES.STAFF.EMPLOYEES,
         icon: 'fa-solid fa-users',
         roles: ['STAFF'],
       },
       {
         title: 'Danh sách khách hàng',
-        link: '/nhan-vien/danh-sach-khach-hang',
+        link: ROUTES.STAFF.CUSTOMERS,
         icon: 'fa-solid fa-users',
         roles: ['STAFF'],
       },
       {
         title: 'Thông tin nhân viên',
-        link: '/nhan-vien/thong-tin',
+        link: ROUTES.STAFF.PROFILE,
         icon: 'fa-solid fa-user',
         roles: ['STAFF'],
       },
     ];
   } else if (role === 'CUSTOMER') {
     routes = [
-      { title: 'Trang chủ', link: '/', icon: 'fa-solid fa-house', roles: ['CUSTOMER'] },
+      { title: 'Trang chủ', link: ROUTES.HOME, icon: 'fa-solid fa-house', roles: ['CUSTOMER'] },
       {
         title: 'Giới thiệu',
-        link: '/gioi-thieu',
+        link: ROUTES.ABOUT,
         icon: 'fa-solid fa-circle-info',
         roles: ['CUSTOMER'],
       },
-      { title: 'Liên hệ', link: '/lien-he', icon: 'fa-solid fa-phone', roles: ['CUSTOMER'] },
+      { title: 'Liên hệ', link: ROUTES.CONTACT, icon: 'fa-solid fa-phone', roles: ['CUSTOMER'] },
       // { title: 'Đặt phòng', link: '/dat-phong', icon: 'fa-solid fa-calendar', roles: ['CUSTOMER'] },
       {
         title: 'Lịch sử',
-        link: '/lich-su-don-hang',
+        link: ROUTES.HISTORY_ORDERS,
         icon: 'fa-solid fa-clock-rotate-left',
         roles: ['CUSTOMER'],
       },
       {
         title: 'Thông tin cá nhân',
-        link: '/tai-khoan',
+        link: ROUTES.PROFILE,
         icon: 'fa-solid fa-user',
         roles: ['CUSTOMER'],
       },
@@ -234,7 +235,7 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('isBrand');
-    window.location.href = '/quan-tri/dang-nhap';
+    window.location.href = ROUTES.ADMIN.LOGIN;
   };
 
   const renderNavigationList = () => {

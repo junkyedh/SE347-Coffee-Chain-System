@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSystemContext } from '@/hooks/useSystemContext';
 import { FaPhoneAlt, FaLock } from 'react-icons/fa';
+import { ROUTES } from '@/constants';
 import './AdminLogin.scss';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { message } from 'antd';
@@ -32,13 +33,13 @@ const AdminLogin: React.FC = () => {
           console.log('Đăng nhập thành công:', { token, role });
           switch (role) {
             case 'ADMIN_SYSTEM':
-              navigate('/quan-tri/thong-ke');
+              navigate(ROUTES.ADMIN.STATISTICS);
               break;
             case 'ADMIN_BRAND':
-              navigate('/quan-ly/thong-ke');
+              navigate(ROUTES.MANAGER.STATISTICS);
               break;
             case 'STAFF':
-              navigate('/nhan-vien/thong-ke');
+              navigate(ROUTES.STAFF.STATISTICS);
               break;
           }
         } else {
@@ -109,7 +110,7 @@ const AdminLogin: React.FC = () => {
                 Ghi nhớ đăng nhập
               </label>
             </div>
-            <a href="/forgot-password" className="text-muted">
+            <a href={ROUTES.FORGOT_PASSWORD} className="text-muted">
               Quên mật khẩu?
             </a>
           </div>
@@ -121,7 +122,7 @@ const AdminLogin: React.FC = () => {
             <span
               className="text-primary"
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate('/dang-nhap')}
+              onClick={() => navigate(ROUTES.LOGIN)}
             >
               Đăng nhập khách hàng
             </span>

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import SEO from '@/components/common/SEO';
 import { FaPhoneAlt, FaLock, FaUser, FaMapMarkerAlt, FaVenusMars } from 'react-icons/fa';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
+import { ROUTES } from '@/constants';
 import '../../admin/AdminLogin/AdminLogin.scss';
 import { message } from 'antd';
 
@@ -29,7 +30,7 @@ const RegisterCustomer: React.FC = () => {
       if (res.status === 201 || res.status === 200) {
         localStorage.removeItem('sessionId');
         message.success('Đăng ký thành công! Vui lòng đăng nhập.');
-        navigate('/dang-nhap');
+        navigate(ROUTES.LOGIN);
       } else {
         message.error('Đăng ký thất bại.');
       }
@@ -147,7 +148,7 @@ const RegisterCustomer: React.FC = () => {
             <span
               className="text-primary"
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate('/dang-nhap')}
+              onClick={() => navigate(ROUTES.LOGIN)}
             >
               Đăng nhập
             </span>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ROUTES } from '@/constants';
 import './PageNotFound.scss';
 
 const PageNotFound: React.FC = () => {
@@ -13,7 +14,7 @@ const PageNotFound: React.FC = () => {
           <div className="contant_box_404">
             <h3 className="h2">Có vẻ bạn đã lạc đường</h3>
             <p>Trang bạn tìm kiếm không tồn tại hoặc đã bị di chuyển!</p>
-            <Link to="/" className="link_404">Về trang chủ</Link>
+            <Link to={ROUTES.HOME} className="link_404">Về trang chủ</Link>
           </div>
         </div>
       </div>

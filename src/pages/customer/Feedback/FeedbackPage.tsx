@@ -1,5 +1,6 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import SEO from '@/components/common/SEO';
+import { ROUTES } from '@/constants';
 import { extractOrderIdFromSlug } from '@/utils/slugify';
 import { MessageSquare, Send, Star } from 'lucide-react';
 import React, { useState } from 'react';
@@ -36,7 +37,7 @@ const FeedbackPage: React.FC = () => {
       console.log('Feedback data:', { reservationCode, rating, comments });
 
       alert('Gửi phản hồi thành công!');
-      navigate('/lich-su-don-hang');
+      navigate(ROUTES.HISTORY_ORDERS);
     } catch (error) {
       console.error('Failed to submit feedback:', error);
       alert('Gửi phản hồi thất bại, vui lòng thử lại!');

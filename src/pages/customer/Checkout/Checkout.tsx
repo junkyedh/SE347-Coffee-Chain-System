@@ -3,6 +3,7 @@ import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
 import SEO from '@/components/common/SEO';
 import { useCart, type CartItem } from '@/hooks/cartContext';
 import { MainApiRequest } from '@/services/MainApiRequest';
+import { ROUTES } from '@/constants';
 import { CheckCircle, Clock, CreditCard, MapPin, Tag, Wallet } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -415,7 +416,7 @@ export const Checkout: React.FC = () => {
         }
       }
 
-      navigate(`/theo-doi-don-hang/${orderId}`, { replace: true });
+      navigate(ROUTES.TRACKING_ORDER(String(orderId)), { replace: true });
     } catch (err) {
       console.error(err);
       alert('Đặt hàng thất bại, vui lòng thử lại.');
@@ -441,7 +442,7 @@ export const Checkout: React.FC = () => {
       />
       <Breadcrumbs
         title="Thanh toán"
-        items={[{ label: 'Trang chủ', to: '/' }, { label: 'Thanh toán' }]}
+        items={[{ label: 'Trang chủ', to: ROUTES.HOME }, { label: 'Thanh toán' }]}
       />
 
       <div className="checkout">
@@ -687,7 +688,7 @@ export const Checkout: React.FC = () => {
                 </button>
 
                 <div className="terms-note">
-                  Bằng cách đặt hàng, bạn đồng ý với <a href="/terms">Điều khoản dịch vụ</a>
+                  Bằng cách đặt hàng, bạn đồng ý với <a href={ROUTES.TERMS}>Điều khoản dịch vụ</a>
                 </div>
               </div>
             </div>

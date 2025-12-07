@@ -1,6 +1,7 @@
 import SEO from '@/components/common/SEO';
 import { useSystemContext } from '@/hooks/useSystemContext';
 import { MainApiRequest } from '@/services/MainApiRequest';
+import { ROUTES } from '@/constants';
 import { message } from 'antd';
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
@@ -29,7 +30,7 @@ const Login: React.FC = () => {
         const role = data.user?.role || 'CUSTOMER';
         if (token) {
           setAuth(token, role);
-          navigate('/');
+          navigate(ROUTES.HOME);
         } else {
           message.error('Đăng nhập thất bại: không nhận được token.');
         }
@@ -42,7 +43,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (isLoggedIn && token) {
-      navigate('/');
+      navigate(ROUTES.HOME);
     }
   }, [isLoggedIn, token, navigate]);
 
@@ -107,7 +108,7 @@ const Login: React.FC = () => {
                 Ghi nhớ đăng nhập
               </label>
             </div>
-            <a href="/forgot-password" className="text-muted">
+            <a href={ROUTES.FORGOT_PASSWORD} className="text-muted">
               Quên mật khẩu?
             </a>
           </div>
@@ -119,7 +120,7 @@ const Login: React.FC = () => {
             <span
               className="text-primary"
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate('/dang-ky')}
+              onClick={() => navigate(ROUTES.REGISTER)}
             >
               Đăng ký
             </span>

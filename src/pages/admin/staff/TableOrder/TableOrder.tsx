@@ -1,5 +1,6 @@
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
+import { ROUTES } from '@/constants';
 import {
   CoffeeOutlined,
   DeleteOutlined,
@@ -127,7 +128,7 @@ const AdminTableOrder = () => {
 
       await AdminApiRequest.post('/branch-order', orderData);
       message.success('Đơn hàng đã được tạo thành công!');
-      navigate('/nhan-vien/dat-mon');
+      navigate(ROUTES.STAFF.ORDER_MENU);
     } catch (error) {
       console.error('Error creating order:', error);
       message.error('Không thể tạo đơn hàng!');

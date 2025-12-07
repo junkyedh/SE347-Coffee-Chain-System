@@ -8,6 +8,7 @@ import { User, Settings, Clock, LogOut, Home, Info, Coffee, Phone } from 'lucide
 import { useSystemContext } from '../../../hooks/useSystemContext';
 import { MainApiRequest } from '../../../services/MainApiRequest';
 import CartDrawer from '../../customer/CartDrawer/CartDrawer';
+import { ROUTES } from '../../../constants';
 import React from 'react';
 
 const Header: React.FC = () => {
@@ -63,7 +64,7 @@ const Header: React.FC = () => {
     try {
       await logout();
       setUserInfo(null);
-      navigate('/dang-nhap');
+      navigate(ROUTES.LOGIN);
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -71,10 +72,10 @@ const Header: React.FC = () => {
 
   // Navigation items with icons
   const navItems = [
-    { to: '/', icon: Home, label: 'Trang chủ' },
-    { to: '/gioi-thieu', icon: Info, label: 'Giới thiệu' },
-    { to: '/thuc-don', icon: Coffee, label: 'Thực đơn' },
-    { to: '/lien-he', icon: Phone, label: 'Liên hệ' },
+    { to: ROUTES.HOME, icon: Home, label: 'Trang chủ' },
+    { to: ROUTES.ABOUT, icon: Info, label: 'Giới thiệu' },
+    { to: ROUTES.MENU, icon: Coffee, label: 'Thực đơn' },
+    { to: ROUTES.CONTACT, icon: Phone, label: 'Liên hệ' },
   ];
 
   // User dropdown items (synchronized between desktop and mobile)
@@ -82,12 +83,12 @@ const Header: React.FC = () => {
     {
       icon: Settings,
       label: 'Hồ sơ của tôi',
-      action: () => navigate('/thong-tin-tai-khoan'),
+      action: () => navigate(ROUTES.PROFILE),
     },
     {
       icon: Clock,
       label: 'Lịch sử đơn hàng',
-      action: () => navigate('/lich-su-don-hang'),
+      action: () => navigate(ROUTES.HISTORY_ORDERS),
     },
     {
       icon: LogOut,
@@ -103,7 +104,7 @@ const Header: React.FC = () => {
         <Navbar expand="lg" className="justify-content-between w-100">
           {/* Logo */}
           <Navbar.Brand className="logo">
-            <NavLink to="/">
+            <NavLink to={ROUTES.HOME}>
               <Coffee className="logo-icon" />
               Café w Fen
             </NavLink>
@@ -168,7 +169,7 @@ const Header: React.FC = () => {
                   </div>
                 ) : (
                   <NavLink
-                    to="/dang-nhap"
+                    to={ROUTES.LOGIN}
                     className="offcanvas-login-btn d-block text-center"
                     onClick={closeMenu}
                   >
@@ -214,7 +215,7 @@ const Header: React.FC = () => {
                   ))}
                 </NavDropdown>
               ) : (
-                <NavLink className="login-btn" to="/dang-nhap">
+                <NavLink className="login-btn" to={ROUTES.LOGIN}>
                   <LogOut className="login-icon" />
                   Đăng nhập
                 </NavLink>

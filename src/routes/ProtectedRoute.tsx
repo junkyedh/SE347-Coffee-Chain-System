@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSystemContext } from '../hooks/useSystemContext';
+import { ROUTES } from '../constants';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,11 +16,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   }
 
   if (!isLoggedIn) {
-    return <Navigate to="/login" />; // navigate to login if not logged in
+    return <Navigate to={ROUTES.LOGIN} />; // navigate to login if not logged in
   }
 
   if (!allowedRoles.includes(role)) {
-    return <Navigate to="/unauthorized" replace />; // navigate if not authorized
+    return <Navigate to={ROUTES.NOT_FOUND} replace />; // navigate if not authorized
   }
 
   return <>{children}</>;

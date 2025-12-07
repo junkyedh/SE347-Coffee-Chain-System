@@ -1,3 +1,5 @@
+import { ROUTES } from '../../constants';
+
 export type Route = {
   title: string;
   link: string;
@@ -14,49 +16,49 @@ export const sidebarRoutes: Route[] = [
   // Admin routes
   {
     title: 'Thống kê',
-    link: '/quan-tri/thong-ke',
+    link: ROUTES.ADMIN.STATISTICS,
     icon: 'fa-solid fa-chart-line',
     roles: ['ADMIN_SYSTEM'],
   },
   {
     title: 'Chi nhánh',
-    link: '/quan-tri/danh-sach-chi-nhanh',
+    link: ROUTES.ADMIN.BRANCHES,
     icon: 'fa-solid fa-building',
     roles: ['ADMIN_SYSTEM'],
   },
   {
     title: 'Nhân viên',
-    link: '/quan-tri/danh-sach-nhan-vien',
+    link: ROUTES.ADMIN.EMPLOYEES,
     icon: 'fa-solid fa-users',
     roles: ['ADMIN_SYSTEM'],
   },
   {
     title: 'Khách hàng',
-    link: '/quan-tri/danh-sach-khach-hang',
+    link: ROUTES.ADMIN.CUSTOMERS,
     icon: 'fa-solid fa-user',
     roles: ['ADMIN_SYSTEM'],
   },
   {
     title: 'Đơn hàng',
-    link: '/quan-tri/danh-sach-don-hang',
+    link: ROUTES.ADMIN.ORDERS,
     icon: 'fa-solid fa-receipt',
     roles: ['ADMIN_SYSTEM'],
   },
   {
     title: 'Sản phẩm',
-    link: '/quan-tri/danh-sach-san-pham',
+    link: ROUTES.ADMIN.PRODUCTS,
     icon: 'fa-solid fa-box',
     roles: ['ADMIN_SYSTEM'],
   },
   {
     title: 'Khuyến mãi',
-    link: '/quan-tri/khuyen-mai',
+    link: ROUTES.ADMIN.PROMOTIONS,
     icon: 'fa-solid fa-ticket',
     roles: ['ADMIN_SYSTEM'],
   },
   {
     title: 'Đánh giá',
-    link: '/quan-tri/danh-gia',
+    link: ROUTES.ADMIN.RATINGS,
     icon: 'fa-solid fa-star',
     roles: ['ADMIN_SYSTEM'],
   },
@@ -64,61 +66,61 @@ export const sidebarRoutes: Route[] = [
   // Manager routes
   {
     title: 'Thống kê',
-    link: '/quan-ly/thong-ke',
+    link: ROUTES.MANAGER.STATISTICS,
     icon: 'fa-solid fa-chart-line',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Nguyên liệu',
-    link: '/quan-ly/danh-sach-nguyen-lieu',
+    link: ROUTES.MANAGER.MATERIALS,
     icon: 'fa-solid fa-boxes-stacked',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Sản phẩm',
-    link: '/quan-ly/danh-sach-san-pham',
+    link: ROUTES.MANAGER.PRODUCTS,
     icon: 'fa-solid fa-box',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Đơn hàng',
-    link: '/quan-ly/danh-sach-don-hang',
+    link: ROUTES.MANAGER.ORDERS,
     icon: 'fa-solid fa-receipt',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Nhân viên',
-    link: '/quan-ly/danh-sach-nhan-vien',
+    link: ROUTES.MANAGER.EMPLOYEES,
     icon: 'fa-solid fa-users',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Bàn ghế',
-    link: '/quan-ly/danh-sach-ban-ghe',
+    link: ROUTES.MANAGER.TABLES,
     icon: 'fa-solid fa-table',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Khách hàng',
-    link: '/quan-ly/danh-sach-khach-hang',
+    link: ROUTES.MANAGER.CUSTOMERS,
     icon: 'fa-solid fa-user',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Khuyến mãi',
-    link: '/quan-ly/khuyen-mai',
+    link: ROUTES.MANAGER.PROMOTIONS,
     icon: 'fa-solid fa-ticket',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Đánh giá',
-    link: '/quan-ly/danh-gia',
+    link: ROUTES.MANAGER.RATINGS,
     icon: 'fa-solid fa-star',
     roles: ['ADMIN_BRAND'],
   },
   {
     title: 'Thông tin quán',
-    link: '/quan-ly/thong-tin-quan',
+    link: ROUTES.MANAGER.BRANCH_INFO,
     icon: 'fa-solid fa-building',
     roles: ['ADMIN_BRAND'],
   },
@@ -152,13 +154,13 @@ export const sidebarRoutes: Route[] = [
   },
   {
     title: 'Danh sách khách hàng',
-    link: '/nhan-vien/danh-sach-khach-hang',
+    link: ROUTES.STAFF.CUSTOMERS,
     icon: 'fa-solid fa-users',
     roles: ['STAFF'],
   },
   {
     title: 'Thông tin nhân viên',
-    link: '/nhan-vien/thong-tin',
+    link: ROUTES.STAFF.PROFILE,
     icon: 'fa-solid fa-user',
     roles: ['STAFF'],
   },
@@ -166,32 +168,31 @@ export const sidebarRoutes: Route[] = [
   // Customer routes
   {
     title: 'Trang chủ',
-    link: '/',
+    link: ROUTES.HOME,
     icon: 'fa-solid fa-house',
     roles: ['CUSTOMER'],
   },
   {
     title: 'Giới thiệu',
-    link: '/gioi-thieu',
+    link: ROUTES.ABOUT,
     icon: 'fa-solid fa-circle-info',
     roles: ['CUSTOMER'],
   },
   {
     title: 'Liên hệ',
-    link: '/lien-he',
+    link: ROUTES.CONTACT,
     icon: 'fa-solid fa-phone',
     roles: ['CUSTOMER'],
   },
-  // { title: 'Đặt phòng', link: '/dat-phong', icon: 'fa-solid fa-calendar', roles: ['CUSTOMER'] },
   {
     title: 'Lịch sử',
-    link: '/lich-su-don-hang',
+    link: ROUTES.HISTORY_ORDERS,
     icon: 'fa-solid fa-clock-rotate-left',
     roles: ['CUSTOMER'],
   },
   {
     title: 'Thông tin cá nhân',
-    link: '/tai-khoan',
+    link: ROUTES.PROFILE,
     icon: 'fa-solid fa-user',
     roles: ['CUSTOMER'],
   },

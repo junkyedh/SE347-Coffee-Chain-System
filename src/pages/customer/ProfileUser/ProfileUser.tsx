@@ -2,6 +2,7 @@ import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import { Button } from '@/components/common/Button/Button';
 import SEO from '@/components/common/SEO';
 import { MainApiRequest } from '@/services/MainApiRequest';
+import { ROUTES } from '@/constants';
 import { Award, Calendar, Camera, Edit3, Phone, Save, User, X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -54,7 +55,7 @@ const ProfileUser: React.FC = () => {
         });
       } catch (err) {
         console.error('Không tải được profile:', err);
-        navigate('/dang-nhap');
+        navigate(ROUTES.LOGIN);
       }
     };
 

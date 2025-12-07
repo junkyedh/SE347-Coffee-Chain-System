@@ -11,6 +11,7 @@ import PriceFilter, { PriceOption } from '@/components/customer/PriceFilter/Pric
 import SearchBar from '@/components/customer/Searchbar/Searchbar';
 import SortDropdown from '@/components/customer/SortDropdown/SortDropdown';
 import ViewToggle from '@/components/customer/ViewToggle/ViewToggle';
+import { ROUTES } from '@/constants';
 import { useCart } from '@/hooks/cartContext';
 import { useAuth } from '@/hooks/useAuth';
 import { MainApiRequest } from '@/services/MainApiRequest';
@@ -244,9 +245,9 @@ const Menu: React.FC = () => {
       <Breadcrumbs
         title={selectedCategory !== 'all' ? selectedCategory : 'Menu'}
         items={[
-          { label: 'Trang chủ', to: '/' },
-          { label: 'Thực đơn', to: '/thuc-don' },
-          ...(selectedCategory !== 'all' ? [{ label: selectedCategory, to: `/thuc-don?category=${selectedCategory}` }] : [])
+          { label: 'Trang chủ', to: ROUTES.HOME },
+          { label: 'Thực đơn', to: ROUTES.MENU },
+          ...(selectedCategory !== 'all' ? [{ label: selectedCategory, to: `${ROUTES.MENU}?category=${selectedCategory}` }] : [])
         ]}
       />
       <div className="menu-page">
