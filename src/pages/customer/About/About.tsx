@@ -10,6 +10,7 @@ import icons2 from '@/assets/img9.jpg';
 import cafeImg3 from '@/assets/juice7.jpg';
 import about3 from '@/assets/juice9.jpg';
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import SEO from '@/components/common/SEO';
 import { useEffect } from 'react';
 import { Card, CardTitle, Col, Container, Row } from 'react-bootstrap';
 import './About.scss';
@@ -21,6 +22,11 @@ const About = () => {
 
   return (
     <>
+      <SEO
+        title="Giới thiệu"
+        description="Tìm hiểu về SE347 Coffee Chain - Chuỗi cà phê hàng đầu Việt Nam. Sứ mệnh, giá trị cốt lõi và cam kết mang đến trải nghiệm cà phê tốt nhất cho khách hàng."
+        keywords="giới thiệu, about us, SE347, coffee chain, chuỗi cà phê, về chúng tôi, sứ mệnh, giá trị"
+      />
       <Breadcrumbs
         title="Giới thiệu"
         items={[{ label: 'Trang chủ', to: '/' }, { label: 'Giới thiệu' }]}

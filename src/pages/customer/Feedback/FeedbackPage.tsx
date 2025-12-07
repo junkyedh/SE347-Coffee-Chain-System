@@ -1,16 +1,20 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import SEO from '@/components/common/SEO';
+import { extractOrderIdFromSlug } from '@/utils/slugify';
 import { MessageSquare, Send, Star } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './FeedbackPage.scss';
 
 const FeedbackPage: React.FC = () => {
-  const { reservationCode } = useParams<{ reservationCode: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comments, setComments] = useState('');
+  
+  const reservationCode = slug ? extractOrderIdFromSlug(slug) : 'N/A';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +47,11 @@ const FeedbackPage: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title={`Đánh giá đơn hàng #${reservationCode}`}
+        description={`Gửi đánh giá và phản hồi cho đơn hàng #${reservationCode} tại SE347 Coffee Chain. Chia sẻ trải nghiệm của bạn để chúng tôi phục vụ tốt hơn.`}
+        keywords="đánh giá, feedback, phản hồi, review, đánh giá dịch vụ"
+      />
       <Breadcrumbs
         title="Đánh giá dịch vụ"
         items={[{ label: 'Trang chủ', to: '/' }, { label: 'Đánh giá' }]}

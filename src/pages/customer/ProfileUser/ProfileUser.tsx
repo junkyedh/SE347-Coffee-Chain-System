@@ -1,5 +1,6 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import { Button } from '@/components/common/Button/Button';
+import SEO from '@/components/common/SEO';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { Award, Calendar, Camera, Edit3, Phone, Save, User, X } from 'lucide-react';
 import type React from 'react';
@@ -145,6 +146,11 @@ const ProfileUser: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="Hồ sơ của tôi"
+        description={`Quản lý thông tin cá nhân - ${customer.name}. Cập nhật thông tin tài khoản, địa chỉ giao hàng và xem hạng thành viên tại SE347 Coffee Chain.`}
+        keywords="hồ sơ cá nhân, thông tin tài khoản, profile, tài khoản khách hàng"
+      />
       <Breadcrumbs
         title="Hồ sơ của tôi"
         items={[{ label: 'Trang chủ', to: '/' }, { label: 'Hồ sơ' }]}

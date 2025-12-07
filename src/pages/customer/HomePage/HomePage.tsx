@@ -4,6 +4,7 @@ import FeaturedList from '@/components/customer/FeaturedProduct/FeaturedProduct'
 import Features from '@/components/customer/Features/Features';
 import Gallery from '@/components/customer/Gallery/Gallery';
 import LoginPromptModal from '@/components/common/LoginPromptModal/LoginPromptModal';
+import SEO from '@/components/common/SEO';
 import { useCart } from '@/hooks/cartContext';
 import useProducts from '@/hooks/useProducts';
 import { useAuth } from '@/hooks/useAuth';
@@ -49,6 +50,11 @@ const Home = () => {
 
   return (
     <>
+      <SEO
+        title="Trang chủ"
+        description="SE347 Coffee Chain - Hệ thống chuỗi cửa hàng cà phê hàng đầu Việt Nam. Đặt hàng online, giao hàng tận nơi. Cà phê ngon, trà sữa, bánh ngọt và nhiều thức uống đa dạng."
+        keywords="cà phê, coffee shop, trà sữa, đặt hàng online, giao hàng tận nơi, chuỗi cà phê việt nam, vietnamese coffee, milk tea, bánh ngọt, thức uống"
+      />
       <LoginPromptModal 
         isOpen={showLoginPrompt} 
         onClose={() => setShowLoginPrompt(false)} 

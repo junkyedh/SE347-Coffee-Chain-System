@@ -1,5 +1,6 @@
 import image from '@/assets/service2.jpg';
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
+import SEO from '@/components/common/SEO';
 import { useEffect } from 'react';
 import { Card, Col, Container, FloatingLabel, Form, ListGroup, Row } from 'react-bootstrap';
 import './Contact.scss';
@@ -11,6 +12,11 @@ const Contact = () => {
 
   return (
     <>
+      <SEO
+        title="Liên hệ"
+        description="Liên hệ với SE347 Coffee Chain. Gửi câu hỏi, phản hồi hoặc đề xuất cho chúng tôi. Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn."
+        keywords="liên hệ, contact, hỗ trợ, phản hồi, hotline, địa chỉ, email, customer service"
+      />
       <Breadcrumbs
         title="Liên hệ"
         items={[{ label: 'Trang chủ', to: '/' }, { label: 'Liên hệ' }]}

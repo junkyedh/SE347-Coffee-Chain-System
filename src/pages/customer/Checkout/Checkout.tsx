@@ -1,5 +1,6 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
+import SEO from '@/components/common/SEO';
 import { useCart, type CartItem } from '@/hooks/cartContext';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { CheckCircle, Clock, CreditCard, MapPin, Tag, Wallet } from 'lucide-react';
@@ -433,6 +434,11 @@ export const Checkout: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="Thanh toán"
+        description="Thanh toán đơn hàng tại SE347 Coffee Chain. Hỗ trợ nhiều phương thức thanh toán: tiền mặt, thẻ, VNPay. Giao hàng nhanh chóng và tiện lợi."
+        keywords="thanh toán, checkout, đặt hàng, payment, giao hàng, VNPay, tiền mặt"
+      />
       <Breadcrumbs
         title="Thanh toán"
         items={[{ label: 'Trang chủ', to: '/' }, { label: 'Thanh toán' }]}
