@@ -1,0 +1,1 @@
+export { VNPayCallback } from './VNPayCallback';
