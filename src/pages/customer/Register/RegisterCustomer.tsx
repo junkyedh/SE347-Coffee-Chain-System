@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import SEO from '@/components/common/SEO';
 import { FaPhoneAlt, FaLock, FaUser, FaMapMarkerAlt, FaVenusMars } from 'react-icons/fa';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import '../../admin/AdminLogin/AdminLogin.scss';
@@ -38,13 +39,19 @@ const RegisterCustomer: React.FC = () => {
   };
 
   return (
-    <div className="bg-login">
-      <motion.div
-        className="card1"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+    <>
+      <SEO
+        title="Đăng ký"
+        description="Đăng ký tài khoản SE347 Coffee Chain miễn phí. Nhận ưu đãi, tích điểm và trải nghiệm mua sắm tiện lợi hơn."
+        keywords="đăng ký, register, sign up, tạo tài khoản, thành viên mới"
+      />
+      <div className="bg-login">
+        <motion.div
+          className="card1"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
         <h1>Đăng ký tài khoản</h1>
 
         <form method="POST" className="needs-validation">
@@ -148,6 +155,7 @@ const RegisterCustomer: React.FC = () => {
         </form>
       </motion.div>
     </div>
+    </>
   );
 };
 

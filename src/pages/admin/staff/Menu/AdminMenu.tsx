@@ -274,7 +274,7 @@ const AdminMenu = () => {
       setOrder({});
       setCouponCode('');
       setDiscountAmount(0);
-      navigate('/staff/order/order-list');
+      navigate('/nhan-vien/danh-sach-don-hang');
     } catch (error) {
       console.error('Error during payment:', error);
       message.error('Có lỗi xảy ra khi thanh toán!');

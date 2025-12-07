@@ -58,9 +58,9 @@ const MainRoutes: React.FC = () => {
             <Route path="/thong-tin-tai-khoan" element={<ProfileUser />}/>
             <Route path="/thanh-toan" element={<Checkout />} />
             <Route path="/vnpay-callback" element={<VNPayCallback />} />
-            <Route path="/theo-doi-don-hang/:id" element={<TrackingOrder />} />
+            <Route path="/theo-doi-don-hang/:slug" element={<TrackingOrder />} />
             <Route path="/lich-su-don-hang" element={<HistoryOrder />} />
-            <Route path="/danh-gia" element={<FeedbackPage />} />
+            <Route path="/danh-gia/:slug" element={<FeedbackPage />} />
             <Route path="/dang-ky" element={<RegisterCustomer />} />
           </Route>
 

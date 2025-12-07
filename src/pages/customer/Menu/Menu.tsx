@@ -2,6 +2,7 @@ import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import EmptyState from '@/components/common/EmtyState/EmptyState';
 import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
 import LoginPromptModal from '@/components/common/LoginPromptModal/LoginPromptModal';
+import SEO from '@/components/common/SEO';
 import { Pagination } from '@/components/common/Pagination/Pagination';
 import CardListView from '@/components/customer/CardListView/CardListView';
 import CardProduct from '@/components/customer/CardProduct/CardProduct';
@@ -231,6 +232,11 @@ const Menu: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title={selectedCategory !== 'all' ? `${selectedCategory} - Thực đơn` : "Thực đơn"}
+        description={`Xem thực đơn ${selectedCategory !== 'all' ? selectedCategory : 'đầy đủ'} tại SE347 Coffee Chain. Cà phê, trà sửa, bánh ngọt và nhiều thức uống hấp dẫn khác. Đặt hàng online giá tốt.`}
+        keywords={`thực đơn, menu, ${selectedCategory !== 'all' ? selectedCategory : 'cà phê, trà sửa, bánh ngọt'}, đồ uống, giá cả, đặt hàng online`}
+      />
       <LoginPromptModal 
         isOpen={showLoginPrompt} 
         onClose={() => setShowLoginPrompt(false)} 

@@ -1,3 +1,4 @@
+import SEO from '@/components/common/SEO';
 import { useSystemContext } from '@/hooks/useSystemContext';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { message } from 'antd';
@@ -46,13 +47,19 @@ const Login: React.FC = () => {
   }, [isLoggedIn, token, navigate]);
 
   return (
-    <div className="bg-login">
-      <motion.div
-        className="card1"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+    <>
+      <SEO
+        title="Đăng nhập"
+        description="Đăng nhập vào tài khoản SE347 Coffee Chain để đặt hàng, theo dõi đơn hàng và nhận ưu đãi đặc biệt dành cho thành viên."
+        keywords="đăng nhập, login, sign in, tài khoản, member, thành viên"
+      />
+      <div className="bg-login">
+        <motion.div
+          className="card1"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
         <h1>Đăng nhập</h1>
         <form className="needs-validation">
           <div className="my-3">
@@ -120,6 +127,7 @@ const Login: React.FC = () => {
         </form>
       </motion.div>
     </div>
+    </>
   );
 };
 

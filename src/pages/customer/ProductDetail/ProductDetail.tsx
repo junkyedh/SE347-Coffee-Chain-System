@@ -1,13 +1,17 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
+import LoginPromptModal from '@/components/common/LoginPromptModal/LoginPromptModal';
+import SEO from '@/components/common/SEO';
 import ProductRating from '@/components/customer/RatingStar/ProductRating';
 import { useCart } from '@/hooks/cartContext';
+import { useAuth } from '@/hooks/useAuth';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { yellow } from '@mui/material/colors';
 import { message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaMinus, FaPlus, FaStar } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
+import { extractIdFromSlug } from '@/utils/slugify';
 import './ProductDetail.scss';
 
 interface ProductSize {
@@ -56,7 +60,7 @@ interface RatingData {
 }
 
 const DetailProduct: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -64,13 +68,18 @@ const DetailProduct: React.FC = () => {
   const [ratingData, setRatingData] = useState<RatingData | null>(null);
   const [filterStar, setFilterStar] = useState<'5' | '4' | '3' | '2' | '1' | 'all'>('all');
   const [sortOption, setSortOption] = useState<'newest' | 'oldest'>('newest');
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { addToCart } = useCart();
+  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (!id) return;
-    MainApiRequest.get(`/product/${id}`)
+    if (!slug) return;
+    
+    const productId = extractIdFromSlug(slug);
+    
+    MainApiRequest.get(`/product/${productId}`)
       .then((res) => {
         const p: Product = res.data;
         setProduct(p);
@@ -80,13 +89,13 @@ const DetailProduct: React.FC = () => {
       })
       .catch(console.error);
 
-    MainApiRequest.get<RatingData>(`/ratings/product/${id}`)
+    MainApiRequest.get<RatingData>(`/ratings/product/${productId}`)
       .then((res) => setRatingData(res.data))
       .catch((err) => {
         console.error('Failed to fetch ratings:', err);
         setRatingData(null);
       });
-  }, [id]);
+  }, [slug]);
 
   const displayedRatings = useMemo(() => {
     if (!ratingData) return [];
@@ -134,6 +143,11 @@ const DetailProduct: React.FC = () => {
   })();
 
   const handleAddToCart = async () => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    
     try {
       await addToCart(
         Number(product.id),
@@ -149,8 +163,13 @@ const DetailProduct: React.FC = () => {
   };
 
   const handlePlaceOrder = () => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    
     if (!product.available) return message.error('Sản phẩm đang hết hàng.');
-    navigate(`/checkout`, {
+    navigate(`/thanh-toan`, {
       state: {
         initialItems: [
           {
@@ -166,11 +185,21 @@ const DetailProduct: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title={product.name}
+        description={`${product.description || product.name} - ${product.category}. Giá từ ${product.sizes[0]?.price.toLocaleString('vi-VN')}₫. Đặt hàng ngay tại SE347 Coffee Chain.`}
+        keywords={`${product.name}, ${product.category}, cà phê, coffee, đặt hàng online, ${product.sizes.map(s => s.sizeName).join(', ')}`}
+        ogImage={product.image}
+      />
+      <LoginPromptModal 
+        isOpen={showLoginPrompt} 
+        onClose={() => setShowLoginPrompt(false)} 
+      />
       <Breadcrumbs
         title={product.name}
         items={[
           { label: 'Trang chủ', to: '/' },
-          { label: product.category, to: `/category/${product.category}` },
+          { label: product.category, to: `/san-pham/${product.category}` },
           { label: product.name },
         ]}
       />
