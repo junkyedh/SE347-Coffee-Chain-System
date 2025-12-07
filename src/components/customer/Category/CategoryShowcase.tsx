@@ -6,6 +6,7 @@ import img5 from '@/assets/tea1.jpg';
 import img2 from '@/assets/tea2.jpg';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './CategoryShowcase.scss';
 
 interface Category {
@@ -67,6 +68,7 @@ const CATEGORY_CONFIG: Category[] = [
 
 const CategoryShowcase: React.FC = () => {
   const [productCounts, setProductCounts] = useState<Record<string, number>>({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -98,7 +100,7 @@ const CategoryShowcase: React.FC = () => {
           <div
             key={category.id}
             className="category-card"
-            onClick={() => (window.location.href = `/?category=${category.id}`)}
+            onClick={() => navigate(`/thuc-don?category=${encodeURIComponent(category.keyWords[0])}`)}
           >
             <div className="category-image-wrapper">
               <img src={category.image} alt={category.name} />

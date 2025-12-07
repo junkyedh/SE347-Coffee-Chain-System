@@ -33,6 +33,7 @@ import Menu from "@/pages/customer/Menu/Menu";
 import DetailProduct from "@/pages/customer/ProductDetail/ProductDetail";
 import RegisterCustomer from "@/pages/customer/Register/RegisterCustomer";
 import { TrackingOrder } from "@/pages/customer/TrackingOrder/TrackingOrder";
+import { VNPayCallback } from "@/pages/customer/VNPayCallback";
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Layout from "../layouts/Layout/Layout";
@@ -49,20 +50,21 @@ const MainRoutes: React.FC = () => {
           {/* Customer routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/about-us" element={<About />} />
-            <Route path="/contact-us" element={<Contact />} />
-            <Route path="/product/:id" element={<DetailProduct />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/profile-user" element={<ProfileUser />}/>
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="tracking-order/:id" element={<TrackingOrder />} />
-            <Route path="/history" element={<HistoryOrder />} />
-            <Route path="/feedback" element={<FeedbackPage />} />
-            <Route path="/register" element={<RegisterCustomer />} />
+            <Route path="/dang-nhap" element={<Login />} />
+            <Route path="/gioi-thieu" element={<About />} />
+            <Route path="/lien-he" element={<Contact />} />
+            <Route path="/san-pham/:slug" element={<DetailProduct />} />
+            <Route path="/thuc-don" element={<Menu />} />
+            <Route path="/thong-tin-tai-khoan" element={<ProfileUser />}/>
+            <Route path="/thanh-toan" element={<Checkout />} />
+            <Route path="/vnpay-callback" element={<VNPayCallback />} />
+            <Route path="/theo-doi-don-hang/:id" element={<TrackingOrder />} />
+            <Route path="/lich-su-don-hang" element={<HistoryOrder />} />
+            <Route path="/danh-gia" element={<FeedbackPage />} />
+            <Route path="/dang-ky" element={<RegisterCustomer />} />
           </Route>
 
-      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/quan-tri/dang-nhap" element={<AdminLogin />} />
 
 
       <Route
@@ -73,34 +75,34 @@ const MainRoutes: React.FC = () => {
         }
       >
         {/* Các route chung cho Admin, Manager, Staff */}
-        <Route path="/admin/dashboard" element={<Statistic />} />
-        <Route path="/admin/branchlist" element={<AdminBranchList />} />
-        <Route path="/admin/materiallist" element={<AdminMaterialList />} />
-        <Route path="/admin/productlist" element={<AdminProductList />} />
-        <Route path="/admin/orderlist" element={<AdminOrderList />} />
-        <Route path="/admin/stafflist" element={<AdminStaffList />} />
-        <Route path="/admin/customerlist" element={<AdminCustomerList />} />
-        <Route path="/admin/promote" element={<AdminPromotion />} />
-        <Route path="/admin/rating" element={<AdminCustomerRating />} />
+        <Route path="/quan-tri/thong-ke" element={<Statistic />} />
+        <Route path="/quan-tri/danh-sach-chi-nhanh" element={<AdminBranchList />} />
+        <Route path="/quan-tri/danh-sach-nguyen-lieu" element={<AdminMaterialList />} />
+        <Route path="/quan-tri/danh-sach-san-pham" element={<AdminProductList />} />
+        <Route path="/quan-tri/danh-sach-don-hang" element={<AdminOrderList />} />
+        <Route path="/quan-tri/danh-sach-nhan-vien" element={<AdminStaffList />} />
+        <Route path="/quan-tri/danh-sach-khach-hang" element={<AdminCustomerList />} />
+        <Route path="/quan-tri/khuyen-mai" element={<AdminPromotion />} />
+        <Route path="/quan-tri/danh-gia" element={<AdminCustomerRating />} />
 
-        <Route path="/manager/dashboard" element={<ManagerStatistic />} />
-        <Route path="/manager/productlist" element={<ManagerProductList />} />
-        <Route path="/manager/materiallist" element={<ManagerMaterialList />} />
-        <Route path="/manager/stafflist" element={<ManagerStaffList />} />
-        <Route path="/manager/table" element={<ManagerTableList />} />
-        <Route path="/manager/customerlist" element={<ManagerCustomerList />} />
-        <Route path="/manager/orderlist" element={<ManagerOrderList />} />
-        <Route path="/manager/promote" element={<ManagerPromotion />} />
-        <Route path="/manager/rating" element={<AdminCustomerRating />} />
-        <Route path="/manager/info" element={<ManagerBranchInfo />} />
+        <Route path="/quan-ly/thong-ke" element={<ManagerStatistic />} />
+        <Route path="/quan-ly/danh-sach-san-pham" element={<ManagerProductList />} />
+        <Route path="/quan-ly/danh-sach-nguyen-lieu" element={<ManagerMaterialList />} />
+        <Route path="/quan-ly/danh-sach-nhan-vien" element={<ManagerStaffList />} />
+        <Route path="/quan-ly/danh-sach-ban-ghe" element={<ManagerTableList />} />
+        <Route path="/quan-ly/danh-sach-khach-hang" element={<ManagerCustomerList />} />
+        <Route path="/quan-ly/danh-sach-don-hang" element={<ManagerOrderList />} />
+        <Route path="/quan-ly/khuyen-mai" element={<ManagerPromotion />} />
+        <Route path="/quan-ly/danh-gia" element={<AdminCustomerRating />} />
+        <Route path="/quan-ly/thong-tin-quan" element={<ManagerBranchInfo />} />
 
-        <Route path="/staff/dashboard" element={<ManagerBranchInfo />} />
-        <Route path="/staff/order/place-order" element={<AdminMenu />} />
-        <Route path="/staff/order/choose-table" element={<AdminTableOrder />} />
-        <Route path="/staff/order/order-list" element={<OrderList />} />
-        <Route path="/staff/customer-list" element={<CustomerList />} />
-        <Route path="/staff/staff-list" element={<StaffList />} />
-        <Route path="/staff/info" element={<StaffProfile />} />
+        <Route path="/nhan-vien/thong-ke" element={<ManagerBranchInfo />} />
+        <Route path="/nhan-vien/don-hang/dat-mon" element={<AdminMenu />} />
+        <Route path="/nhan-vien/don-hang/chon-ban" element={<AdminTableOrder />} />
+        <Route path="/nhan-vien/don-hang/danh-sach-don-hang" element={<OrderList />} />
+        <Route path="/nhan-vien/danh-sach-khach-hang" element={<CustomerList />} />
+        <Route path="/nhan-vien/danh-sach-nhan-vien" element={<StaffList />} />
+        <Route path="/nhan-vien/thong-tin" element={<StaffProfile />} />
       </Route>
       <Route path="/404" element={<PageNotFound />} />
       <Route path="*" element={<PageNotFound />} />

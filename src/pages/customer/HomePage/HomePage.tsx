@@ -3,9 +3,13 @@ import CategoryShowcase from '@/components/customer/Category/CategoryShowcase';
 import FeaturedList from '@/components/customer/FeaturedProduct/FeaturedProduct';
 import Features from '@/components/customer/Features/Features';
 import Gallery from '@/components/customer/Gallery/Gallery';
+import LoginPromptModal from '@/components/common/LoginPromptModal/LoginPromptModal';
 import { useCart } from '@/hooks/cartContext';
 import useProducts from '@/hooks/useProducts';
+import { useAuth } from '@/hooks/useAuth';
 import { message } from 'antd';
+import { createProductUrl } from '@/utils/slugify';
+import { useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import 'slick-carousel/slick/slick-theme.css';
@@ -16,6 +20,8 @@ const Home = () => {
   const navigate = useNavigate();
   const { products: productList } = useProducts();
   const { addToCart } = useCart();
+  const { isLoggedIn } = useAuth();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const handleAddToCart = async (
     productId: number,
@@ -23,6 +29,11 @@ const Home = () => {
     quantity: number = 1,
     mood?: string
   ) => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    
     try {
       await addToCart(productId, size, quantity, mood);
       message.success('Thêm vào giỏ hàng thành công!');
@@ -32,13 +43,16 @@ const Home = () => {
     }
   };
 
-  const handleProductClick = (productId: string) => {
-    console.log(`Navigate to product detail: ${productId}`);
-    navigate(`/product/${productId}`);
+  const handleProductClick = (productId: string, productName: string) => {
+    navigate(createProductUrl(productName, productId));
   };
 
   return (
     <>
+      <LoginPromptModal 
+        isOpen={showLoginPrompt} 
+        onClose={() => setShowLoginPrompt(false)} 
+      />
       <Banner />
       <Features />
       <CategoryShowcase />
@@ -61,7 +75,7 @@ const Home = () => {
           <Container>
             <Row className="align-items-center">
               <Col sx={12} md={4} className="text-center mt-3 mt-md-0">
-                <Link to="/contact-us" className="secondary_btn bounce">
+                <Link to="/lien-he" className="secondary_btn bounce">
                   Liên hệ với chúng tôi!
                 </Link>
               </Col>

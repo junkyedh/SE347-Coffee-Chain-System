@@ -28,7 +28,7 @@ const RegisterCustomer: React.FC = () => {
       if (res.status === 201 || res.status === 200) {
         localStorage.removeItem('sessionId');
         message.success('Đăng ký thành công! Vui lòng đăng nhập.');
-        navigate('/login');
+        navigate('/dang-nhap');
       } else {
         message.error('Đăng ký thất bại.');
       }
@@ -140,7 +140,7 @@ const RegisterCustomer: React.FC = () => {
             <span
               className="text-primary"
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/dang-nhap')}
             >
               Đăng nhập
             </span>

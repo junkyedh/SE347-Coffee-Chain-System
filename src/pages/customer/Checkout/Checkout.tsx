@@ -35,6 +35,12 @@ interface Coupon {
   code: string;
   discount: number;
   description: string;
+  promote: {
+    id: number;
+    name: string;
+    promoteType: 'Phần trăm' | 'Cố định';
+    discount: number;
+  };
 }
 
 interface Branch {
@@ -63,7 +69,7 @@ export const Checkout: React.FC = () => {
   const [address, setAddress] = useState('');
   const [note, setNote] = useState('');
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer'>('cash');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'vnpay'>('cash');
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
@@ -94,32 +100,54 @@ export const Checkout: React.FC = () => {
 
   useEffect(() => {
     const loadItems = async () => {
-      if (state?.initialItems) {
-        const mapped = await Promise.all(
-          (state.initialItems as LocationStateItem[]).map(async (it) => {
-            const { data: res } = await MainApiRequest.get<ProductDetail>(
-              `/product/${it.productId}`
-            );
-            const sz = res.sizes.find((s) => s.sizeName === it.size) || {
-              sizeName: it.size,
-              price: 0,
-            };
-            return {
-              productId: Number(res.id),
-              name: res.name,
-              image: res.image,
-              size: it.size,
-              mood: it.mood,
-              quantity: it.quantity,
-              price: sz?.price || 0,
-            } as OrderItem;
-          })
-        );
-        setItems(mapped);
-      } else {
-        await fetchCart();
-        setItems(
-          cart.map((it) => ({
+      try {
+        if (state?.initialItems && Array.isArray(state.initialItems) && state.initialItems.length > 0) {
+          console.log('[Checkout] Loading items from state:', state.initialItems);
+          const mapped = await Promise.all(
+            (state.initialItems as LocationStateItem[]).map(async (it) => {
+              const { data: res } = await MainApiRequest.get<ProductDetail>(
+                `/product/${it.productId}`
+              );
+              
+              // Xác định category để tính giá đúng
+              const productFull = await MainApiRequest.get<{category: string}>(`/product/${it.productId}`);
+              const isCake = productFull.data.category === 'Bánh ngọt';
+              
+              let price = 0;
+              if (isCake) {
+                // Với bánh ngọt: whole = piece × 8
+                if (it.size === 'whole') {
+                  const piecePrice = res.sizes.find((s) => s.sizeName === 'piece')?.price || res.sizes[0]?.price || 0;
+                  price = piecePrice * 8;
+                } else if (it.size === 'piece') {
+                  price = res.sizes.find((s) => s.sizeName === 'piece')?.price || res.sizes[0]?.price || 0;
+                } else {
+                  const sz = res.sizes.find((s) => s.sizeName === it.size);
+                  price = sz?.price || 0;
+                }
+              } else {
+                // Với đồ uống và sản phẩm khác
+                const sz = res.sizes.find((s) => s.sizeName === it.size);
+                price = sz?.price || 0;
+              }
+              
+              return {
+                productId: Number(res.id),
+                name: res.name,
+                image: res.image,
+                size: it.size,
+                mood: it.mood,
+                quantity: it.quantity,
+                price: price,
+              } as OrderItem;
+            })
+          );
+          console.log('[Checkout] Loaded items:', mapped);
+          setItems(mapped);
+        } else {
+          console.log('[Checkout] Loading items from cart');
+          await fetchCart();
+          const cartItems = cart.map((it) => ({
             productId: Number(it.productId),
             name: it.name,
             image: it.image,
@@ -127,12 +155,34 @@ export const Checkout: React.FC = () => {
             mood: it.mood,
             quantity: it.quantity,
             price: it.price,
-          }))
-        );
+          }));
+          console.log('[Checkout] Cart items:', cartItems);
+          setItems(cartItems);
+        }
+      } catch (error) {
+        console.error('[Checkout] Error loading items:', error);
       }
     };
     loadItems();
-  }, [state, cart, fetchCart]);
+  }, [state]);
+
+  // Load from cart if no state provided
+  useEffect(() => {
+    if (!state?.initialItems && cart.length > 0) {
+      console.log('[Checkout] Updating items from cart changes');
+      setItems(
+        cart.map((it) => ({
+          productId: Number(it.productId),
+          name: it.name,
+          image: it.image,
+          size: it.size,
+          mood: it.mood,
+          quantity: it.quantity,
+          price: it.price,
+        }))
+      );
+    }
+  }, [cart, state]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -178,29 +228,84 @@ export const Checkout: React.FC = () => {
 
   // Calculate membership discount
   useEffect(() => {
-    const fetchMembershipDiscount = async () => {
+    const fetchMembershipRank = async () => {
       try {
         const res = await MainApiRequest.get<{ msg: string; data: { rank: string } }>(
           '/auth/callback'
         );
         const rank = res.data.data.rank;
-        const tier = membershipList.find((m) => m.rank === rank);
-        if (tier) {
-          setMembershipDiscount(tier.discount);
-        }
+        // Lưu rank để tính toán giảm giá
+        setMembershipDiscount(rank as any);
       } catch (err) {
         console.error('Failed to fetch membership rank:', err);
+        setMembershipDiscount(0);
       }
     };
-    fetchMembershipDiscount();
-  }, [membershipList]);
+    fetchMembershipRank();
+  }, []);
 
   const deliveryFee = deliveryMethod === 'delivery' ? 10000 : 0;
-  const discount = appliedCoupon ? appliedCoupon.discount : 0;
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const membershipApplied = appliedCoupon ? 0 : membershipDiscount;
-  const totalBeforeMembership = subtotal + deliveryFee - discount;
-  const finalTotal = totalBeforeMembership - membershipApplied;
+  
+  console.log('[Checkout] Price calculation:', { 
+    itemsCount: items.length, 
+    subtotal, 
+    deliveryFee,
+    items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity }))
+  });
+  
+  // Tính toán theo thứ tự: subtotal + phí ship - mã giảm giá - giảm giá membership
+  const totalAfterDelivery = subtotal + deliveryFee;
+  
+  // Tính giảm giá từ voucher (có thể là % hoặc số tiền cố định)
+  let couponDiscount = 0;
+  if (appliedCoupon) {
+    const promote = appliedCoupon.promote;
+    if (promote.promoteType === 'Phần trăm') {
+      // Giảm theo phần trăm
+      couponDiscount = Math.floor(totalAfterDelivery * (promote.discount / 100));
+    } else {
+      // Giảm số tiền cố định
+      couponDiscount = promote.discount;
+    }
+    // Voucher không được giảm quá tổng tiền (tối thiểu phải còn 1,000đ)
+    couponDiscount = Math.min(couponDiscount, totalAfterDelivery - 1000);
+  }
+  
+  const totalAfterCoupon = totalAfterDelivery - couponDiscount;
+  
+  // Tính giảm giá membership dựa trên rank (chỉ áp dụng nếu không dùng coupon)
+  let membershipApplied = 0;
+  if (!appliedCoupon && membershipDiscount) {
+    const rank = membershipDiscount as any as string;
+    
+    if (rank === 'Kim cương') {
+      // Kim cương: giảm 10%
+      membershipApplied = Math.floor(totalAfterCoupon * 0.1);
+    } else if (rank === 'Vàng') {
+      // Vàng: giảm 7%, tối đa 10,000đ
+      membershipApplied = Math.min(Math.floor(totalAfterCoupon * 0.07), 10000);
+    } else if (rank === 'Bạc') {
+      // Bạc: giảm 5%, tối đa 10,000đ
+      membershipApplied = Math.min(Math.floor(totalAfterCoupon * 0.05), 10000);
+    } else if (rank === 'Đồng') {
+      // Đồng: giảm 3%, tối đa 10,000đ
+      membershipApplied = Math.min(Math.floor(totalAfterCoupon * 0.03), 10000);
+    }
+    // Thường: không giảm (membershipApplied = 0)
+  }
+  
+  // Đảm bảo finalTotal luôn >= 1000 VND
+  const finalTotal = Math.max(1000, totalAfterCoupon - membershipApplied);
+  
+  console.log('[Checkout] Final calculation:', { 
+    totalAfterDelivery,
+    couponDiscount,
+    totalAfterCoupon,
+    membershipRank: membershipDiscount,
+    membershipApplied,
+    finalTotal 
+  });
 
   const handleApplyCoupon = () => {
     const code = couponCode.trim().toUpperCase();
@@ -225,6 +330,18 @@ export const Checkout: React.FC = () => {
       alert('Vui lòng nhập địa chỉ giao hàng.');
       return;
     }
+    
+    // Kiểm tra giỏ hàng không rỗng
+    if (items.length === 0) {
+      alert('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi đặt hàng.');
+      return;
+    }
+    
+    // Kiểm tra số tiền hợp lệ cho VNPay
+    if (paymentMethod === 'vnpay' && finalTotal < 5000) {
+      alert('Số tiền thanh toán qua VNPay phải từ 5,000đ trở lên. Vui lòng thêm sản phẩm hoặc chọn phương thức thanh toán khác.');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -245,6 +362,8 @@ export const Checkout: React.FC = () => {
         totalPrice: finalTotal,
         orderDate: new Date().toISOString(),
         status: 'PENDING',
+        paymentMethod: paymentMethod, // 'cash' hoặc 'vnpay'
+        paymentStatus: paymentMethod === 'vnpay' ? 'Đã thanh toán' : 'Chưa thanh toán', // VNPay = đã thanh toán, Cash = chưa thanh toán
       });
 
       await Promise.all(
@@ -267,7 +386,35 @@ export const Checkout: React.FC = () => {
         localStorage.setItem('guest_order_history', JSON.stringify(newHistory));
       }
 
-      navigate(`/tracking-order/${orderId}`, { replace: true });
+      // If VNPay payment method is selected, redirect to payment URL
+      if (paymentMethod === 'vnpay') {
+        try {
+          console.log('[VNPay] Creating payment with amount:', finalTotal);
+          const { data: paymentData } = await MainApiRequest.post('/payment/vnpay/create', {
+            orderId,
+            amount: finalTotal,
+            orderInfo: `Thanh toan don hang ${orderId}`,
+            returnUrl: `${window.location.origin}/vnpay-callback`,
+          });
+          
+          console.log('[VNPay] Payment data received:', paymentData);
+          
+          if (paymentData.paymentUrl) {
+            // Redirect to VNPay payment page
+            window.location.href = paymentData.paymentUrl;
+            return;
+          } else {
+            throw new Error('Không nhận được URL thanh toán từ VNPay');
+          }
+        } catch (err) {
+          console.error('VNPay payment error:', err);
+          alert('Không thể tạo thanh toán VNPay. Vui lòng thử lại.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      navigate(`/theo-doi-don-hang/${orderId}`, { replace: true });
     } catch (err) {
       console.error(err);
       alert('Đặt hàng thất bại, vui lòng thử lại.');
@@ -396,18 +543,18 @@ export const Checkout: React.FC = () => {
                     <Wallet className="option-icon" />
                     <div className="option-info">
                       <div className="option-title">Tiền mặt</div>
-                      <div className="option-desc">Thanh toán khi nhận hàng</div>
+                      <div className="option-desc">Thanh toán khi nhận hàng (COD)</div>
                     </div>
                   </div>
                   <div
-                    className={`radio-option ${paymentMethod === 'transfer' ? 'selected' : ''}`}
-                    onClick={() => setPaymentMethod('transfer')}
+                    className={`radio-option ${paymentMethod === 'vnpay' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('vnpay')}
                   >
-                    <input type="radio" checked={paymentMethod === 'transfer'} readOnly />
+                    <input type="radio" checked={paymentMethod === 'vnpay'} readOnly />
                     <CreditCard className="option-icon" />
                     <div className="option-info">
-                      <div className="option-title">Chuyển khoản</div>
-                      <div className="option-desc">Chuyển khoản qua ngân hàng</div>
+                      <div className="option-title">VNPay</div>
+                      <div className="option-desc">Thanh toán online qua VNPay</div>
                     </div>
                   </div>
                 </div>
@@ -483,32 +630,16 @@ export const Checkout: React.FC = () => {
                     <CheckCircle className="coupon-icon" />
                     <div className="coupon-info">
                       <div className="coupon-code">{appliedCoupon.code}</div>
-                      <div className="coupon-desc">{appliedCoupon.description}</div>
+                      <div className="coupon-desc">{appliedCoupon.promote.name}</div>
                     </div>
                     <div className="coupon-discount">
-                      -{Number(appliedCoupon.discount || 0).toLocaleString('vi-VN')}₫
+                      {appliedCoupon.promote.promoteType === 'Phần trăm' 
+                        ? `-${appliedCoupon.promote.discount}%` 
+                        : `-${Number(appliedCoupon.promote.discount || 0).toLocaleString('vi-VN')}₫`
+                      }
                     </div>
                   </div>
                 )}
-
-                <div className="available-coupons">
-                  <div className="coupons-label">Mã giảm giá có sẵn:</div>
-                  {availableCoupons.map((coupon) => (
-                    <div
-                      key={coupon.code}
-                      className="coupon-option"
-                      onClick={() => setCouponCode(coupon.code)}
-                    >
-                      <div className="coupon-content">
-                        <div className="coupon-code">{coupon.code}</div>
-                        <div className="coupon-desc">{coupon.description}</div>
-                      </div>
-                      <div className="coupon-discount">
-                        -{Number(coupon.discount || 0).toLocaleString('vi-VN')}₫
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Total */}
@@ -523,15 +654,15 @@ export const Checkout: React.FC = () => {
                     <span>Phí giao hàng</span>
                     <span>{Number(deliveryFee || 0).toLocaleString('vi-VN')}₫</span>
                   </div>
-                  {discount > 0 && (
+                  {couponDiscount > 0 && (
                     <div className="total-line discount">
                       <span>Giảm giá voucher</span>
-                      <span>-{Number(discount || 0).toLocaleString('vi-VN')}₫</span>
+                      <span>-{Number(couponDiscount || 0).toLocaleString('vi-VN')}₫</span>
                     </div>
                   )}
                   {membershipApplied > 0 && (
                     <div className="total-line discount">
-                      <span>Giảm giá thành viên</span>
+                      <span>Giảm giá thành viên ({membershipDiscount})</span>
                       <span>-{Number(membershipApplied || 0).toLocaleString('vi-VN')}₫</span>
                     </div>
                   )}

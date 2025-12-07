@@ -1,6 +1,7 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import EmptyState from '@/components/common/EmtyState/EmptyState';
 import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
+import LoginPromptModal from '@/components/common/LoginPromptModal/LoginPromptModal';
 import { Pagination } from '@/components/common/Pagination/Pagination';
 import CardListView from '@/components/customer/CardListView/CardListView';
 import CardProduct from '@/components/customer/CardProduct/CardProduct';
@@ -9,8 +10,13 @@ import PriceFilter, { PriceOption } from '@/components/customer/PriceFilter/Pric
 import SearchBar from '@/components/customer/Searchbar/Searchbar';
 import SortDropdown from '@/components/customer/SortDropdown/SortDropdown';
 import ViewToggle from '@/components/customer/ViewToggle/ViewToggle';
+import { useCart } from '@/hooks/cartContext';
+import { useAuth } from '@/hooks/useAuth';
 import { MainApiRequest } from '@/services/MainApiRequest';
+import { message } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { createProductUrl } from '@/utils/slugify';
 import './Menu.scss';
 
 interface RawProduct {
@@ -47,6 +53,8 @@ export interface Product {
 }
 
 const Menu: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -55,10 +63,61 @@ const Menu: React.FC = () => {
     'default' | 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'rating' | 'popular'
   >('default');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(8);
   const [loading, setLoading] = useState(true);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  
+  const { addToCart } = useCart();
+  const { isLoggedIn } = useAuth();
+
+  // Handler cho add to cart với login check
+  const handleAddToCart = async (
+    productId: number,
+    size: string,
+    quantity: number = 1,
+    mood?: string
+  ) => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    
+    try {
+      await addToCart(productId, size, quantity, mood);
+      message.success('Thêm vào giỏ hàng thành công!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      message.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại sau.');
+    }
+  };
+
+  // Handler cho product click
+  const handleProductClick = (productId: string, productName: string) => {
+    navigate(createProductUrl(productName, productId));
+  };
+
+  // Đọc category từ URL params khi component mount
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl) {
+      setSelectedCategory(categoryFromUrl);
+    }
+  }, [searchParams]);
+
+  // Handler để update cả state và URL khi thay đổi category
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    setCurrentPage(1); // Reset về trang 1 khi đổi category
+    
+    // Update URL
+    if (categoryId === 'all') {
+      searchParams.delete('category');
+    } else {
+      searchParams.set('category', categoryId);
+    }
+    setSearchParams(searchParams);
+  };
 
   useEffect(() => {
     MainApiRequest.get<RawProduct[]>('/product/list')
@@ -172,11 +231,16 @@ const Menu: React.FC = () => {
 
   return (
     <>
+      <LoginPromptModal 
+        isOpen={showLoginPrompt} 
+        onClose={() => setShowLoginPrompt(false)} 
+      />
       <Breadcrumbs
-        title="Menu"
+        title={selectedCategory !== 'all' ? selectedCategory : 'Menu'}
         items={[
           { label: 'Trang chủ', to: '/' },
-          { label: 'Thực đơn', to: '/menu' },
+          { label: 'Thực đơn', to: '/thuc-don' },
+          ...(selectedCategory !== 'all' ? [{ label: selectedCategory, to: `/thuc-don?category=${selectedCategory}` }] : [])
         ]}
       />
       <div className="menu-page">
@@ -187,7 +251,7 @@ const Menu: React.FC = () => {
             <CategoryFilter
               categories={categories}
               selected={selectedCategory}
-              onChange={setSelectedCategory}
+              onChange={handleCategoryChange}
             />
             <PriceFilter selected={priceFilter} onChange={setPriceFilter} />
           </aside>
@@ -229,11 +293,24 @@ const Menu: React.FC = () => {
                     <div className={viewMode === 'grid' ? 'menu-page__grid' : 'menu-page__list'}>
                       {viewMode === 'grid'
                         ? paginatedProducts.map((prod) => (
-                            <CardProduct key={prod.id} product={prod} />
+                            <CardProduct 
+                              key={prod.id} 
+                              product={prod}
+                              onAddToCart={(size, quantity, mood) =>
+                                handleAddToCart(Number(prod.id), size, quantity, mood)
+                              }
+                              onProductClick={() => handleProductClick(prod.id, prod.name)}
+                            />
                           ))
                         : paginatedProducts.map((prod) => (
                             <div key={prod.id} className="menu-page__list-item">
-                              <CardListView product={prod} />
+                              <CardListView 
+                                product={prod}
+                                onAddToCart={(productId, size, quantity, mood) =>
+                                  handleAddToCart(productId, size, quantity, mood)
+                                }
+                                onProductClick={() => handleProductClick(prod.id, prod.name)}
+                              />
                             </div>
                           ))}
                     </div>

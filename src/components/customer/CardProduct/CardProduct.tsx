@@ -1,8 +1,11 @@
 import { useCart } from '@/hooks/cartContext';
+import { useAuth } from '@/hooks/useAuth';
+import LoginPromptModal from '@/components/common/LoginPromptModal/LoginPromptModal';
 import { message } from 'antd';
 import React, { useState } from 'react';
 import { FaCartPlus, FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { createProductUrl } from '@/utils/slugify';
 import './CardProduct.scss';
 
 export interface ProductSize {
@@ -40,10 +43,12 @@ function normalizeSizes(raw: any[]): ProductSize[] {
 }
 
 const CardProduct: React.FC<Props> = ({ product, onProductClick, onAddToCart }) => {
-  const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+  const [selectedSizeIndex] = useState(0);
+  const [quantity] = useState(1);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isLoggedIn } = useAuth();
 
   const sizes = normalizeSizes(product.sizes);
   const size = sizes[selectedSizeIndex];
@@ -58,11 +63,11 @@ const CardProduct: React.FC<Props> = ({ product, onProductClick, onAddToCart }) 
       : undefined
     : undefined;
 
-  const handleCardClick = () => {
+  const handleProductClick = () => {
     if (onProductClick) {
       onProductClick(product.id);
     } else {
-      navigate(`/product/${product.id}`);
+      navigate(createProductUrl(product.name, product.id));
     }
   };
 
@@ -89,9 +94,17 @@ const CardProduct: React.FC<Props> = ({ product, onProductClick, onAddToCart }) 
       'quantity:',
       quantity
     );
+    
+    // Nếu có onAddToCart từ parent, sử dụng nó (parent sẽ handle login check)
     if (onAddToCart) {
       onAddToCart(sizeName, quantity, mood);
     } else {
+      // Nếu không, sử dụng logic mặc định với login check
+      if (!isLoggedIn) {
+        setShowLoginPrompt(true);
+        return;
+      }
+      
       addToCart(Number(product.id), sizeName, 1, mood)
         .then(() => message.success('Đã thêm vào giỏ hàng'))
         .catch(() => message.error('Không thể thêm vào giỏ hàng'));
@@ -99,11 +112,16 @@ const CardProduct: React.FC<Props> = ({ product, onProductClick, onAddToCart }) 
   };
 
   return (
-    <div
-      className={`cardProduct ${!product.available ? 'disabled' : ''}`}
-      onClick={handleCardClick}
-      style={{ cursor: product.available ? 'pointer' : 'not-allowed' }}
-    >
+    <>
+      <LoginPromptModal 
+        isOpen={showLoginPrompt} 
+        onClose={() => setShowLoginPrompt(false)} 
+      />
+      <div
+        className={`cardProduct ${!product.available ? 'disabled' : ''}`}
+        onClick={handleProductClick}
+        style={{ cursor: product.available ? 'pointer' : 'not-allowed' }}
+      >
       <div className="cardProductImageWrapper">
         <img src={product.image} alt={product.name} className="cardProductImage" />
         {(product.isPopular || product.isNew) && (
@@ -136,7 +154,10 @@ const CardProduct: React.FC<Props> = ({ product, onProductClick, onAddToCart }) 
             <button
               type="button"
               className="cardProductBtn"
-              onClick={handleCardClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleProductClick();
+              }}
               disabled={!product.available}
             >
               Chi tiết
@@ -153,6 +174,7 @@ const CardProduct: React.FC<Props> = ({ product, onProductClick, onAddToCart }) 
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -13,6 +13,7 @@ import {
   BiX,
 } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
+import { createProductUrl } from '@/utils/slugify';
 import './CartDrawer.scss';
 import { Button } from '@/components/common/Button/Button';
 import { Badge } from '@/components/common/Badge/Badge';
@@ -27,7 +28,7 @@ const CartDrawer: React.FC = () => {
 
   const handleCheckout = () => {
     close();
-    navigate('/checkout', {
+    navigate('/thanh-toan', {
       state: {
         initialItems: cart.map((i) => ({
           productId: i.productId,
@@ -138,7 +139,7 @@ const CartDrawer: React.FC = () => {
                               className="product-image"
                               onClick={() => {
                                 close();
-                                navigate(`/product/${item.productId}`);
+                                navigate(createProductUrl(item.name, item.productId));
                               }}
                             />
                             <div className="image-overlay">
@@ -147,7 +148,7 @@ const CartDrawer: React.FC = () => {
                                 className="image-overlay-btn"
                                 onClick={() => {
                                   close();
-                                  navigate(`/product/${item.productId}`);
+                                  navigate(createProductUrl(item.name, item.productId));
                                 }}
                               >
                                 <BiArrowToRight />
@@ -165,7 +166,7 @@ const CartDrawer: React.FC = () => {
                                 className="product-name mb-0"
                                 onClick={() => {
                                   close();
-                                  navigate(`/product/${item.productId}`);
+                                  navigate(createProductUrl(item.name, item.productId));
                                 }}
                               >
                                 {item.name}

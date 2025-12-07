@@ -8,7 +8,7 @@ interface FeaturedListProps {
   title?: string;
   products: ProductType[];
   onAddToCart?: (productId: number, size: string, quantity: number, mood?: string) => void;
-  onProductClick?: (productId: string) => void;
+  onProductClick?: (productId: string, productName: string) => void;
 }
 
 const FeaturedList: React.FC<FeaturedListProps> = ({
@@ -34,7 +34,7 @@ const FeaturedList: React.FC<FeaturedListProps> = ({
   const navigate = useNavigate();
 
   const handleShowMore = () => {
-    navigate('/menu');
+    navigate('/thuc-don');
   };
   console.log('Popular products:', popularProducts);
   return (
@@ -48,7 +48,7 @@ const FeaturedList: React.FC<FeaturedListProps> = ({
               onAddToCart={(size, quantity, mood) =>
                 onAddToCart?.(Number(product.id), size, quantity, mood)
               }
-              onProductClick={onProductClick}
+              onProductClick={() => onProductClick?.(product.id, product.name)}
             />
           </div>
         ))}

@@ -7,6 +7,7 @@ import './Header.scss';
 import { User, Settings, Clock, LogOut, Home, Info, Coffee, Phone } from 'lucide-react';
 import { useSystemContext } from '../../../hooks/useSystemContext';
 import { MainApiRequest } from '../../../services/MainApiRequest';
+import CartDrawer from '../../customer/CartDrawer/CartDrawer';
 import React from 'react';
 
 const Header: React.FC = () => {
@@ -55,13 +56,14 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     fetchUserInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const handleLogout = async () => {
     try {
       await logout();
       setUserInfo(null);
-      navigate('/login');
+      navigate('/dang-nhap');
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -70,9 +72,9 @@ const Header: React.FC = () => {
   // Navigation items with icons
   const navItems = [
     { to: '/', icon: Home, label: 'Trang chủ' },
-    { to: '/about-us', icon: Info, label: 'Giới thiệu' },
-    { to: '/menu', icon: Coffee, label: 'Thực đơn' },
-    { to: '/contact-us', icon: Phone, label: 'Liên hệ' },
+    { to: '/gioi-thieu', icon: Info, label: 'Giới thiệu' },
+    { to: '/thuc-don', icon: Coffee, label: 'Thực đơn' },
+    { to: '/lien-he', icon: Phone, label: 'Liên hệ' },
   ];
 
   // User dropdown items (synchronized between desktop and mobile)
@@ -80,12 +82,12 @@ const Header: React.FC = () => {
     {
       icon: Settings,
       label: 'Hồ sơ của tôi',
-      action: () => navigate('/profile-user'),
+      action: () => navigate('/thong-tin-tai-khoan'),
     },
     {
       icon: Clock,
       label: 'Lịch sử đơn hàng',
-      action: () => navigate('/history'),
+      action: () => navigate('/lich-su-don-hang'),
     },
     {
       icon: LogOut,
@@ -166,7 +168,7 @@ const Header: React.FC = () => {
                   </div>
                 ) : (
                   <NavLink
-                    to="/login"
+                    to="/dang-nhap"
                     className="offcanvas-login-btn d-block text-center"
                     onClick={closeMenu}
                   >
@@ -212,12 +214,13 @@ const Header: React.FC = () => {
                   ))}
                 </NavDropdown>
               ) : (
-                <NavLink className="login-btn" to="/login">
+                <NavLink className="login-btn" to="/dang-nhap">
                   <LogOut className="login-icon" />
                   Đăng nhập
                 </NavLink>
               )}
             </Nav>
+            <CartDrawer />
           </div>
         </Navbar>
       </Container>

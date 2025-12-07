@@ -112,7 +112,7 @@ const Login: React.FC = () => {
             <span
               className="text-primary"
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/dang-ky')}
             >
               Đăng ký
             </span>

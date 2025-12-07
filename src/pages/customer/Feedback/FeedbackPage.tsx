@@ -32,7 +32,7 @@ const FeedbackPage: React.FC = () => {
       console.log('Feedback data:', { reservationCode, rating, comments });
 
       alert('Gửi phản hồi thành công!');
-      navigate('/history');
+      navigate('/lich-su-don-hang');
     } catch (error) {
       console.error('Failed to submit feedback:', error);
       alert('Gửi phản hồi thất bại, vui lòng thử lại!');

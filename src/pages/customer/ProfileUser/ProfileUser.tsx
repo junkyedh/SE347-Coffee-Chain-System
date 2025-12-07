@@ -53,7 +53,7 @@ const ProfileUser: React.FC = () => {
         });
       } catch (err) {
         console.error('Không tải được profile:', err);
-        navigate('/login');
+        navigate('/dang-nhap');
       }
     };
 

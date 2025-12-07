@@ -32,13 +32,13 @@ const AdminLogin: React.FC = () => {
           console.log('Đăng nhập thành công:', { token, role });
           switch (role) {
             case 'ADMIN_SYSTEM':
-              navigate('/admin/dashboard');
+              navigate('/quan-tri/thong-ke');
               break;
             case 'ADMIN_BRAND':
-              navigate('/manager/dashboard');
+              navigate('/quan-ly/thong-ke');
               break;
             case 'STAFF':
-              navigate('/staff/dashboard');
+              navigate('/nhan-vien/thong-ke');
               break;
           }
         } else {
@@ -121,7 +121,7 @@ const AdminLogin: React.FC = () => {
             <span
               className="text-primary"
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/dang-nhap')}
             >
               Đăng nhập khách hàng
             </span>
