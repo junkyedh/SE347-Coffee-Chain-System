@@ -391,7 +391,8 @@ const Sidebar: React.FC = () => {
 
         <button className="logout-box" onClick={handleLogout}>
           <i className="fa-solid fa-sign-out"></i>
-          LOG OUT
+          <span className="logout-text">LOG OUT</span>
+          {/* LOG OUT */}
         </button>
       </div>
     </>
