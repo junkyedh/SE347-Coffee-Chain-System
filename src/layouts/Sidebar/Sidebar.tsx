@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useSystemContext } from '../../hooks/useSystemContext';
-import { comparePathname } from '../../utils/uri';
-import { ROUTES } from '../../constants';
-import './Sidebar.scss';
+import React, { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useSystemContext } from "../../hooks/useSystemContext";
+import { comparePathname } from "../../utils/uri";
+import { ROUTES } from "../../constants";
+import "./Sidebar.scss";
 
 type Route = {
   title: string;
@@ -18,7 +18,7 @@ type SubRoutesState = {
 };
 
 const Sidebar: React.FC = () => {
-  const [currentPath, setCurrentPath] = useState('');
+  const [currentPath, setCurrentPath] = useState("");
   const [openSubRoutes, setOpenSubRoutes] = useState<SubRoutesState>({});
   const location = useLocation();
   const { role } = useSystemContext();
@@ -29,195 +29,205 @@ const Sidebar: React.FC = () => {
     setCurrentPath(location.pathname);
   }, [location]);
 
-  if (role === 'ADMIN_SYSTEM') {
+  if (role === "ADMIN_SYSTEM") {
     routes = [
       {
-        title: 'THỐNG KÊ',
+        title: "THỐNG KÊ",
         link: ROUTES.ADMIN.STATISTICS,
-        icon: 'fa-solid fa-chart-line',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-chart-line",
+        roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: 'DANH SÁCH CHI NHÁNH',
+        title: "DANH SÁCH CHI NHÁNH",
         link: ROUTES.ADMIN.BRANCHES,
-        icon: 'fa-solid fa-building',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-building",
+        roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: 'DANH SÁCH NGUYÊN LIỆU',
+        title: "DANH SÁCH NGUYÊN LIỆU",
         link: ROUTES.ADMIN.MATERIALS,
-        icon: 'fa-solid fa-boxes-stacked',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-boxes-stacked",
+        roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: 'DANH SÁCH SẢN PHẨM',
+        title: "DANH SÁCH SẢN PHẨM",
         link: ROUTES.ADMIN.PRODUCTS,
-        icon: 'fa-solid fa-box',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-box",
+        roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: 'DANH SÁCH ĐƠN HÀNG',
+        title: "DANH SÁCH ĐƠN HÀNG",
         link: ROUTES.ADMIN.ORDERS,
-        icon: 'fa-solid fa-receipt',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-receipt",
+        roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: 'DANH SÁCH NHÂN VIÊN',
+        title: "DANH SÁCH NHÂN VIÊN",
         link: ROUTES.ADMIN.EMPLOYEES,
-        icon: 'fa-solid fa-users',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-users",
+        roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: 'DANH SÁCH KHÁCH HÀNG',
+        title: "DANH SÁCH KHÁCH HÀNG",
         link: ROUTES.ADMIN.CUSTOMERS,
-        icon: 'fa-solid fa-user',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-user",
+        roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: 'KHUYẾN MÃI',
+        title: "KHUYẾN MÃI",
         link: ROUTES.ADMIN.PROMOTIONS,
-        icon: 'fa-solid fa-ticket',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-ticket",
+        roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: 'ĐÁNH GIÁ',
+        title: "ĐÁNH GIÁ",
         link: ROUTES.ADMIN.RATINGS,
-        icon: 'fa-solid fa-star',
-        roles: ['ADMIN_SYSTEM'],
+        icon: "fa-solid fa-star",
+        roles: ["ADMIN_SYSTEM"],
       },
     ];
-  } else if (role === 'ADMIN_BRAND') {
+  } else if (role === "ADMIN_BRAND") {
     routes = [
       {
-        title: 'Thống kê',
+        title: "Thống kê",
         link: ROUTES.MANAGER.STATISTICS,
-        icon: 'fa-solid fa-chart-line',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-chart-line",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Nguyên liệu',
+        title: "Nguyên liệu",
         link: ROUTES.MANAGER.MATERIALS,
-        icon: 'fa-solid fa-boxes-stacked',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-boxes-stacked",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Sản phẩm',
+        title: "Sản phẩm",
         link: ROUTES.MANAGER.PRODUCTS,
-        icon: 'fa-solid fa-box',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-box",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Đơn hàng',
+        title: "Đơn hàng",
         link: ROUTES.MANAGER.ORDERS,
-        icon: 'fa-solid fa-receipt',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-receipt",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Nhân viên',
+        title: "Nhân viên",
         link: ROUTES.MANAGER.EMPLOYEES,
-        icon: 'fa-solid fa-users',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-users",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Bàn ghế',
+        title: "Bàn ghế",
         link: ROUTES.MANAGER.TABLES,
-        icon: 'fa-solid fa-table',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-table",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Khách hàng',
+        title: "Khách hàng",
         link: ROUTES.MANAGER.CUSTOMERS,
-        icon: 'fa-solid fa-user',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-user",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Khuyến mãi',
+        title: "Khuyến mãi",
         link: ROUTES.MANAGER.PROMOTIONS,
-        icon: 'fa-solid fa-ticket',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-ticket",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Đánh giá',
+        title: "Đánh giá",
         link: ROUTES.MANAGER.RATINGS,
-        icon: 'fa-solid fa-star',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-star",
+        roles: ["ADMIN_BRAND"],
       },
       {
-        title: 'Thông tin quán',
+        title: "Thông tin quán",
         link: ROUTES.MANAGER.BRANCH_INFO,
-        icon: 'fa-solid fa-building',
-        roles: ['ADMIN_BRAND'],
+        icon: "fa-solid fa-building",
+        roles: ["ADMIN_BRAND"],
       },
     ];
-  } else if (role === 'STAFF') {
+  } else if (role === "STAFF") {
     routes = [
       {
-        title: 'ĐẶT MÓN',
-        link: '/nhan-vien/don-hang',
-        icon: 'fa-solid fa-cart-plus',
-        roles: ['STAFF'],
+        title: "ĐẶT MÓN",
+        link: "/nhan-vien/don-hang",
+        icon: "fa-solid fa-cart-plus",
+        roles: ["STAFF"],
         children: [
           {
-            title: 'Chọn bàn',
-            link: 'chon-ban',
-            icon: 'fa-solid fa-mug-saucer',
-            roles: ['STAFF'],
+            title: "Chọn bàn",
+            link: "chon-ban",
+            icon: "fa-solid fa-mug-saucer",
+            roles: ["STAFF"],
           },
           {
-            title: 'Gọi món',
-            link: 'dat-mon',
-            icon: 'fa-solid fa-cart-plus',
-            roles: ['STAFF'],
+            title: "Gọi món",
+            link: "dat-mon",
+            icon: "fa-solid fa-cart-plus",
+            roles: ["STAFF"],
           },
           {
-            title: 'Danh sách đơn hàng',
-            link: 'danh-sach-don-hang',
-            icon: 'fa-solid fa-receipt',
-            roles: ['STAFF'],
+            title: "Danh sách đơn hàng",
+            link: "danh-sach-don-hang",
+            icon: "fa-solid fa-receipt",
+            roles: ["STAFF"],
           },
         ],
       },
       {
-        title: 'Danh sách nhân viên',
+        title: "Danh sách nhân viên",
         link: ROUTES.STAFF.EMPLOYEES,
-        icon: 'fa-solid fa-users',
-        roles: ['STAFF'],
+        icon: "fa-solid fa-users",
+        roles: ["STAFF"],
       },
       {
-        title: 'Danh sách khách hàng',
+        title: "Danh sách khách hàng",
         link: ROUTES.STAFF.CUSTOMERS,
-        icon: 'fa-solid fa-users',
-        roles: ['STAFF'],
+        icon: "fa-solid fa-users",
+        roles: ["STAFF"],
       },
       {
-        title: 'Thông tin nhân viên',
+        title: "Thông tin nhân viên",
         link: ROUTES.STAFF.PROFILE,
-        icon: 'fa-solid fa-user',
-        roles: ['STAFF'],
+        icon: "fa-solid fa-user",
+        roles: ["STAFF"],
       },
     ];
-  } else if (role === 'CUSTOMER') {
+  } else if (role === "CUSTOMER") {
     routes = [
-      { title: 'Trang chủ', link: ROUTES.HOME, icon: 'fa-solid fa-house', roles: ['CUSTOMER'] },
       {
-        title: 'Giới thiệu',
-        link: ROUTES.ABOUT,
-        icon: 'fa-solid fa-circle-info',
-        roles: ['CUSTOMER'],
+        title: "Trang chủ",
+        link: ROUTES.HOME,
+        icon: "fa-solid fa-house",
+        roles: ["CUSTOMER"],
       },
-      { title: 'Liên hệ', link: ROUTES.CONTACT, icon: 'fa-solid fa-phone', roles: ['CUSTOMER'] },
+      {
+        title: "Giới thiệu",
+        link: ROUTES.ABOUT,
+        icon: "fa-solid fa-circle-info",
+        roles: ["CUSTOMER"],
+      },
+      {
+        title: "Liên hệ",
+        link: ROUTES.CONTACT,
+        icon: "fa-solid fa-phone",
+        roles: ["CUSTOMER"],
+      },
       // { title: 'Đặt phòng', link: '/dat-phong', icon: 'fa-solid fa-calendar', roles: ['CUSTOMER'] },
       {
-        title: 'Lịch sử',
+        title: "Lịch sử",
         link: ROUTES.HISTORY_ORDERS,
-        icon: 'fa-solid fa-clock-rotate-left',
-        roles: ['CUSTOMER'],
+        icon: "fa-solid fa-clock-rotate-left",
+        roles: ["CUSTOMER"],
       },
       {
-        title: 'Thông tin cá nhân',
+        title: "Thông tin cá nhân",
         link: ROUTES.PROFILE,
-        icon: 'fa-solid fa-user',
-        roles: ['CUSTOMER'],
+        icon: "fa-solid fa-user",
+        roles: ["CUSTOMER"],
       },
     ];
   }
@@ -231,28 +241,34 @@ const Sidebar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('isBrand');
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("isBrand");
     window.location.href = ROUTES.ADMIN.LOGIN;
   };
 
   const renderNavigationList = () => {
     return routes.map((route, index) => {
       if (!route.roles) return null;
-      if (localStorage.getItem('role') && !route.roles.includes(localStorage.getItem('role') || ''))
+      if (
+        localStorage.getItem("role") &&
+        !route.roles.includes(localStorage.getItem("role") || "")
+      )
         return null;
 
       const hasChildren = route.children && route.children.length > 0;
-      const isActive = comparePathname(route.link ?? '', currentPath);
-      const isOpen = openSubRoutes[route.link ?? ''];
+      const isActive = comparePathname(route.link ?? "", currentPath);
+      const isOpen = openSubRoutes[route.link ?? ""];
 
       return (
-        <li key={index} className={`side-item ${hasChildren ? 'dropdown' : ''}`}>
+        <li
+          key={index}
+          className={`side-item ${hasChildren ? "dropdown" : ""}`}
+        >
           <Link
-            to={hasChildren ? '#' : route.link ?? '#'}
-            className={`side-link ${isActive ? 'side-link-active' : ''}`}
+            to={hasChildren ? "#" : route.link ?? "#"}
+            className={`side-link ${isActive ? "side-link-active" : ""}`}
             onClick={
               hasChildren
                 ? (e) => {
@@ -267,10 +283,12 @@ const Sidebar: React.FC = () => {
             <span className="icon">
               <i className={route.icon}></i>
             </span>
-            <span className={`title ${isActive ? 'title-active' : ''}`}>{route.title}</span>
+            <span className={`title ${isActive ? "title-active" : ""}`}>
+              {route.title}
+            </span>
             {hasChildren && (
-              <span className={`arrow ${isOpen ? 'up' : 'down'}`}>
-                <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`}></i>
+              <span className={`arrow ${isOpen ? "up" : "down"}`}>
+                <i className={`fas fa-chevron-${isOpen ? "up" : "down"}`}></i>
               </span>
             )}
           </Link>
@@ -279,8 +297,8 @@ const Sidebar: React.FC = () => {
               {route.children?.map((subRoute, subIndex) => {
                 if (!subRoute.roles) return null;
                 if (
-                  localStorage.getItem('role') &&
-                  !subRoute.roles.includes(localStorage.getItem('role') || '')
+                  localStorage.getItem("role") &&
+                  !subRoute.roles.includes(localStorage.getItem("role") || "")
                 )
                   return null;
                 return (
@@ -288,9 +306,12 @@ const Sidebar: React.FC = () => {
                     <Link
                       to={`${route.link}/${subRoute.link}`}
                       className={`side-link ${
-                        comparePathname(`${route.link}/${subRoute.link}`, currentPath)
-                          ? 'side-link-active'
-                          : ''
+                        comparePathname(
+                          `${route.link}/${subRoute.link}`,
+                          currentPath
+                        )
+                          ? "side-link-active"
+                          : ""
                       }`}
                     >
                       <span className="icon">
@@ -298,9 +319,12 @@ const Sidebar: React.FC = () => {
                       </span>
                       <span
                         className={`title ${
-                          comparePathname(`${route.link}/${subRoute.link}`, currentPath)
-                            ? 'title-active'
-                            : ''
+                          comparePathname(
+                            `${route.link}/${subRoute.link}`,
+                            currentPath
+                          )
+                            ? "title-active"
+                            : ""
                         }`}
                       >
                         {subRoute.title}
@@ -319,7 +343,7 @@ const Sidebar: React.FC = () => {
   return (
     <>
       <div className="d-flex sidebar menulist">
-        <ul className="side side-pills">
+        <div className="logo-container">
           <h1 className="logo">
             <svg
               width="90"
@@ -361,12 +385,14 @@ const Sidebar: React.FC = () => {
               </defs>
             </svg>
           </h1>
-          {renderNavigationList()}
-          <button className="logout-box" onClick={handleLogout}>
-            <i className="fa-solid fa-sign-out"></i>
-            LOG OUT
-          </button>
-        </ul>
+        </div>
+
+        <ul className="side side-pills">{renderNavigationList()}</ul>
+
+        <button className="logout-box" onClick={handleLogout}>
+          <i className="fa-solid fa-sign-out"></i>
+          LOG OUT
+        </button>
       </div>
     </>
   );
