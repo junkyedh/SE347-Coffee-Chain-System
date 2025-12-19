@@ -24,7 +24,7 @@
   transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   border-right: 1px solid rgba(get-color($primary, "900"), 0.2);
   padding: 1rem 1rem;
-  @media (max-width: 900px) {
+  @media (max-width: 600px) {
     min-width: 60px;
     max-width: 70px;
     .logo {
@@ -36,6 +36,20 @@
     .side-pills {
       .title {
         display: none;
+      }
+    }
+
+    .logout-box {
+      padding: 0.7rem 0 !important; /* Reset padding để icon căn giữa */
+      justify-content: center; /* Căn giữa icon */
+
+      .logout-text {
+        display: none; /* Ẩn chữ LOG OUT đi */
+      }
+
+      i {
+        margin-right: 0 !important; /* Bỏ khoảng cách bên phải icon */
+        font-size: 1.3rem; /* Tăng kích thước icon lên xíu cho dễ ấn */
       }
     }
   }
