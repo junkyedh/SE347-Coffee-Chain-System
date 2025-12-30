@@ -31,8 +31,18 @@
     }
 
     &.active {
-      background: var(--color-accent);
+      /* Thử màu Cam San Hô */
+      // background: #ff6b6b;
+
+      /* Hoặc thử màu Xanh */
+      background: #557c8d;
+
       color: #fff;
+
+      .label,
+      .icon {
+        color: #fff !important;
+      }
     }
   }
 }
