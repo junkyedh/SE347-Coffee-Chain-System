@@ -1,9 +1,8 @@
 @import "../../styles/variables";
 
 .sidebar {
-  min-width: 270px;
-  max-width: 330px;
-  width: 100%;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
   background: linear-gradient(
     135deg,
     get-color($primary, "800"),
@@ -15,80 +14,97 @@
   box-shadow: 0 4px 32px rgba(get-color($primary, "900"), 0.07);
   display: flex;
   flex-direction: column;
-
-  height: 100vh;
-  padding: 1rem 1rem;
+  padding: 1rem 0;
   overflow: hidden;
-
   z-index: 2;
   transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   border-right: 1px solid rgba(get-color($primary, "900"), 0.2);
-  padding: 1rem 1rem;
-  @media (max-width: 600px) {
-    min-width: 60px;
-    max-width: 70px;
+
+  // =========================================================
+  // LOGIC CHO TABLET & MOBILE (DƯỚI 1024px) - GIỮ NGUYÊN ICON
+  // =========================================================
+  @media (max-width: 1024px) {
+    padding: 0.5rem 0;
+
     .logo {
-      svg {
-        width: 42px !important;
-        height: 24px !important;
-      }
-    }
-    .side-pills {
-      .title {
-        display: none;
-      }
-    }
-
-    .logout-box {
-      padding: 0.7rem 0 !important; /* Reset padding để icon căn giữa */
-      justify-content: center; /* Căn giữa icon */
-
-      .logout-text {
-        display: none; /* Ẩn chữ LOG OUT đi */
-      }
-
-      i {
-        margin-right: 0 !important; /* Bỏ khoảng cách bên phải icon */
-        font-size: 1.3rem; /* Tăng kích thước icon lên xíu cho dễ ấn */
-      }
-    }
-  }
-  @media (max-width: 600px) {
-    min-width: 52px;
-    max-width: 60px;
-    .logo {
+      height: 60px !important;
+      margin-bottom: 0 !important;
       svg {
         width: 36px !important;
-        height: 20px !important;
+        height: 36px !important;
       }
     }
+
+    .side-pills .side-item {
+      .side-link {
+        padding: 0.8rem 0 !important;
+        justify-content: center !important;
+
+        .icon {
+          margin-right: 0 !important;
+          width: auto;
+          font-size: 1.4rem;
+          display: flex;
+          justify-content: center;
+        }
+        .title,
+        .arrow {
+          display: none !important;
+        }
+
+        &.side-link-active {
+          background: rgba(255, 255, 255, 0.1);
+          border-left: 3px solid get-color($accent1, "500");
+        }
+      }
+      &.dropdown > .side-children {
+        display: none !important;
+      }
+    }
+
     .logout-box {
-      padding: 0.5rem 0.4rem;
-      font-size: 0.92rem;
+      margin: 0.5rem auto !important;
+      width: 48px !important;
+      height: 48px !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+      .logout-text {
+        display: none !important;
+      }
+      i {
+        margin-right: 0 !important;
+        font-size: 1.2rem;
+      }
     }
   }
+
+  // =========================================
+  // STYLE GỐC (DESKTOP & LAPTOP > 1024px)
+  // =========================================
   .logo {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 82px;
     margin-bottom: 0.5rem;
-    flex-shrink: 0; /* Không cho logo bị co lại khi màn hình thấp */
-
+    flex-shrink: 0;
     svg {
       width: 86px;
       height: 44px;
     }
   }
+
   .side-pills {
     list-style: none;
     margin: 0;
     padding: 0;
-
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-
     &::-webkit-scrollbar {
       width: 4px;
     }
@@ -97,30 +113,17 @@
       border-radius: 4px;
     }
 
-    // .logo {
-    //   display: flex;
-    //   align-items: center;
-    //   justify-content: center;
-    //   height: 82px;
-    //   margin-bottom: 0.5rem;
-    //   svg {
-    //     width: 86px;
-    //     height: 44px;
-    //   }
-    // }
-
     .side-item {
       width: 100%;
       &.dropdown > .side-link {
         justify-content: space-between;
       }
-      padding: 0.5rem 0;
       margin: 0.1rem 0;
     }
 
     .side-link {
       display: flex;
-      align-items: center;
+      align-items: center; // Căn giữa icon với khối text (kể cả khi text 2 dòng)
       padding: 0.74rem 1rem 0.74rem 1.5rem;
       color: get-color($neutral, "50");
       font-size: 1.05rem;
@@ -130,22 +133,38 @@
       background: transparent;
       border-left: 4px solid transparent;
       transition: background 0.12s, color 0.11s;
+      cursor: pointer;
+      height: auto; // Cho phép chiều cao tự giãn nở theo nội dung
+      min-height: 50px; // Đảm bảo chiều cao tối thiểu
 
       .icon {
         width: 24px;
         font-size: 1.17rem;
         margin-right: 0.9rem;
         min-width: 22px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0; // Không cho icon bị co méo khi text dài
       }
+
       .title {
         flex: 1;
         font-size: 1.07rem;
         font-weight: 500;
         letter-spacing: 0.01em;
         transition: color 0.11s;
+
+        // --- PHẦN QUAN TRỌNG: CHO PHÉP XUỐNG DÒNG ---
+        white-space: normal; // Cho phép xuống dòng
+        line-height: 1.4; // Khoảng cách dòng thoáng để dễ đọc
+        word-break: break-word; // Ngắt từ hợp lý
+        padding-right: 5px; // Thêm chút khoảng cách bên phải
       }
+
       .arrow {
         margin-left: 0.48rem;
+        flex-shrink: 0;
       }
 
       &:hover,
@@ -172,7 +191,7 @@
       }
     }
 
-    // Sub menu - children
+    // Sub menu
     .side-children {
       background: get-color($primary, "900");
       margin: 0 0 0 8px;
@@ -199,12 +218,10 @@
     }
   }
 
-  // Logout
+  // Logout Desktop
   .logout-box {
-    margin: 1rem 0 0.5rem 0rem;
-    width: 100%;
+    margin: 1rem 1rem 0.5rem 1rem;
     flex-shrink: 0;
-
     z-index: 10;
     background: linear-gradient(
       90deg,
@@ -223,6 +240,7 @@
     align-items: center;
     justify-content: center;
     transition: background 0.16s, color 0.12s;
+    white-space: nowrap; // Nút logout giữ nguyên 1 dòng cho đẹp
     i {
       font-size: 1.15rem;
       margin-right: 0.7rem;
