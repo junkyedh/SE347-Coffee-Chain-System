@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { ROUTES } from "../../constants";
 import { useSystemContext } from "../../hooks/useSystemContext";
 import { comparePathname } from "../../utils/uri";
-import { ROUTES } from "../../constants";
 import "./Sidebar.scss";
 
 type Route = {
@@ -29,6 +29,7 @@ const Sidebar: React.FC = () => {
     setCurrentPath(location.pathname);
   }, [location]);
 
+  // --- (Giữ nguyên phần định nghĩa routes như cũ của bạn) ---
   if (role === "ADMIN_SYSTEM") {
     routes = [
       {
@@ -216,7 +217,6 @@ const Sidebar: React.FC = () => {
         icon: "fa-solid fa-phone",
         roles: ["CUSTOMER"],
       },
-      // { title: 'Đặt phòng', link: '/dat-phong', icon: 'fa-solid fa-calendar', roles: ['CUSTOMER'] },
       {
         title: "Lịch sử",
         link: ROUTES.HISTORY_ORDERS,
@@ -231,6 +231,7 @@ const Sidebar: React.FC = () => {
       },
     ];
   }
+
   if (routes.length === 0) return null;
 
   const toggleSubRoutes = (path: string) => {
@@ -269,6 +270,8 @@ const Sidebar: React.FC = () => {
           <Link
             to={hasChildren ? "#" : route.link ?? "#"}
             className={`side-link ${isActive ? "side-link-active" : ""}`}
+            // THÊM TITLE Ở ĐÂY ĐỂ HIỆN TOOLTIP NATIVE
+            title={route.title}
             onClick={
               hasChildren
                 ? (e) => {
@@ -305,6 +308,8 @@ const Sidebar: React.FC = () => {
                   <li key={subIndex} className="side-item">
                     <Link
                       to={`${route.link}/${subRoute.link}`}
+                      // THÊM TITLE Ở ĐÂY CHO SUB MENU
+                      title={subRoute.title}
                       className={`side-link ${
                         comparePathname(
                           `${route.link}/${subRoute.link}`,
@@ -345,6 +350,7 @@ const Sidebar: React.FC = () => {
       <div className="d-flex sidebar menulist">
         <div className="logo-container">
           <h1 className="logo">
+            {/* Logo SVG code - giữ nguyên như cũ */}
             <svg
               width="90"
               height="50"
@@ -389,10 +395,10 @@ const Sidebar: React.FC = () => {
 
         <ul className="side side-pills">{renderNavigationList()}</ul>
 
-        <button className="logout-box" onClick={handleLogout}>
+        {/* THÊM TITLE VÀO NÚT LOGOUT */}
+        <button className="logout-box" onClick={handleLogout} title="Đăng xuất">
           <i className="fa-solid fa-sign-out"></i>
           <span className="logout-text">LOG OUT</span>
-          {/* LOG OUT */}
         </button>
       </div>
     </>
