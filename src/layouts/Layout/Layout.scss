@@ -1,22 +1,37 @@
-@import '../../styles/variables';
+@import "../../styles/variables";
 
 :root {
-  --sidebar-width: 330px;
+  // 1. PC Màn hình lớn
+  --sidebar-width: 280px;
+
+  @media (max-width: 1400px) {
+    --sidebar-width: 250px;
+  }
+
+  @media (max-width: 1024px) {
+    --sidebar-width: 80px;
+  }
+
+  // 4. Mobile
+  @media (max-width: 600px) {
+    --sidebar-width: 60px;
+  }
 }
 
 .layout {
-  background-color: get-color($background, '100');
+  background-color: get-color($background, "100");
 
   .navbar {
     position: fixed;
     width: var(--sidebar-width);
     height: 100vh;
-    background-color: get-color($background, '200');
+    background-color: get-color($background, "200");
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    transition: width 0.3s ease;
   }
 
   .main-content {
@@ -24,5 +39,32 @@
     height: 100vh;
     overflow-y: auto;
     background-color: #ffffff;
+    transition: margin-left 0.3s ease;
   }
+}
+/* Thêm vào Layout.scss hoặc file style chung */
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto; /* Kích hoạt cuộn ngang */
+  -webkit-overflow-scrolling: touch; /* Giúp cuộn mượt mà trên iPad/iPhone */
+  margin-bottom: 1rem;
+
+  /* Tùy chỉnh thanh cuộn cho đẹp (tùy chọn) */
+  &::-webkit-scrollbar {
+    height: 8px; /* Chiều cao thanh cuộn ngang */
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Đảm bảo bảng luôn giữ độ rộng tối thiểu để không bị bóp méo */
+.table {
+  min-width: 1000px; /* Hoặc 800px tùy số lượng cột của bạn */
+  /* Nếu nội dung < 1000px thì hiện scroll, nếu > thì hiện bình thường */
 }
