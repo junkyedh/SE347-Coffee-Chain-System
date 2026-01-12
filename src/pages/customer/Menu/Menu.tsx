@@ -11,6 +11,7 @@ import PriceFilter, { PriceOption } from '@/components/customer/PriceFilter/Pric
 import SearchBar from '@/components/customer/Searchbar/Searchbar';
 import SortDropdown from '@/components/customer/SortDropdown/SortDropdown';
 import ViewToggle from '@/components/customer/ViewToggle/ViewToggle';
+import BranchFilter from '@/components/customer/BranchFilter/BranchFilter';
 import { ROUTES } from '@/constants';
 import { useCart } from '@/hooks/cartContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -37,6 +38,7 @@ interface RawProduct {
   rating?: number;
   discount?: number;
 }
+
 export interface Product {
   id: string;
   name: string;
@@ -58,8 +60,10 @@ const Menu: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedBranch, setSelectedBranch] = useState<number | 'all'>('all');
   const [priceFilter, setPriceFilter] = useState<PriceOption>('all');
   const [sortBy, setSortBy] = useState<
     'default' | 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'rating' | 'popular'
@@ -69,7 +73,8 @@ const Menu: React.FC = () => {
   const [itemsPerPage] = useState(8);
   const [loading, setLoading] = useState(true);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  
+  const [branchList, setBranchList] = useState<any[]>([]);
+
   const { addToCart } = useCart();
   const { isLoggedIn } = useAuth();
 
@@ -84,7 +89,7 @@ const Menu: React.FC = () => {
       setShowLoginPrompt(true);
       return;
     }
-    
+
     try {
       await addToCart(productId, size, quantity, mood);
       message.success('Thêm vào giỏ hàng thành công!');
@@ -94,24 +99,84 @@ const Menu: React.FC = () => {
     }
   };
 
+  const fetchBranchList = async () => {
+    try {
+      const res = await MainApiRequest.get('/branch/list');
+      setBranchList(res.data);
+    } catch (error) {
+      console.error('Error fetching branch list:', error);
+    }
+  };
+
+  // Fetch all products for category counts
+  const fetchAllProducts = async () => {
+    try {
+      const res = await MainApiRequest.get<RawProduct[]>('/product/list');
+      const mapped: Product[] = res.data.map((p) => ({
+        ...p,
+        sizes: p.sizes.map((s) => ({ sizeName: s.sizeName, price: s.price })),
+      }));
+      setAllProducts(mapped);
+    } catch (error) {
+      console.error('Error fetching all products:', error);
+    }
+  };
+
+  // Fetch filtered products from backend
+  const fetchFilteredProducts = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedBranch !== 'all') {
+        params.append('branchId', String(selectedBranch));
+      }
+
+      if (selectedCategory !== 'all') {
+        params.append('category', selectedCategory);
+      }
+
+
+      const res = await MainApiRequest.get<RawProduct[]>(
+        `/product/filter?${params.toString()}`
+      );
+
+      const mapped: Product[] = res.data.map((p) => ({
+        ...p,
+        sizes: p.sizes.map((s) => ({ sizeName: s.sizeName, price: s.price })),
+      }));
+
+      setProducts(mapped);
+    } catch (error) {
+      console.error('Error fetching filtered products:', error);
+      message.error('Không thể tải sản phẩm. Vui lòng thử lại sau.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handler cho product click
   const handleProductClick = (productId: string, productName: string) => {
     navigate(createProductUrl(productName, productId));
   };
 
-  // Đọc category từ URL params khi component mount
-  useEffect(() => {
-    const categoryFromUrl = searchParams.get('category');
-    if (categoryFromUrl) {
-      setSelectedCategory(categoryFromUrl);
+  const handleBranchChange = (branchId: number | 'all') => {
+    setSelectedBranch(branchId);
+    setCurrentPage(1);
+
+    // Update URL
+    if (branchId === 'all') {
+      searchParams.delete('branch');
+    } else {
+      searchParams.set('branch', String(branchId));
     }
-  }, [searchParams]);
+    setSearchParams(searchParams);
+  };
 
   // Handler để update cả state và URL khi thay đổi category
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    setCurrentPage(1); // Reset về trang 1 khi đổi category
-    
+    setCurrentPage(1);
+
     // Update URL
     if (categoryId === 'all') {
       searchParams.delete('category');
@@ -121,25 +186,39 @@ const Menu: React.FC = () => {
     setSearchParams(searchParams);
   };
 
+  // Read URL params on mount
   useEffect(() => {
-    MainApiRequest.get<RawProduct[]>('/product/list')
-      .then((res) => {
-        const mapped: Product[] = res.data.map((p) => ({
-          ...p,
-          sizes: p.sizes.map((s) => ({ sizeName: s.sizeName, price: s.price })),
-        }));
-        setProducts(mapped);
-      })
-      .catch(console.error);
+    const categoryFromUrl = searchParams.get('category');
+    const branchFromUrl = searchParams.get('branch');
+
+    if (categoryFromUrl) {
+      setSelectedCategory(categoryFromUrl);
+    }
+
+    if (branchFromUrl) {
+      setSelectedBranch(branchFromUrl === 'all' ? 'all' : Number(branchFromUrl));
+    }
+  }, [searchParams]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchBranchList();
+    fetchAllProducts();
   }, []);
 
+  // Fetch filtered products when category or branch changes
+  useEffect(() => {
+    fetchFilteredProducts();
+  }, [selectedCategory, selectedBranch]);
+
+  // Generate categories with counts from all products
   const categories: Category[] = useMemo(() => {
     const counts: Record<string, number> = {};
-    products.forEach((p) => {
+    allProducts.forEach((p) => {
       counts[p.category] = (counts[p.category] || 0) + 1;
     });
     return [
-      { id: 'all', name: 'Tất cả', count: products.length, icon: '✨' },
+      { id: 'all', name: 'Tất cả', count: allProducts.length, icon: '✨' },
       ...Object.entries(counts).map(([cat, cnt]) => ({
         id: cat,
         name: cat,
@@ -148,24 +227,24 @@ const Menu: React.FC = () => {
           cat === 'Cà phê'
             ? '☕'
             : cat === 'Trà trái cây'
-            ? '🍃'
-            : cat === 'Trà sữa'
-            ? '🧋'
-            : cat === 'Nước ép'
-            ? '🥤'
-            : cat === 'Sinh tố'
-            ? '🥭'
-            : cat === 'Bánh ngọt'
-            ? '🧁'
-            : undefined,
+              ? '🍃'
+              : cat === 'Trà sữa'
+                ? '🧋'
+                : cat === 'Nước ép'
+                  ? '🥤'
+                  : cat === 'Sinh tố'
+                    ? '🥭'
+                    : cat === 'Bánh ngọt'
+                      ? '🧁'
+                      : undefined,
       })),
     ];
-  }, [products]);
+  }, [allProducts]);
 
+  // Frontend filtering for search and price (after backend filtering)
   const filtered = useMemo(() => {
     return products.filter((p) => {
       if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-      if (selectedCategory !== 'all' && p.category !== selectedCategory) return false;
 
       const basePrice = p.sizes[0]?.price - (p.discount || 0);
       if (priceFilter === 'under-30k' && basePrice >= 30000) return false;
@@ -174,8 +253,9 @@ const Menu: React.FC = () => {
 
       return true;
     });
-  }, [products, searchQuery, selectedCategory, priceFilter]);
+  }, [products, searchQuery, priceFilter]);
 
+  // Sort products
   const sorted = useMemo(() => {
     const arr = [...filtered];
     switch (sortBy) {
@@ -205,6 +285,7 @@ const Menu: React.FC = () => {
     return arr;
   }, [filtered, sortBy]);
 
+  // Paginate products
   const paginatedProducts = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -213,23 +294,10 @@ const Menu: React.FC = () => {
 
   const totalPages = Math.ceil(sorted.length / itemsPerPage);
 
+  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCategory, priceFilter, sortBy]);
-
-  useEffect(() => {
-    setLoading(true);
-    MainApiRequest.get<RawProduct[]>('/product/list')
-      .then((res) => {
-        const mapped: Product[] = res.data.map((p) => ({
-          ...p,
-          sizes: p.sizes.map((s) => ({ sizeName: s.sizeName, price: s.price })),
-        }));
-        setProducts(mapped);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  }, [searchQuery, priceFilter, sortBy]);
 
   return (
     <>
@@ -238,9 +306,9 @@ const Menu: React.FC = () => {
         description={`Xem thực đơn ${selectedCategory !== 'all' ? selectedCategory : 'đầy đủ'} tại SE347 Coffee Chain. Cà phê, trà sửa, bánh ngọt và nhiều thức uống hấp dẫn khác. Đặt hàng online giá tốt.`}
         keywords={`thực đơn, menu, ${selectedCategory !== 'all' ? selectedCategory : 'cà phê, trà sửa, bánh ngọt'}, đồ uống, giá cả, đặt hàng online`}
       />
-      <LoginPromptModal 
-        isOpen={showLoginPrompt} 
-        onClose={() => setShowLoginPrompt(false)} 
+      <LoginPromptModal
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
       />
       <Breadcrumbs
         title={selectedCategory !== 'all' ? selectedCategory : 'Menu'}
@@ -259,6 +327,11 @@ const Menu: React.FC = () => {
               categories={categories}
               selected={selectedCategory}
               onChange={handleCategoryChange}
+            />
+            <BranchFilter
+              branches={branchList}
+              selected={selectedBranch}
+              onChange={handleBranchChange}
             />
             <PriceFilter selected={priceFilter} onChange={setPriceFilter} />
           </aside>
@@ -300,29 +373,28 @@ const Menu: React.FC = () => {
                     <div className={viewMode === 'grid' ? 'menu-page__grid' : 'menu-page__list'}>
                       {viewMode === 'grid'
                         ? paginatedProducts.map((prod) => (
-                            <CardProduct 
-                              key={prod.id} 
+                          <CardProduct
+                            key={prod.id}
+                            product={prod}
+                            onAddToCart={(size, quantity, mood) =>
+                              handleAddToCart(Number(prod.id), size, quantity, mood)
+                            }
+                            onProductClick={() => handleProductClick(prod.id, prod.name)}
+                          />
+                        ))
+                        : paginatedProducts.map((prod) => (
+                          <div key={prod.id} className="menu-page__list-item">
+                            <CardListView
                               product={prod}
-                              onAddToCart={(size, quantity, mood) =>
-                                handleAddToCart(Number(prod.id), size, quantity, mood)
+                              onAddToCart={(productId, size, quantity, mood) =>
+                                handleAddToCart(productId, size, quantity, mood)
                               }
                               onProductClick={() => handleProductClick(prod.id, prod.name)}
                             />
-                          ))
-                        : paginatedProducts.map((prod) => (
-                            <div key={prod.id} className="menu-page__list-item">
-                              <CardListView 
-                                product={prod}
-                                onAddToCart={(productId, size, quantity, mood) =>
-                                  handleAddToCart(productId, size, quantity, mood)
-                                }
-                                onProductClick={() => handleProductClick(prod.id, prod.name)}
-                              />
-                            </div>
-                          ))}
+                          </div>
+                        ))}
                     </div>
 
-                    {/* Add Pagination */}
                     {totalPages > 1 && (
                       <div className="menu-page__pagination">
                         <Pagination

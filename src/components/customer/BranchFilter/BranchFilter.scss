@@ -1,0 +1,169 @@
+.branch-filter {
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+
+  &__search {
+    position: relative;
+    margin-bottom: 0.75rem;
+
+    &-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text);
+      font-size: 0.875rem;
+      opacity: 0.6;
+    }
+
+    &-input {
+      width: 100%;
+      padding: 0.625rem 0.75rem 0.625rem 2.25rem;
+      border: 1px solid #e5e7eb;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      transition: all 0.2s;
+      outline: none;
+      color: var(--color-text);
+      background: #fff;
+
+      &:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+      }
+
+      &::placeholder {
+        color: var(--color-text);
+        opacity: 0.5;
+      }
+    }
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f3f4f6;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 3px;
+
+      &:hover {
+        background: #9ca3af;
+      }
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s;
+
+    .icon {
+      margin-right: 0.5rem;
+      color: var(--color-text);
+      font-size: 1rem;
+    }
+
+    .name {
+      flex: 1;
+      color: var(--color-text);
+      font-size: 0.875rem;
+    }
+
+    .count {
+      background: transparent;
+      padding: 0;
+      font-size: 0.875rem;
+      color: var(--color-text);
+    }
+
+    &:hover {
+      background: #f3f4f6;
+    }
+
+    &.active {
+      background: var(--color-primary);
+
+      .name,
+      .icon,
+      .count {
+        color: #fff;
+      }
+    }
+  }
+
+  &__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    margin-right: 0.5rem;
+
+    .name {
+      color: var(--color-text);
+      font-size: 0.875rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .address {
+      font-size: 0.75rem;
+      color: var(--color-text);
+      opacity: 0.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__empty {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--color-text);
+    opacity: 0.5;
+    font-size: 0.875rem;
+  }
+
+  // Active state for info layout
+  &__item.active &__info {
+    .name,
+    .address {
+      color: #fff;
+      opacity: 1;
+    }
+
+    .address {
+      opacity: 0.8;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .branch-filter {
+    &__list {
+      max-height: 300px;
+    }
+  }
+}
