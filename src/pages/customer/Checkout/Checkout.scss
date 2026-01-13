@@ -1,4 +1,4 @@
-@import '../../../styles/variables.scss';
+@import "../../../styles/variables.scss";
 
 .checkout {
   padding: 2rem;
@@ -144,7 +144,7 @@
           background: rgba(255, 111, 97, 0.1);
         }
 
-        input[type='radio'] {
+        input[type="radio"] {
           width: auto;
           margin: 0;
         }
@@ -244,15 +244,48 @@
 
   .coupon-input {
     display: flex;
-    gap: 0.75rem;
+    align-items: stretch;
     margin-bottom: 1rem;
 
     input {
       flex: 1;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      color: var(--color-text);
+
+      border: 1px solid #d1d5db;
+      border-right: none;
+      border-radius: 0.5rem 0 0 0.5rem;
+      background-color: #fff;
+
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(175, 42, 42, 0.15);
+        z-index: 1;
+      }
     }
 
     .primaryBtn {
+      padding: 0 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+
+      border-radius: 0 0.5rem 0.5rem 0;
       white-space: nowrap;
+
+      margin-top: 0;
+      margin-bottom: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 
@@ -396,6 +429,39 @@
       &:hover {
         text-decoration: underline;
       }
+    }
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 96px;
+    padding: 0.75rem 1rem;
+
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-text);
+
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+    background-color: #fff;
+
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease,
+      background-color 0.2s ease;
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+
+    &:hover {
+      border-color: #9ca3af;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(175, 42, 42, 0.15);
+      background-color: #fff;
     }
   }
 }
