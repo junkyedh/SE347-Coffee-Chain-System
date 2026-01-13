@@ -165,7 +165,7 @@ const ProfileUser: React.FC = () => {
                 <div className="avatar-section">
                   <div className="avatar-wrapper">
                     <img
-                      src={customer.image || '/placeholder.svg?height=120&width=120'}
+                      src={customer.image || 'https://placehold.co/120'}
                       alt="avatar"
                       className="avatar-img"
                     />
