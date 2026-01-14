@@ -1,34 +1,33 @@
-import imgDefault from '@/assets/cup10.jpg';
-import AdminButton from '@/components/admin/AdminButton/AdminButton';
-import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
-import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
-import SearchInput from '@/components/common/SearchInput/SearchInput';
-import { AdminApiRequest } from '@/services/AdminApiRequest';
-import { PlusOutlined } from '@ant-design/icons';
+import imgDefault from "@/assets/cup10.jpg";
+import AdminButton from "@/components/admin/AdminButton/AdminButton";
+import AdminPopConfirm from "@/components/admin/PopConfirm/AdminPopConfirm";
+import FloatingLabelInput from "@/components/common/FloatingInput/FloatingLabelInput";
+import SearchInput from "@/components/common/SearchInput/SearchInput";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
+import { PlusOutlined } from "@ant-design/icons";
 import {
-    Button,
-    Checkbox,
-    Form,
-    GetProp,
-    Input,
-    message,
-    Modal,
-    Progress,
-    Select,
-    Space,
-    Table,
-    Tag,
-    Upload,
-    UploadProps,
-} from 'antd';
-import { useEffect, useState } from 'react';
-import '../adminPage.scss';
+  Button,
+  Checkbox,
+  Form,
+  GetProp,
+  Input,
+  message,
+  Modal,
+  Progress,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Upload,
+  UploadProps,
+} from "antd";
+import { useEffect, useState } from "react";
+import "../adminPage.scss";
 
 type ProductSize = {
   sizeName: string;
   price: number;
 };
-
 type Product = {
   id: number;
   name: string;
@@ -41,7 +40,7 @@ type Product = {
   sizes?: ProductSize[];
 };
 
-type UploadRequestOption = Parameters<GetProp<UploadProps, 'customRequest'>>[0];
+type UploadRequestOption = Parameters<GetProp<UploadProps, "customRequest">>[0];
 
 const AdminProductList = () => {
   const [form] = Form.useForm();
@@ -50,16 +49,20 @@ const AdminProductList = () => {
   const [openCreateProductModal, setOpenCreateProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [fileList, setFileList] = useState<any[]>([]);
-  const [imageUrl, setImageUrl] = useState<string>('');
-  const selectedCategory = Form.useWatch('category', form);
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const selectedCategory = Form.useWatch("category", form);
   const [filteredProductList, setFilteredProductList] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [searchKeyword, setSearchKeyword] = useState<string>('');
-  const [materials, setMaterials] = useState<{ id: number; name: string }[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [materials, setMaterials] = useState<{ id: number; name: string }[]>(
+    []
+  );
 
   useEffect(() => {
     if (selectedCategory) {
-      const filtered = products.filter((product) => product.category === selectedCategory);
+      const filtered = products.filter(
+        (product) => product.category === selectedCategory
+      );
       setFilteredProductList(filtered);
     } else {
       setFilteredProductList(products);
@@ -67,17 +70,15 @@ const AdminProductList = () => {
   }, [selectedCategory, products]);
 
   const fetchAdminProductList = async () => {
-    const res = await AdminApiRequest.get('/product/list');
+    const res = await AdminApiRequest.get("/product/list");
     setAdminProductList(res.data);
   };
-
   useEffect(() => {
     fetchAdminProductList();
   }, []);
-
   useEffect(() => {
     const fetchMaterials = async () => {
-      const res = await AdminApiRequest.get('/material/list');
+      const res = await AdminApiRequest.get("/material/list");
       setMaterials(res.data);
     };
 
@@ -86,10 +87,9 @@ const AdminProductList = () => {
 
   const handleUpload = async (options: UploadRequestOption) => {
     const { onSuccess, onError, file, onProgress } = options;
-
     const fmData = new FormData();
     const config = {
-      headers: { 'content-type': 'multipart/form-data' },
+      headers: { "content-type": "multipart/form-data" },
       onUploadProgress: (event: any) => {
         const percent = Math.floor((event.loaded / event.total) * 100);
         setProgress(percent);
@@ -99,15 +99,15 @@ const AdminProductList = () => {
         onProgress && onProgress({ percent });
       },
     };
-    fmData.append('file', file);
+    fmData.append("file", file);
     try {
-      const res = await AdminApiRequest.post('/file/upload', fmData, config);
+      const res = await AdminApiRequest.post("/file/upload", fmData, config);
       const { data } = res;
       setImageUrl(data.imageUrl);
-      onSuccess && onSuccess('Ok');
+      onSuccess && onSuccess("Ok");
     } catch (err) {
-      console.error('Error:', err);
-      onError && onError(new Error('Upload failed'));
+      console.error("Error:", err);
+      onError && onError(new Error("Upload failed"));
     }
   };
 
@@ -118,15 +118,14 @@ const AdminProductList = () => {
 
   const handleRemove = () => {
     setFileList([]);
-    setImageUrl('');
+    setImageUrl("");
   };
 
   const onOpenCreateProductModal = (record: any = null) => {
     setEditingProduct(record);
     form.resetFields();
     setFileList([]);
-    setImageUrl('');
-
+    setImageUrl("");
     if (record) {
       const {
         name,
@@ -166,13 +165,12 @@ const AdminProductList = () => {
         sizes: sizeData,
         productMaterials: materialsData,
       });
-
       if (image) {
         setFileList([
           {
-            uid: '-1',
-            name: 'image.png',
-            status: 'done',
+            uid: "-1",
+            name: "image.png",
+            status: "done",
             url: image,
           },
         ]);
@@ -186,12 +184,11 @@ const AdminProductList = () => {
   const onOKCreateProduct = async () => {
     try {
       const values = await form.validateFields();
-
       const payload: any = {
         name: values.name,
         category: values.category,
         image: imageUrl,
-        description: values.description || '',
+        description: values.description || "",
         available: values.available ?? true,
         hot: values.hot ?? false,
         cold: values.cold ?? false,
@@ -212,7 +209,7 @@ const AdminProductList = () => {
       if (editingProduct) {
         await AdminApiRequest.put(`/product/${editingProduct.id}`, payload);
       } else {
-        await AdminApiRequest.post('/product', payload);
+        await AdminApiRequest.post("/product", payload);
       }
 
       fetchAdminProductList();
@@ -221,7 +218,9 @@ const AdminProductList = () => {
       form.resetFields();
     } catch (error) {
       console.error(error);
-      message.error('Không thể tạo hoặc cập nhật sản phẩm. Vui lòng kiểm tra lại thông tin.');
+      message.error(
+        "Không thể tạo hoặc cập nhật sản phẩm. Vui lòng kiểm tra lại thông tin."
+      );
     }
   };
 
@@ -232,7 +231,6 @@ const AdminProductList = () => {
 
   const onOpenEditProduct = (record: any) => {
     setEditingProduct(record);
-
     const mappedMaterials =
       record.materials?.map((m: any) => ({
         materialId: m.id || m.materialId,
@@ -243,8 +241,8 @@ const AdminProductList = () => {
     form.setFieldsValue({
       name: record.name,
       category: record.category,
-      description: record.description || '',
-      sizes: record.sizes || [{ sizeName: 'M', price: null }],
+      description: record.description || "",
+      sizes: record.sizes || [{ sizeName: "M", price: null }],
       productMaterials: mappedMaterials,
       hot: record.hot ?? false,
       cold: record.cold ?? false,
@@ -252,49 +250,56 @@ const AdminProductList = () => {
       isNew: record.isNew ?? false,
       available: record.available ?? true,
     });
-
     setFileList(
       record.image
         ? [
             {
-              uid: '1',
-              name: record.name + '.png',
-              status: 'done',
+              uid: "1",
+              name: record.name + ".png",
+              status: "done",
               url: record.image,
             },
           ]
         : []
     );
-
-    setImageUrl(record.image || '');
-    console.log('url: ', imageUrl);
+    setImageUrl(record.image || "");
+    console.log("url: ", imageUrl);
     setOpenCreateProductModal(true);
   };
 
   const onDeleteProduct = async (id: number) => {
     try {
       await AdminApiRequest.delete(`/product/${id}`);
-      setAdminProductList((prevList) => prevList.filter((product) => product.id !== id));
-      message.success('Sản phẩm đã được xóa thành công.');
+      setAdminProductList((prevList) =>
+        prevList.filter((product) => product.id !== id)
+      );
+      message.success("Sản phẩm đã được xóa thành công.");
     } catch (error) {
-      console.error('Error deleting product:', error);
-      message.error('Không thể xóa sản phẩm. Vui lòng thử lại.');
+      console.error("Error deleting product:", error);
+      message.error("Không thể xóa sản phẩm. Vui lòng thử lại.");
     }
   };
 
   const onToggleProductStatus = async (record: any) => {
     try {
       const updatedProduct = { ...record, available: !record.available };
-      await AdminApiRequest.put(`/product/available/${record.id}`, updatedProduct);
+      await AdminApiRequest.put(
+        `/product/available/${record.id}`,
+        updatedProduct
+      );
       setAdminProductList((prevList) =>
         prevList.map((product) =>
-          product.id === record.id ? { ...product, available: updatedProduct.available } : product
+          product.id === record.id
+            ? { ...product, available: updatedProduct.available }
+            : product
         )
       );
       message.success(`Trạng thái sản phẩm đã được cập nhật thành công.`);
     } catch (error) {
-      console.error('Error updating product status:', error);
-      message.error('Không thể cập nhật trạng thái sản phẩm. Vui lòng thử lại.');
+      console.error("Error updating product status:", error);
+      message.error(
+        "Không thể cập nhật trạng thái sản phẩm. Vui lòng thử lại."
+      );
     }
   };
 
@@ -305,8 +310,8 @@ const AdminProductList = () => {
       return;
     }
     const filtered = adminProductList.filter((product) => {
-      const name = (product.name || '').toLowerCase();
-      const category = (product.category || '').toLowerCase();
+      const name = (product.name || "").toLowerCase();
+      const category = (product.category || "").toLowerCase();
 
       return name.includes(keyword) || category.includes(keyword);
     });
@@ -343,10 +348,9 @@ const AdminProductList = () => {
         </div>
       </div>
 
-      {/* Creating the modal for creating or editing products */}
       <Modal
         className="custom-modal"
-        title={editingProduct ? 'Chỉnh sửa sản phẩm' : 'Thêm mới sản phẩm'}
+        title={editingProduct ? "Chỉnh sửa sản phẩm" : "Thêm mới sản phẩm"}
         open={openCreateProductModal}
         onCancel={onCancelCreateProduct}
         footer={null}
@@ -355,17 +359,19 @@ const AdminProductList = () => {
         <Form form={form} layout="vertical" onFinish={onOKCreateProduct}>
           <div
             className="modal-grid-layout"
-            style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "24px",
+            }}
           >
-            {/* Bên trái */}
             <div>
-              {/* Upload ảnh */}
               <Form.Item name="image">
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                     minHeight: 140,
                   }}
                 >
@@ -388,34 +394,41 @@ const AdminProductList = () => {
                 {progress > 0 && <Progress percent={progress} />}
               </Form.Item>
 
-              {/* Tên + loại */}
               <div className="grid-2">
                 <FloatingLabelInput
                   label="Tên sản phẩm"
                   name="name"
                   component="input"
                   type="text"
-                  rules={[{ required: true, message: 'Vui lòng nhập tên sản phẩm!' }]}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập tên sản phẩm!" },
+                  ]}
                 />
                 <FloatingLabelInput
                   label="Loại"
                   name="category"
                   component="select"
-                  rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
+                  rules={[
+                    { required: true, message: "Vui lòng chọn danh mục!" },
+                  ]}
                   options={[
-                    { value: 'Cà phê', label: 'Cà phê' },
-                    { value: 'Trà sữa', label: 'Trà sữa' },
-                    { value: 'Trà trái cây', label: 'Trà trái cây' },
-                    { value: 'Nước ép', label: 'Nước ép' },
-                    { value: 'Sinh tố', label: 'Sinh tố' },
-                    { value: 'Bánh ngọt', label: 'Bánh ngọt' },
+                    { value: "Cà phê", label: "Cà phê" },
+                    { value: "Trà sữa", label: "Trà sữa" },
+                    { value: "Trà trái cây", label: "Trà trái cây" },
+                    { value: "Nước ép", label: "Nước ép" },
+                    { value: "Sinh tố", label: "Sinh tố" },
+                    { value: "Bánh ngọt", label: "Bánh ngọt" },
                   ]}
                 />
               </div>
 
-              <FloatingLabelInput label="Mô tả" name="description" component="input" type="text" />
+              <FloatingLabelInput
+                label="Mô tả"
+                name="description"
+                component="input"
+                type="text"
+              />
 
-              {/* Hot & Cold */}
               <div className="checkbox-group">
                 <Form.Item name="hot" valuePropName="checked">
                   <Checkbox>Hot</Checkbox>
@@ -425,7 +438,6 @@ const AdminProductList = () => {
                 </Form.Item>
               </div>
 
-              {/* Flags */}
               <div className="checkbox-group">
                 <Form.Item name="isPopular" valuePropName="checked">
                   <Checkbox>Phổ biến</Checkbox>
@@ -433,32 +445,40 @@ const AdminProductList = () => {
                 <Form.Item name="isNew" valuePropName="checked">
                   <Checkbox>Mới</Checkbox>
                 </Form.Item>
-                <Form.Item name="available" valuePropName="checked" initialValue={true}>
+                <Form.Item
+                  name="available"
+                  valuePropName="checked"
+                  initialValue={true}
+                >
                   <Checkbox>Đang bán</Checkbox>
                 </Form.Item>
               </div>
             </div>
 
-            {/* Bên phải */}
             <div>
-              {/* Giá & Size */}
-              <Form.List name="sizes" initialValue={[{ sizeName: 'M', price: null }]}>
+              <Form.List
+                name="sizes"
+                initialValue={[{ sizeName: "M", price: null }]}
+              >
                 {(fields, { add, remove }) => (
                   <>
                     <label className="form-label mt-3">Giá theo kích cỡ:</label>
                     {fields.map((field) => (
-                      <div key={field.key} className="d-flex align-items-center gap-2 mb-2">
+                      <div
+                        key={field.key}
+                        className="d-flex align-items-center gap-2 mb-2"
+                      >
                         <Form.Item
                           {...field}
-                          name={[field.name, 'sizeName']}
-                          rules={[{ required: true, message: 'Tên size!' }]}
+                          name={[field.name, "sizeName"]}
+                          rules={[{ required: true, message: "Tên size!" }]}
                         >
                           <Input placeholder="S / M / L" />
                         </Form.Item>
                         <Form.Item
                           {...field}
-                          name={[field.name, 'price']}
-                          rules={[{ required: true, message: 'Giá bắt buộc!' }]}
+                          name={[field.name, "price"]}
+                          rules={[{ required: true, message: "Giá bắt buộc!" }]}
                         >
                           <Input type="number" placeholder="Giá (VND)" />
                         </Form.Item>
@@ -485,17 +505,21 @@ const AdminProductList = () => {
                 )}
               </Form.List>
 
-              {/* Nguyên liệu */}
               <Form.List name="productMaterials">
                 {(fields, { add, remove }) => (
                   <>
                     <label className="form-label mt-3">Nguyên liệu:</label>
                     {fields.map((field) => (
-                      <div key={field.key} className="d-flex align-items-center gap-2 mb-2">
+                      <div
+                        key={field.key}
+                        className="d-flex align-items-center gap-2 mb-2"
+                      >
                         <Form.Item
                           {...field}
-                          name={[field.name, 'materialId']}
-                          rules={[{ required: true, message: 'Chọn nguyên liệu' }]}
+                          name={[field.name, "materialId"]}
+                          rules={[
+                            { required: true, message: "Chọn nguyên liệu" },
+                          ]}
                         >
                           <Select
                             placeholder="Nguyên liệu"
@@ -507,12 +531,16 @@ const AdminProductList = () => {
                         </Form.Item>
                         <Form.Item
                           {...field}
-                          name={[field.name, 'materialQuantity']}
-                          rules={[{ required: true, message: 'Nhập số lượng' }]}
+                          name={[field.name, "materialQuantity"]}
+                          rules={[{ required: true, message: "Nhập số lượng" }]}
                         >
                           <Input type="number" placeholder="Số lượng" />
                         </Form.Item>
-                        <AdminButton variant="accent" size="sm" onClick={() => remove(field.name)}>
+                        <AdminButton
+                          variant="accent"
+                          size="sm"
+                          onClick={() => remove(field.name)}
+                        >
                           X
                         </AdminButton>
                       </div>
@@ -528,13 +556,16 @@ const AdminProductList = () => {
             </div>
           </div>
 
-          {/* Footer */}
           <div className="modal-footer-custom d-flex justify-content-end align-items-center gap-3 mt-5">
-            <AdminButton variant="secondary" size="sm" onClick={onCancelCreateProduct}>
+            <AdminButton
+              variant="secondary"
+              size="sm"
+              onClick={onCancelCreateProduct}
+            >
               Hủy
             </AdminButton>
             <AdminButton variant="primary" size="sm" disabled={progress > 0}>
-              {editingProduct ? 'Lưu thay đổi' : 'Tạo mới'}
+              {editingProduct ? "Lưu thay đổi" : "Tạo mới"}
             </AdminButton>
           </div>
         </Form>
@@ -544,129 +575,187 @@ const AdminProductList = () => {
         className="custom-table"
         rowKey="id"
         dataSource={adminProductList}
+        // Kích hoạt thanh cuộn ngang và dọc
+        scroll={{ x: "max-content", y: 600 }}
         pagination={{
           pageSize: 6,
           showSizeChanger: true,
         }}
         columns={[
-          { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
           {
-            title: 'Hình ảnh',
-            dataIndex: 'image',
-            key: 'image',
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 70, // Set độ rộng cố định
+            align: "center",
+            sorter: (a, b) => a.id - b.id,
+          },
+          {
+            title: "Hình ảnh",
+            dataIndex: "image",
+            key: "image",
+            width: 120, // Đủ rộng để chứa ảnh
+            align: "center",
             render: (image: string) => (
               <img
                 src={image || imgDefault}
                 alt="Product"
                 style={{
-                  width: '100px',
-                  height: '100px',
-                  borderRadius: '8px',
+                  width: "80px",
+                  height: "80px",
+                  borderRadius: "8px",
+                  objectFit: "cover",
+                  border: "1px solid #eee",
                 }}
               />
             ),
           },
           {
-            title: 'Tên sản phẩm',
-            dataIndex: 'name',
-            key: 'name',
+            title: "Tên sản phẩm",
+            dataIndex: "name",
+            key: "name",
+            width: 200, // Tên dài sẽ không bị ép
             sorter: (a, b) => a.name.localeCompare(b.name),
+            render: (text) => <span style={{ fontWeight: 600 }}>{text}</span>,
           },
           {
-            title: 'Loại',
-            dataIndex: 'category',
-            key: 'category',
+            title: "Loại",
+            dataIndex: "category",
+            key: "category",
+            width: 120,
+            align: "center",
             sorter: (a, b) => a.category.localeCompare(b.category),
+            render: (text) => <Tag color="blue">{text}</Tag>,
           },
           {
-            title: 'Giá',
-            key: 'price',
+            title: "Giá",
+            key: "price",
+            width: 180, // Quan trọng: Đủ rộng để hiển thị giá S/M/L
             sorter: (a: any, b: any) => {
-              const priceA = a.sizes?.find((s: ProductSize) => s.sizeName === 'M')?.price || 0;
-              const priceB = b.sizes?.find((s: ProductSize) => s.sizeName === 'M')?.price || 0;
+              const priceA =
+                a.sizes?.find((s: ProductSize) => s.sizeName === "M")?.price ||
+                0;
+              const priceB =
+                b.sizes?.find((s: ProductSize) => s.sizeName === "M")?.price ||
+                0;
               return priceA - priceB;
             },
             render: (_, record) => {
-              const formatter = new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND',
+              const formatter = new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
               });
-
               return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px",
+                    fontSize: "13px",
+                  }}
+                >
                   {record.sizes?.map((s: ProductSize) => (
-                    <p key={s.sizeName}>
-                      {s.sizeName}: {formatter.format(s.price)}
-                    </p>
+                    <div
+                      key={s.sizeName}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        minWidth: "120px",
+                      }}
+                    >
+                      <span style={{ color: "#666" }}>{s.sizeName}:</span>
+                      <span style={{ fontWeight: 600 }}>
+                        {formatter.format(s.price)}
+                      </span>
+                    </div>
                   ))}
                 </div>
               );
             },
           },
           {
-            title: 'Mood',
-            dataIndex: 'mood',
-            key: 'mood',
-            sorter: (a, b) => a.mood?.localeCompare(b.mood || '') || 0,
+            title: "Mood",
+            dataIndex: "mood",
+            key: "mood",
+            width: 130,
+            align: "center",
+            sorter: (a, b) => a.mood?.localeCompare(b.mood || "") || 0,
             render: (_, record) => {
-              const drinkCategory = ['Cà phê', 'Trà trái cây', 'Trà sữa', 'Nước ép', 'Sinh tố'];
-              if (!drinkCategory.includes(record.category)) return 'Không áp dụng';
-              if (record.category === 'Cà phê') {
-                return <span>{record.mood || 'Nóng / Đá'}</span>;
+              const drinkCategory = [
+                "Cà phê",
+                "Trà trái cây",
+                "Trà sữa",
+                "Nước ép",
+                "Sinh tố",
+              ];
+              if (!drinkCategory.includes(record.category))
+                return <span style={{ color: "#ccc" }}>---</span>;
+              let text = "---";
+              if (record.category === "Cà phê") {
+                text = record.mood || "Nóng / Đá";
               } else if (
-                record.category === 'Trà sữa' ||
-                record.category === 'Nước ép' ||
-                record.category === 'Sinh tố' ||
-                record.category === 'Trà trái cây'
+                ["Trà sữa", "Nước ép", "Sinh tố", "Trà trái cây"].includes(
+                  record.category
+                )
               ) {
-                return <span>{record.mood || 'Lạnh'}</span>;
+                text = record.mood || "Lạnh";
               }
-              return 'Không áp dụng';
+              return <span style={{ fontSize: "13px" }}>{text}</span>;
             },
           },
           {
-            title: 'Trạng thái',
-            dataIndex: 'available',
-            key: 'available',
-            sorter: (a, b) => (a.available === b.available ? 0 : a.available ? -1 : 1),
+            title: "Trạng thái",
+            dataIndex: "available",
+            key: "available",
+            width: 130,
+            align: "center",
+            sorter: (a, b) =>
+              a.available === b.available ? 0 : a.available ? -1 : 1,
             render: (available: boolean) => (
-              <Tag color={available ? 'green' : 'red'}>{available ? 'Đang bán' : 'Ngưng bán'}</Tag>
+              <Tag color={available ? "green" : "red"}>
+                {available ? "Đang bán" : "Ngưng bán"}
+              </Tag>
             ),
           },
+
           {
-            title: 'Hành động',
-            key: 'action',
+            title: "Hành động",
+            key: "action",
+            width: 180, // Cố định chiều rộng cột hành động
+            align: "center",
             render: (_, record) => (
-              <Space size="middle">
+              <Space size="small">
                 <AdminButton
                   variant="secondary"
                   size="sm"
                   icon={<i className="fas fa-edit"></i>}
                   onClick={() => onOpenEditProduct(record)}
-                ></AdminButton>
+                />
 
                 <AdminPopConfirm
-                  title="Bạn có chắc chắn muốn xóa coupon này?"
+                  title="Xóa sản phẩm này?"
                   onConfirm={() => onDeleteProduct(record.id)}
-                  okText="Đồng ý"
-                  cancelText="Hủy"
+                  okText="Có"
+                  cancelText="Không"
                 >
                   <AdminButton
                     variant="destructive"
                     size="sm"
                     icon={<i className="fas fa-trash"></i>}
-                  ></AdminButton>
+                  />
                 </AdminPopConfirm>
 
                 <Button
-                  type="text"
+                  size="small"
                   style={{
-                    color: record.available ? 'orange' : 'green',
-                    borderColor: record.available ? 'orange' : 'green',
+                    fontSize: "12px",
+                    minWidth: "75px",
+                    color: record.available ? "#faad14" : "#52c41a",
+                    borderColor: record.available ? "#faad14" : "#52c41a",
                   }}
                   onClick={() => onToggleProductStatus(record)}
                 >
-                  {record.available ? 'Ngưng bán' : 'Mở bán'}
+                  {record.available ? "Ngưng" : "Mở bán"}
                 </Button>
               </Space>
             ),
