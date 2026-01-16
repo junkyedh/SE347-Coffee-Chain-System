@@ -8,21 +8,20 @@ import { CartProvider } from './hooks/cartContext';
 import { ToastProvider } from './components/common/Toast/Toast';
 import { validateEnvConfig } from './config/env.config';
 
-// Validate environment configuration khi app khởi động
 validateEnvConfig();
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
   <React.StrictMode>
-    <CartProvider>
-      <AppSystemProvider>
+    <AppSystemProvider>
+      <CartProvider>
         <BrowserRouter>
           <ToastProvider>
             <App />
           </ToastProvider>
         </BrowserRouter>
-      </AppSystemProvider>
-    </CartProvider>
+      </CartProvider>
+    </AppSystemProvider>
   </React.StrictMode>
 );

@@ -29,8 +29,11 @@ const AdminLogin: React.FC = () => {
       if ((res.status === 200 || res.status === 201) && token && role) {
         // Chỉ cho phép các role quản trị đăng nhập admin
         if (role === 'ADMIN_SYSTEM' || role === 'ADMIN_BRAND' || role === 'STAFF') {
+          // setAuth will handle storing token properly
           setAuth(token, role);
-          console.log('Đăng nhập thành công:', { token, role });
+          message.success('Đăng nhập thành công!');
+          
+          // Navigate based on role
           switch (role) {
             case 'ADMIN_SYSTEM':
               navigate(ROUTES.ADMIN.STATISTICS);

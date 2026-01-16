@@ -22,14 +22,21 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await MainApiRequest.post('/auth/signin', { phone, password, userType: 'customer' });
+      const res = await MainApiRequest.post('/auth/signin', { 
+        phone, 
+        password, 
+        userType: 'customer' 
+      });
+      
       if (res.status === 200 || res.status === 201) {
         const data = res.data;
         const token = data.token;
-        // prefer role from response if provided, otherwise fallback to 'CUSTOMER'
         const role = data.user?.role || 'CUSTOMER';
+        
         if (token) {
+          // setAuth will handle storing token and fetching user info
           setAuth(token, role);
+          message.success('Đăng nhập thành công!');
           navigate(ROUTES.HOME);
         } else {
           message.error('Đăng nhập thất bại: không nhận được token.');

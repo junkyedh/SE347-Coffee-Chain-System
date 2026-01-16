@@ -5,7 +5,7 @@ import { MainApiRequest } from '@/services/MainApiRequest';
 import { ROUTES } from '@/constants';
 import { Award, Calendar, Camera, Edit3, Phone, Save, User, X } from 'lucide-react';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSystemContext } from '@/hooks/useSystemContext';
 import { useNavigate } from 'react-router-dom';
 import './ProfileUser.scss';
@@ -34,33 +34,38 @@ const ProfileUser: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useSystemContext();
 
+  const fetchProfile = useCallback(async () => {
+    if (!token) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
+
+    try {
+      const res = await MainApiRequest.get<{ data: { phone: string } }>('/auth/callback', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const phone = res.data.data.phone;
+      if (!phone) throw new Error('No phone in callback');
+
+      const customerRes = await MainApiRequest.get<Customer>(
+        `/customer/${encodeURIComponent(phone)}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setCustomer(customerRes.data);
+      setFormData({
+        name: customerRes.data.name,
+        address: customerRes.data.address || '',
+        gender: customerRes.data.gender,
+      });
+    } catch (err) {
+      console.error('Không tải được profile:', err);
+      navigate(ROUTES.LOGIN);
+    }
+  }, [token, navigate]);
+
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await MainApiRequest.get<{ data: { phone: string } }>('/auth/callback', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const phone = res.data.data.phone;
-        if (!phone) throw new Error('No phone in callback');
-
-        const customerRes = await MainApiRequest.get<Customer>(
-          `/customer/${encodeURIComponent(phone)}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setCustomer(customerRes.data);
-        setFormData({
-          name: customerRes.data.name,
-          address: customerRes.data.address || '',
-          gender: customerRes.data.gender,
-        });
-      } catch (err) {
-        console.error('Không tải được profile:', err);
-        navigate(ROUTES.LOGIN);
-      }
-    };
-
     fetchProfile();
-  }, [navigate]);
+  }, [fetchProfile]);
 
   const handleSave = async () => {
     if (!customer) return;

@@ -1,113 +1,121 @@
-import "@/App.scss";
-import AdminBranchList from "@/pages/admin/admin/AdminBranchList";
-import AdminCustomerList from "@/pages/admin/admin/AdminCustomerList";
-import AdminMaterialList from "@/pages/admin/admin/AdminMaterialList";
-import AdminOrderList from "@/pages/admin/admin/AdminOrderList";
-import AdminProductList from "@/pages/admin/admin/AdminProduct";
-import AdminPromotion from "@/pages/admin/admin/AdminPromotion";
-import AdminStaffList from "@/pages/admin/admin/AdminStaffList";
-import Statistic from "@/pages/admin/admin/AdminStatistic";
-import AdminCustomerRating from "@/pages/admin/admin/Rating";
-import ManagerBranchInfo from "@/pages/admin/manager/ManagerBranchInfo";
-import ManagerCustomerList from "@/pages/admin/manager/ManagerCustomerList";
-import ManagerMaterialList from "@/pages/admin/manager/ManagerMaterialList";
-import ManagerOrderList from "@/pages/admin/manager/ManagerOrderList";
-import ManagerProductList from "@/pages/admin/manager/ManagerProduct";
-import ManagerPromotion from "@/pages/admin/manager/ManagerPromotion";
-import ManagerStaffList from "@/pages/admin/manager/ManagerStaffList";
-import ManagerStatistic from "@/pages/admin/manager/ManagerStatistic";
-import ManagerTableList from "@/pages/admin/manager/ManagerTable";
-import CustomerList from "@/pages/admin/staff/CustomerList";
-import AdminMenu from "@/pages/admin/staff/Menu/AdminMenu";
-import OrderList from "@/pages/admin/staff/OrderList";
-import StaffList from "@/pages/admin/staff/StaffList";
-import StaffProfile from "@/pages/admin/staff/StaffProfile/StaffProfile";
-import AdminTableOrder from "@/pages/admin/staff/TableOrder/TableOrder";
-import About from "@/pages/customer/About/About";
-import { Checkout } from "@/pages/customer/Checkout/Checkout";
-import Contact from "@/pages/customer/Contact/Contact";
-import FeedbackPage from "@/pages/customer/Feedback/FeedbackPage";
-import HistoryOrder from "@/pages/customer/HistoryOrder/HistoryOrder";
-import Login from "@/pages/customer/Login/Login";
-import Menu from "@/pages/customer/Menu/Menu";
-import DetailProduct from "@/pages/customer/ProductDetail/ProductDetail";
-import RegisterCustomer from "@/pages/customer/Register/RegisterCustomer";
-import { TrackingOrder } from "@/pages/customer/TrackingOrder/TrackingOrder";
-import { VNPayCallback } from "@/pages/customer/VNPayCallback";
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Layout from "../layouts/Layout/Layout";
-import PublicLayout from "../layouts/Layout/PublicLayout";
-import PageNotFound from "../layouts/PageNotFound";
-import HomePage from "../pages/customer/HomePage/HomePage";
-import ProtectedRoute from "./ProtectedRoute";
-import AdminLogin from "@/pages/admin/AdminLogin/AdminLogin";
-import ProfileUser from "@/pages/customer/ProfileUser/ProfileUser";
+import { ROUTES } from '../constants';
 
-const MainRoutes: React.FC = () => {
+import ProtectedRoute from './ProtectedRoute';
+import PublicLayout from '@/layouts/Layout/PublicLayout';
+import Home from '@/pages/customer/HomePage/HomePage';
+import About from '@/pages/customer/About/About';
+import Menu from '@/pages/customer/Menu/Menu';
+import Contact from '@/pages/customer/Contact/Contact';
+import Login from '@/pages/customer/Login/Login';
+import RegisterCustomer from '@/pages/customer/Register/RegisterCustomer';
+import HistoryOrder from '@/pages/customer/HistoryOrder/HistoryOrder';
+import { Checkout } from '@/pages/customer/Checkout/Checkout';
+import ProfileUser from '@/pages/customer/ProfileUser/ProfileUser';
+import { VNPayCallback } from '@/pages/customer/VNPayCallback';
+import { TrackingOrder } from '@/pages/customer/TrackingOrder/TrackingOrder';
+import DetailProduct from '@/pages/customer/ProductDetail/ProductDetail';
+import FeedbackPage from '@/pages/customer/Feedback/FeedbackPage';
+import AdminLogin from '@/pages/admin/AdminLogin/AdminLogin';
+import Layout from '@/layouts/Layout/Layout';
+import Statistic from '@/pages/admin/admin/AdminStatistic';
+import AdminBranchList from '@/pages/admin/admin/AdminBranchList';
+import AdminMaterialList from '@/pages/admin/admin/AdminMaterialList';
+import AdminProductList from '@/pages/admin/admin/AdminProduct';
+import AdminOrderList from '@/pages/admin/admin/AdminOrderList';
+import AdminStaffList from '@/pages/admin/admin/AdminStaffList';
+import AdminCustomerList from '@/pages/admin/admin/AdminCustomerList';
+import AdminPromotion from '@/pages/admin/admin/AdminPromotion';
+import AdminCustomerRating from '@/pages/admin/admin/AdminCustomerRating';
+import ManagerStatistic from '@/pages/admin/manager/ManagerStatistic';
+import ManagerMaterialList from '@/pages/admin/manager/ManagerMaterialList';
+import ManagerProductList from '@/pages/admin/manager/ManagerProduct';
+import ManagerOrderList from '@/pages/admin/manager/ManagerOrderList';
+import ManagerStaffList from '@/pages/admin/manager/ManagerStaffList';
+import ManagerTableList from '@/pages/admin/manager/ManagerTable';
+import ManagerCustomerList from '@/pages/admin/manager/ManagerCustomerList';
+import ManagerPromotion from '@/pages/admin/manager/ManagerPromotion';
+import ManagerBranchInfo from '@/pages/admin/manager/ManagerBranchInfo';
+import ManagerCustomerRating from '@/pages/admin/manager/ManagerCustomerRating';
+import AdminTableOrder from '@/pages/admin/staff/TableOrder/TableOrder';
+import OrderList from '@/pages/admin/staff/OrderList';
+import StaffList from '@/pages/admin/staff/StaffList';
+import CustomerList from '@/pages/admin/staff/CustomerList';
+import StaffProfile from '@/pages/admin/staff/StaffProfile/StaffProfile';
+import AdminMenu from '@/pages/admin/staff/Menu/AdminMenu';
+import PageNotFound from '@/layouts/PageNotFound';
+
+export default function MainRoutes() {
   return (
-      <Routes>
-          {/* Customer routes */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/dang-nhap" element={<Login />} />
-            <Route path="/gioi-thieu" element={<About />} />
-            <Route path="/lien-he" element={<Contact />} />
-            <Route path="/san-pham/:slug" element={<DetailProduct />} />
-            <Route path="/thuc-don" element={<Menu />} />
-            <Route path="/thong-tin-tai-khoan" element={<ProfileUser />}/>
-            <Route path="/thanh-toan" element={<Checkout />} />
-            <Route path="/vnpay-callback" element={<VNPayCallback />} />
-            <Route path="/theo-doi-don-hang/:slug" element={<TrackingOrder />} />
-            <Route path="/lich-su-don-hang" element={<HistoryOrder />} />
-            <Route path="/danh-gia/:slug" element={<FeedbackPage />} />
-            <Route path="/dang-ky" element={<RegisterCustomer />} />
-          </Route>
+    <Routes>
+      {/* PUBLIC / CUSTOMER ROUTES */}
+      <Route element={<PublicLayout />}>
+        <Route path={ROUTES.HOME} element={<Home />} />
+        <Route path={ROUTES.ABOUT} element={<About />} />
+        <Route path={ROUTES.MENU} element={<Menu />} />
+        <Route path={ROUTES.CONTACT} element={<Contact />} />
+        <Route path={ROUTES.LOGIN} element={<Login />} />
+        <Route path={ROUTES.REGISTER} element={<RegisterCustomer />} />
+        <Route path={ROUTES.HISTORY_ORDERS} element={<HistoryOrder />} />
+        <Route path={ROUTES.CHECKOUT} element={<Checkout />} />
+        <Route path={ROUTES.PROFILE} element={<ProfileUser />} />
+        <Route path={ROUTES.VNPay_CALLBACK} element={<VNPayCallback />} />
+        <Route path={ROUTES.TRACKING_ORDER_PATTERN} element={<TrackingOrder />} />
+        <Route path={ROUTES.PRODUCT_DETAIL_PATTERN} element={<DetailProduct />} />
+        <Route path={ROUTES.FEEDBACK_PATTERN} element={<FeedbackPage />} />
+      </Route>
 
-      <Route path="/quan-tri/dang-nhap" element={<AdminLogin />} />
+      {/* ADMIN LOGIN */}
+      <Route path={ROUTES.ADMIN.LOGIN} element={<AdminLogin />} />
 
-
+      {/* PROTECTED ROUTES - ADMIN / MANAGER / STAFF */}
       <Route
         element={
-          <ProtectedRoute allowedRoles={['ADMIN_SYSTEM', 'ADMIN_BRAND', 'STAFF']}>
+          <ProtectedRoute
+            allowedRoles={['ADMIN_SYSTEM', 'ADMIN_BRAND', 'STAFF']}
+            redirectTo={ROUTES.ADMIN.LOGIN}
+          >
             <Layout />
           </ProtectedRoute>
         }
       >
-        {/* Các route chung cho Admin, Manager, Staff */}
-        <Route path="/quan-tri/thong-ke" element={<Statistic />} />
-        <Route path="/quan-tri/danh-sach-chi-nhanh" element={<AdminBranchList />} />
-        <Route path="/quan-tri/danh-sach-nguyen-lieu" element={<AdminMaterialList />} />
-        <Route path="/quan-tri/danh-sach-san-pham" element={<AdminProductList />} />
-        <Route path="/quan-tri/danh-sach-don-hang" element={<AdminOrderList />} />
-        <Route path="/quan-tri/danh-sach-nhan-vien" element={<AdminStaffList />} />
-        <Route path="/quan-tri/danh-sach-khach-hang" element={<AdminCustomerList />} />
-        <Route path="/quan-tri/khuyen-mai" element={<AdminPromotion />} />
-        <Route path="/quan-tri/danh-gia" element={<AdminCustomerRating />} />
+        {/* ADMIN_SYSTEM ROUTES */}
+        <Route path={ROUTES.ADMIN.STATISTICS} element={<Statistic />} />
+        <Route path={ROUTES.ADMIN.BRANCHES} element={<AdminBranchList />} />
+        <Route path={ROUTES.ADMIN.MATERIALS} element={<AdminMaterialList />} />
+        <Route path={ROUTES.ADMIN.PRODUCTS} element={<AdminProductList />} />
+        <Route path={ROUTES.ADMIN.ORDERS} element={<AdminOrderList />} />
+        <Route path={ROUTES.ADMIN.EMPLOYEES} element={<AdminStaffList />} />
+        <Route path={ROUTES.ADMIN.CUSTOMERS} element={<AdminCustomerList />} />
+        <Route path={ROUTES.ADMIN.PROMOTIONS} element={<AdminPromotion />} />
+        <Route path={ROUTES.ADMIN.RATINGS} element={<AdminCustomerRating />} />
 
-        <Route path="/quan-ly/thong-ke" element={<ManagerStatistic />} />
-        <Route path="/quan-ly/danh-sach-san-pham" element={<ManagerProductList />} />
-        <Route path="/quan-ly/danh-sach-nguyen-lieu" element={<ManagerMaterialList />} />
-        <Route path="/quan-ly/danh-sach-nhan-vien" element={<ManagerStaffList />} />
-        <Route path="/quan-ly/danh-sach-ban-ghe" element={<ManagerTableList />} />
-        <Route path="/quan-ly/danh-sach-khach-hang" element={<ManagerCustomerList />} />
-        <Route path="/quan-ly/danh-sach-don-hang" element={<ManagerOrderList />} />
-        <Route path="/quan-ly/khuyen-mai" element={<ManagerPromotion />} />
-        <Route path="/quan-ly/danh-gia" element={<AdminCustomerRating />} />
-        <Route path="/quan-ly/thong-tin-quan" element={<ManagerBranchInfo />} />
+        {/* ADMIN_BRAND (MANAGER) ROUTES */}
+        <Route path={ROUTES.MANAGER.STATISTICS} element={<ManagerStatistic />} />
+        <Route path={ROUTES.MANAGER.MATERIALS} element={<ManagerMaterialList />} />
+        <Route path={ROUTES.MANAGER.PRODUCTS} element={<ManagerProductList />} />
+        <Route path={ROUTES.MANAGER.ORDERS} element={<ManagerOrderList />} />
+        <Route path={ROUTES.MANAGER.EMPLOYEES} element={<ManagerStaffList />} />
+        <Route path={ROUTES.MANAGER.TABLES} element={<ManagerTableList />} />
+        <Route path={ROUTES.MANAGER.CUSTOMERS} element={<ManagerCustomerList />} />
+        <Route path={ROUTES.MANAGER.PROMOTIONS} element={<ManagerPromotion />} />
+        <Route path={ROUTES.MANAGER.RATINGS} element={<ManagerCustomerRating />} />
+        <Route path={ROUTES.MANAGER.BRANCH_INFO} element={<ManagerBranchInfo />} />
 
-        <Route path="/nhan-vien/thong-ke" element={<ManagerBranchInfo />} />
-        <Route path="/nhan-vien/don-hang/dat-mon" element={<AdminMenu />} />
-        <Route path="/nhan-vien/don-hang/chon-ban" element={<AdminTableOrder />} />
-        <Route path="/nhan-vien/don-hang/danh-sach-don-hang" element={<OrderList />} />
-        <Route path="/nhan-vien/danh-sach-khach-hang" element={<CustomerList />} />
-        <Route path="/nhan-vien/danh-sach-nhan-vien" element={<StaffList />} />
-        <Route path="/nhan-vien/thong-tin" element={<StaffProfile />} />
+        {/* STAFF ROUTES */}
+        <Route path={ROUTES.STAFF.STATISTICS} element={<StaffProfile />} />
+        <Route path={ROUTES.STAFF.ORDER_SELECT_TABLE} element={<AdminTableOrder />} />
+        <Route path={ROUTES.STAFF.ORDER_PLACE} element={<AdminMenu />} />
+        <Route path={ROUTES.STAFF.ORDER_LIST} element={<OrderList />} />
+        <Route path={ROUTES.STAFF.EMPLOYEES} element={<StaffList />} />
+        <Route path={ROUTES.STAFF.CUSTOMERS} element={<CustomerList />} />
+        <Route path={ROUTES.STAFF.PROFILE} element={<StaffProfile />} />
       </Route>
-      <Route path="/404" element={<PageNotFound />} />
+
+      {/* ERROR ROUTES */}
+      <Route path={ROUTES.NOT_FOUND} element={<PageNotFound />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
-};
-
-export default MainRoutes;
+}

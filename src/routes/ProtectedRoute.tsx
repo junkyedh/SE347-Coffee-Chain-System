@@ -1,26 +1,41 @@
+import { useSystemContext } from '@/hooks/useSystemContext';
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useSystemContext } from '../hooks/useSystemContext';
+import { Navigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants';
 
-interface ProtectedRouteProps {
+type ProtectedRouteProps = {
+  allowedRoles?: string[];
+  redirectTo?: string;
   children: React.ReactNode;
-  allowedRoles: string[];
-}
+};
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  allowedRoles,
+  redirectTo,
+  children,
+}) => {
   const { isLoggedIn, role, isInitialized } = useSystemContext();
+  const location = useLocation();
 
-  if (!isInitialized) {
-    return null;
-  }
+  if (!isInitialized) return null;
+
+  const defaultRedirect =
+    location.pathname.startsWith(ROUTES.ADMIN.ROOT) ||
+    location.pathname.startsWith(ROUTES.MANAGER.ROOT) ||
+    location.pathname.startsWith(ROUTES.STAFF.ROOT)
+      ? ROUTES.ADMIN.LOGIN
+      : ROUTES.LOGIN;
+
+  const to = redirectTo ?? defaultRedirect;
 
   if (!isLoggedIn) {
-    return <Navigate to={ROUTES.LOGIN} />; // navigate to login if not logged in
+    return <Navigate to={to} replace state={{ from: location.pathname }} />;
   }
 
-  if (!allowedRoles.includes(role)) {
-    return <Navigate to={ROUTES.NOT_FOUND} replace />; // navigate if not authorized
+  if (allowedRoles && allowedRoles.length > 0) {
+    if (!role || !allowedRoles.includes(role)) {
+      return <Navigate to={to} replace />;
+    }
   }
 
   return <>{children}</>;

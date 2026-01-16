@@ -6,16 +6,14 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import './Header.scss';
 import { User, Settings, Clock, LogOut, Home, Info, Coffee, Phone } from 'lucide-react';
 import { useSystemContext } from '../../../hooks/useSystemContext';
-import { MainApiRequest } from '../../../services/MainApiRequest';
 import CartDrawer from '../../customer/CartDrawer/CartDrawer';
 import { ROUTES } from '../../../constants';
 import React from 'react';
 
 const Header: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const { token, logout } = useSystemContext();
+  const { token, logout, userInfo } = useSystemContext();
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState<any>(null);
 
   const toggleMenu = () => setOpen(!open);
 
@@ -39,31 +37,9 @@ const Header: React.FC = () => {
     }
   };
 
-  const fetchUserInfo = async () => {
-    if (!token) {
-      setUserInfo(null);
-      return;
-    }
-    try {
-      const response = await MainApiRequest.get('/auth/callback', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUserInfo(response.data.data);
-    } catch (error) {
-      setUserInfo(null);
-      localStorage.removeItem('token');
-    }
-  };
-
-  useEffect(() => {
-    fetchUserInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
   const handleLogout = async () => {
     try {
-      await logout();
-      setUserInfo(null);
+      logout();
       navigate(ROUTES.LOGIN);
     } catch (error) {
       console.error('Logout failed:', error);
@@ -221,7 +197,7 @@ const Header: React.FC = () => {
                 </NavLink>
               )}
             </Nav>
-            <CartDrawer />
+            {token && <CartDrawer />}
           </div>
         </Navbar>
       </Container>

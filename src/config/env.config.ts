@@ -10,6 +10,8 @@ interface EnvConfig {
 
   // Payment Gateway
   vnpay: {
+    tmnCode: string;
+    hashSecret: string;
     url: string;
     returnUrl: string;
   };
@@ -35,6 +37,8 @@ export const envConfig: EnvConfig = {
 
   // Payment Gateway Configuration
   vnpay: {
+    tmnCode: getEnvVar('REACT_APP_VNPAY_TMN_CODE', '3CEHDS0A'),
+    hashSecret: getEnvVar('REACT_APP_VNPAY_HASH_SECRET', 'JMQ53A9CM6XTGRPHIBU1CJ4HJFTC1J2G'),
     url: getEnvVar('REACT_APP_VNPAY_URL', 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'),
     returnUrl: getEnvVar('REACT_APP_VNPAY_RETURN_URL', 'http://localhost:3000/vnpay-callback'),
   },

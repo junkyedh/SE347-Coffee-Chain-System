@@ -1,28 +1,11 @@
-import { MainApiRequest } from '@/services/MainApiRequest';
-import { useEffect, useState } from 'react';
+import { useSystemContext } from "./useSystemContext";
 
 export const useAuth = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { isLoggedIn, isInitialized, refreshUserInfo } = useSystemContext();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      await MainApiRequest.get('/auth/callback');
-      setIsLoggedIn(true);
-    } catch {
-      setIsLoggedIn(false);
-    } finally {
-      setLoading(false);
-    }
+  return {
+    isLoggedIn,
+    loading: !isInitialized,
+    refreshAuth: refreshUserInfo,
   };
-
-  const refreshAuth = () => {
-    checkAuth();
-  };
-
-  return { isLoggedIn, loading, refreshAuth };
 };
