@@ -3,6 +3,12 @@
  * File này chứa tất cả các endpoint API thực tế của backend
  */
 
+import { 
+  createProductUrl, 
+  createOrderTrackingUrl, 
+  createFeedbackUrl 
+} from '@/utils/slugify';
+
 export const API_ENDPOINTS = {
   // Authentication
   AUTH: {
@@ -141,7 +147,6 @@ export const ROUTES = {
   ABOUT: '/gioi-thieu',
   CONTACT: '/lien-he',
   MENU: '/thuc-don',
-  PRODUCT_DETAIL: (slug: string) => `/san-pham/${slug}`,
   
   // Auth routes
   LOGIN: '/dang-nhap',
@@ -151,17 +156,26 @@ export const ROUTES = {
   // Customer routes
   PROFILE: '/thong-tin-tai-khoan',
   HISTORY_ORDERS: '/lich-su-don-hang',
-  TRACKING_ORDER: (slug: string) => `/theo-doi-don-hang/${slug}`,
   CHECKOUT: '/thanh-toan',
-  FEEDBACK: (slug: string) => `/danh-gia/${slug}`,
-  TERMS: '/dieu-khoan-dich-vu',
+  TERMS: '/dieu-khoan-su-dung',
   
   // Payment callback
-  VNPAY_CALLBACK: '/vnpay-callback',
+  VNPay_CALLBACK: '/vnpay-callback',
   MOMO_CALLBACK: '/momo-callback',
+  
+  // Dynamic route patterns for React Router
+  PRODUCT_DETAIL_PATTERN: '/san-pham/:slug',
+  TRACKING_ORDER_PATTERN: '/theo-doi-don-hang/:slug',
+  FEEDBACK_PATTERN: '/danh-gia/:slug',
+
+  // Helper functions to generate URLs
+  PRODUCT_DETAIL: createProductUrl,
+  TRACKING_ORDER: createOrderTrackingUrl,
+  FEEDBACK: createFeedbackUrl,
   
   // Admin routes (ADMIN_SYSTEM)
   ADMIN: {
+    ROOT: '/quan-tri',
     LOGIN: '/quan-tri/dang-nhap',
     STATISTICS: '/quan-tri/thong-ke',
     BRANCHES: '/quan-tri/danh-sach-chi-nhanh',
@@ -171,37 +185,40 @@ export const ROUTES = {
     EMPLOYEES: '/quan-tri/danh-sach-nhan-vien',
     CUSTOMERS: '/quan-tri/danh-sach-khach-hang',
     PROMOTIONS: '/quan-tri/khuyen-mai',
-    RATINGS: '/quan-tri/danh-gia',
+    RATINGS: '/quan-tri/khach-hang-danh-gia',
   },
   
   // Manager routes (ADMIN_BRAND)
   MANAGER: {
+    ROOT: '/quan-ly',
     STATISTICS: '/quan-ly/thong-ke',
-    PRODUCTS: '/quan-ly/danh-sach-san-pham',
-    MATERIALS: '/quan-ly/danh-sach-nguyen-lieu',
-    EMPLOYEES: '/quan-ly/danh-sach-nhan-vien',
-    TABLES: '/quan-ly/danh-sach-ban-ghe',
-    CUSTOMERS: '/quan-ly/danh-sach-khach-hang',
-    ORDERS: '/quan-ly/danh-sach-don-hang',
+    MATERIALS: '/quan-ly/danh-sach-nguyen-lieu-chi-nhanh',
+    PRODUCTS: '/quan-ly/danh-sach-san-pham-chi-nhanh',
+    ORDERS: '/quan-ly/danh-sach-don-hang-chi-nhanh',
+    EMPLOYEES: '/quan-ly/danh-sach-nhan-vien-chi-nhanh',
+    TABLES: '/quan-ly/ban-ghe',
+    CUSTOMERS: '/quan-ly/danh-sach-khach-hang-chi-nhanh',
     PROMOTIONS: '/quan-ly/khuyen-mai',
-    RATINGS: '/quan-ly/danh-gia',
+    RATINGS: '/quan-ly/khach-hang-danh-gia-chi-nhanh',
     BRANCH_INFO: '/quan-ly/thong-tin-quan',
   },
   
   // Staff routes (STAFF)
   STAFF: {
+    ROOT: '/nhan-vien',
     STATISTICS: '/nhan-vien/thong-ke',
     ORDER_SELECT_TABLE: '/nhan-vien/don-hang/chon-ban',
-    ORDER_MENU: '/nhan-vien/don-hang/dat-mon',
+    ORDER_PLACE: '/nhan-vien/don-hang/dat-mon',
     ORDER_LIST: '/nhan-vien/don-hang/danh-sach-don-hang',
-    CUSTOMERS: '/nhan-vien/danh-sach-khach-hang',
     EMPLOYEES: '/nhan-vien/danh-sach-nhan-vien',
-    PROFILE: '/nhan-vien/thong-tin',
+    CUSTOMERS: '/nhan-vien/danh-sach-khach-hang',
+    PROFILE: '/nhan-vien/thong-tin-tai-khoan',
   },
   
   // Error pages
   NOT_FOUND: '/404',
-} as const;
+};
+
 
 /**
  * Status Constants

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Rate, Image, Select, message } from 'antd';
-import moment from 'moment';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
-import './adminPage.scss';
+import { Image, Rate, Select, Table, message } from 'antd';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import '../adminPage.scss';
 
-const AdminCustomerRating = () => {
+const ManagerCustomerRating = () => {
   const [ratingsList, setRatingsList] = useState<any[]>([]);
   const [allRatings, setAllRatings] = useState<any[]>([]);
   const [productList, setProductList] = useState<any[]>([]);
@@ -12,7 +12,7 @@ const AdminCustomerRating = () => {
 
   const fetchRatingsList = async () => {
     try {
-      const res = await AdminApiRequest.get('/ratings/list');
+      const res = await AdminApiRequest.get('/branch-ratings/list');
       setRatingsList(res.data);
       setAllRatings(res.data);
     } catch (error) {
@@ -123,4 +123,4 @@ const AdminCustomerRating = () => {
   );
 };
 
-export default AdminCustomerRating;
+export default ManagerCustomerRating;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants";
 import { useSystemContext } from "../../hooks/useSystemContext";
 import { comparePathname } from "../../utils/uri";
@@ -22,6 +22,8 @@ const Sidebar: React.FC = () => {
   const [openSubRoutes, setOpenSubRoutes] = useState<SubRoutesState>({});
   const location = useLocation();
   const { role } = useSystemContext();
+  const { logout } = useSystemContext();
+  const navigate = useNavigate();
 
   let routes: Route[] = [];
 
@@ -29,7 +31,6 @@ const Sidebar: React.FC = () => {
     setCurrentPath(location.pathname);
   }, [location]);
 
-  // --- (Giữ nguyên phần định nghĩa routes như cũ của bạn) ---
   if (role === "ADMIN_SYSTEM") {
     routes = [
       {
@@ -154,25 +155,25 @@ const Sidebar: React.FC = () => {
     routes = [
       {
         title: "ĐẶT MÓN",
-        link: "/nhan-vien/don-hang",
+        link: ROUTES.STAFF.ROOT + "/don-hang",
         icon: "fa-solid fa-cart-plus",
         roles: ["STAFF"],
         children: [
           {
             title: "Chọn bàn",
-            link: "chon-ban",
+            link: ROUTES.STAFF.ORDER_SELECT_TABLE,
             icon: "fa-solid fa-mug-saucer",
             roles: ["STAFF"],
           },
           {
             title: "Gọi món",
-            link: "dat-mon",
+            link: ROUTES.STAFF.ORDER_PLACE,
             icon: "fa-solid fa-cart-plus",
             roles: ["STAFF"],
           },
           {
             title: "Danh sách đơn hàng",
-            link: "danh-sach-don-hang",
+            link: ROUTES.STAFF.ORDER_LIST,
             icon: "fa-solid fa-receipt",
             roles: ["STAFF"],
           },
@@ -241,13 +242,10 @@ const Sidebar: React.FC = () => {
     }));
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("isBrand");
-    window.location.href = ROUTES.ADMIN.LOGIN;
-  };
+const handleLogout = () => {
+  logout();
+  navigate(ROUTES.ADMIN.LOGIN, { replace: true });
+};
 
   const renderNavigationList = () => {
     return routes.map((route, index) => {
