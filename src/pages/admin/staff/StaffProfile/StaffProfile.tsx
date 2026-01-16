@@ -1,33 +1,23 @@
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { Button, Card, Descriptions, Form, message, Modal } from 'antd';
-import { jwtDecode } from 'jwt-decode';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './StaffProfile.scss';
-
-interface TokenPayload {
-  id?: number;
-  phone?: string;
-  role?: string;
-  branchId?: number;
-  type?: 'staff' | 'customer';
-}
-
-const token = localStorage.getItem('token');
-const decoded: TokenPayload | null = token ? jwtDecode(token) : null;
-const staffId = decoded?.id;
+import { useSystemContext } from '@/hooks/useSystemContext';
 
 const StaffProfile = () => {
+  const { userInfo } = useSystemContext();
   const [form] = Form.useForm();
   const [staff, setStaff] = useState<any>(null);
   const [, setLoading] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [branchName, setBranchName] = useState<string | null>(null);
 
-  const fetchStaff = async () => {
+  const fetchStaff = useCallback(async () => {
+    if (!userInfo || !userInfo.id) return;
     try {
-      const res = await AdminApiRequest.get(`/staff/${staffId}`);
+      const res = await AdminApiRequest.get(`/staff/${userInfo.id}`);
       const staffData = res.data;
       setStaff(staffData);
 
@@ -37,15 +27,19 @@ const StaffProfile = () => {
       }
     } catch (err) {
       message.error('Không thể tải thông tin nhân viên');
+      if (userInfo?.id) {
+        message.error('Không thể tải thông tin nhân viên với ID: ' + userInfo.id);
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [userInfo]);
 
   const openEditModal = () => {
+    if (!staff) return;
     form.setFieldsValue({
       ...staff,
-      birth: moment(staff.birth),
+      birth: staff.birth ? moment(staff.birth) : null,
     });
     setEditModalVisible(true);
   };
@@ -55,13 +49,17 @@ const StaffProfile = () => {
       const values = await form.validateFields();
       const data = {
         ...values,
-        birth: moment(values.birth).format('YYYY-MM-DD'),
+        birth: values.birth ? values.birth.format('YYYY-MM-DD') : null,
       };
 
-      await AdminApiRequest.put(`/staff/${staffId}`, data);
-      message.success('Cập nhật thành công!');
-      setEditModalVisible(false);
-      fetchStaff();
+      if (userInfo?.id) {
+        await AdminApiRequest.put(`/staff/${userInfo.id}`, data);
+        message.success('Cập nhật thành công!');
+        setEditModalVisible(false);
+        fetchStaff();
+      } else {
+        message.error('Không tìm thấy thông tin người dùng.');
+      }
     } catch (err) {
       message.error('Lỗi khi cập nhật thông tin.');
     }
@@ -69,7 +67,7 @@ const StaffProfile = () => {
 
   useEffect(() => {
     fetchStaff();
-  }, []);
+  }, [userInfo, fetchStaff]);
 
   return (
     <div className="container-fluid m-3">
