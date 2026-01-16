@@ -1,7 +1,10 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import { Button } from '@/components/common/Button/Button';
 import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
+import SEO from '@/components/common/SEO';
 import { MainApiRequest } from '@/services/MainApiRequest';
+import { ROUTES } from '@/constants';
+import { extractOrderIdFromSlug } from '@/utils/slugify';
 import { ArrowLeft, CheckCircle, Clock, Package, Truck } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -17,6 +20,8 @@ interface RawOrder {
   totalPrice?: number;
   deliveryFee?: number;
   discount?: number;
+  paymentMethod?: string;
+  paymentStatus?: string;
   order_details: {
     productId: number;
     size: string;
@@ -51,43 +56,49 @@ const statusMap: Record<
     description: string;
   }
 > = {
-  PENDING: {
+  Nháp: {
+    label: 'Nháp',
+    color: '#9ca3af',
+    icon: Clock,
+    description: 'Đơn hàng chưa hoàn tất thanh toán',
+  },
+  'Chờ xác nhận': {
     label: 'Chờ xác nhận',
     color: '#f97316',
     icon: Clock,
     description: 'Đơn hàng đang chờ được xác nhận từ cửa hàng',
   },
-  CONFIRMED: {
+  'Đã xác nhận': {
     label: 'Đã xác nhận',
     color: '#3b82f6',
     icon: CheckCircle,
-    description: 'Đơn hàng đã được xác nhận và đang chuẩn bị',
+    description: 'Cửa hàng đã xác nhận đơn hàng của bạn',
   },
-  PREPARING: {
+  'Đang chuẩn bị': {
     label: 'Đang chuẩn bị',
-    color: '#f59e0b',
-    icon: Package,
-    description: 'Đang pha chế và chuẩn bị đồ uống của bạn',
+    color: '#a855f7',
+    icon: Clock,
+    description: 'Đơn hàng của bạn đang được pha chế',
   },
-  READY: {
+  'Sẵn sàng': {
     label: 'Sẵn sàng',
-    color: '#10b981',
-    icon: CheckCircle,
-    description: 'Đơn hàng đã sẵn sàng để giao hoặc nhận',
+    color: '#06b6d4',
+    icon: Package,
+    description: 'Đơn hàng đã sẵn sàng để giao/nhận',
   },
-  DELIVERING: {
+  'Đang giao': {
     label: 'Đang giao',
-    color: '#8b5cf6',
+    color: '#6366f1',
     icon: Truck,
-    description: 'Đơn hàng đang được giao đến địa chỉ của bạn',
+    description: 'Đơn hàng đang trên đường giao đến bạn',
   },
-  COMPLETED: {
+  'Hoàn thành': {
     label: 'Hoàn thành',
     color: '#059669',
     icon: CheckCircle,
     description: 'Đơn hàng đã được giao thành công',
   },
-  CANCELLED: {
+  'Đã hủy': {
     label: 'Đã hủy',
     color: '#ef4444',
     icon: Clock,
@@ -95,8 +106,19 @@ const statusMap: Record<
   },
 };
 
+const statusClassMap: Record<string, string> = {
+  Nháp: 'draft',
+  'Chờ xác nhận': 'pending',
+  'Đã xác nhận': 'confirmed',
+  'Đang chuẩn bị': 'preparing',
+  'Sẵn sàng': 'ready',
+  'Đang giao': 'delivering',
+  'Hoàn thành': 'completed',
+  'Đã hủy': 'cancelled',
+};
+
 export const TrackingOrder: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [order, setOrder] = useState<RawOrder | null>(null);
   const [items, setItems] = useState<OrderItem[]>([]);
@@ -105,6 +127,11 @@ export const TrackingOrder: React.FC = () => {
   const [custAddress, setCustAddress] = useState('');
 
   useEffect(() => {
+    if (!slug) return;
+
+    // Trích xuất ID từ slug
+    const id = extractOrderIdFromSlug(slug);
+
     const fetchOrderData = async () => {
       try {
         let phoneNumber: string | undefined;
@@ -162,7 +189,7 @@ export const TrackingOrder: React.FC = () => {
     };
 
     fetchOrderData();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -177,14 +204,15 @@ export const TrackingOrder: React.FC = () => {
   }
 
   if (!order) {
+    const displayId = slug ? extractOrderIdFromSlug(slug) : 'N/A';
     return (
       <div className="tracking-order">
         <div className="container">
           <div className="tracking-order__empty">
             <div className="empty-icon">📦</div>
             <h3>Không tìm thấy đơn hàng</h3>
-            <p>Đơn hàng #{id} không tồn tại hoặc đã bị xóa</p>
-            <button className="primaryBtn" onClick={() => navigate('/')}>
+            <p>Đơn hàng #{displayId} không tồn tại hoặc đã bị xóa</p>
+            <button className="primaryBtn" onClick={() => navigate(ROUTES.HOME)}>
               <ArrowLeft size={16} />
               Về trang chủ
             </button>
@@ -209,17 +237,17 @@ export const TrackingOrder: React.FC = () => {
 
   const getProgressSteps = () => {
     const steps = [
-      { key: 'PENDING', label: 'Chờ xác nhận' },
-      { key: 'CONFIRMED', label: 'Đã xác nhận' },
-      { key: 'PREPARING', label: 'Đang chuẩn bị' },
-      { key: 'READY', label: 'Sẵn sàng' },
+      { key: 'Chờ xác nhận', label: 'Chờ xác nhận' },
+      { key: 'Đã xác nhận', label: 'Đã xác nhận' },
+      { key: 'Đang chuẩn bị', label: 'Đang chuẩn bị' },
+      { key: 'Sẵn sàng', label: 'Sẵn sàng' },
     ];
 
     if (order.serviceType === 'TAKE AWAY') {
-      steps.push({ key: 'DELIVERING', label: 'Đang giao' });
+      steps.push({ key: 'Đang giao', label: 'Đang giao' });
     }
 
-    steps.push({ key: 'COMPLETED', label: 'Hoàn thành' });
+    steps.push({ key: 'Hoàn thành', label: 'Hoàn thành' });
 
     const currentIndex = steps.findIndex((step) => step.key === order.status);
 
@@ -235,6 +263,11 @@ export const TrackingOrder: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title={`Theo dõi đơn hàng #${order.id}`}
+        description={`Theo dõi trạng thái đơn hàng #${order.id} - ${statusInfo.label}. Cập nhật thời gian thực về tình trạng đơn hàng của bạn tại SE347 Coffee Chain.`}
+        keywords="theo dõi đơn hàng, tracking order, trạng thái đơn hàng, giao hàng"
+      />
       <Breadcrumbs
         title="Theo dõi đơn hàng"
         items={[{ label: 'Trang chủ', to: '/' }, { label: 'Theo dõi đơn hàng' }]}
@@ -263,7 +296,7 @@ export const TrackingOrder: React.FC = () => {
                 variant="primary"
                 size="sm"
                 className="new-order-button"
-                onClick={() => navigate('/menu')}
+                onClick={() => navigate(ROUTES.MENU)}
               >
                 Đặt hàng mới
               </Button>
@@ -274,7 +307,7 @@ export const TrackingOrder: React.FC = () => {
             <div className="tracking-order__order-info">
               <div className="order-header">
                 <h2>Trạng thái đơn hàng</h2>
-                <div className={`status-badge ${order.status.toLowerCase()}`}>
+                <div className={`status-badge ${statusClassMap[order.status] || 'default'}`}>
                   <StatusIcon size={16} />
                   {statusInfo.label}
                 </div>
@@ -301,6 +334,22 @@ export const TrackingOrder: React.FC = () => {
                       {order.serviceType === 'DINE IN'
                         ? 'Nhận tại cửa hàng'
                         : custAddress || 'Địa chỉ giao hàng'}
+                    </span>
+                  </p>
+                </div>
+                <div className="detail-item">
+                  <p>
+                    <strong>Thanh toán:</strong>{' '}
+                    <span>{order.paymentMethod === 'vnpay' ? 'VNPay' : 'Tiền mặt (COD)'}</span>
+                  </p>
+                  <p>
+                    <strong>Trạng thái TT:</strong>{' '}
+                    <span
+                      className={`payment-status ${
+                        order.paymentStatus === 'Đã thanh toán' ? 'paid' : 'unpaid'
+                      }`}
+                    >
+                      {order.paymentStatus || 'Chưa thanh toán'}
                     </span>
                   </p>
                 </div>

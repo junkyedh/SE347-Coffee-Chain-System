@@ -52,6 +52,8 @@ export const ManagerOrderList = () => {
         'Mã đơn': order.id,
         'Số điện thoại': order.phoneCustomer,
         'Loại phục vụ': order.serviceType,
+        'Phương thức thanh toán': order.paymentMethod || 'Tiền mặt',
+        'Trạng thái thanh toán': order.paymentStatus || 'Chưa thanh toán',
         'Tổng tiền': order.totalPrice,
         'Ngày đặt': moment(order.orderDate).format('DD-MM-YYYY HH:mm:ss'),
         'Nhân viên': order.staffName,
@@ -83,6 +85,19 @@ export const ManagerOrderList = () => {
     } catch (error) {
       console.error('Error canceling order:', error);
       message.error('Không thể hủy đơn hàng.');
+    }
+  };
+
+  const handleUpdatePaymentStatus = async (orderId: number, newStatus: string) => {
+    try {
+      await AdminApiRequest.put(`/order/${orderId}`, {
+        paymentStatus: newStatus,
+      });
+      message.success('Cập nhật trạng thái thanh toán thành công!');
+      fetchManagerOrderList();
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      message.error('Không thể cập nhật trạng thái thanh toán.');
     }
   };
 
@@ -135,10 +150,52 @@ export const ManagerOrderList = () => {
             sorter: (a, b) => a.serviceType.localeCompare(b.serviceType),
           },
           {
+            title: 'Phương thức TT',
+            dataIndex: 'paymentMethod',
+            key: 'paymentMethod',
+            render: (method: string) => {
+              const paymentMethod = method || 'cash';
+              let color = 'blue';
+              let text = 'Tiền mặt (COD)';
+              if (paymentMethod === 'vnpay') {
+                color = 'orange';
+                text = 'VNPay';
+              }
+              return <Tag color={color}>{text}</Tag>;
+            },
+          },
+          {
+            title: 'Trạng thái TT',
+            dataIndex: 'paymentStatus',
+            key: 'paymentStatus',
+            render: (status: string, record: any) => {
+              const paymentStatus = status || 'Chưa thanh toán';
+              let color = 'default';
+              if (paymentStatus === 'Đã thanh toán') color = 'green';
+              else if (paymentStatus === 'Chưa thanh toán') color = 'orange';
+              
+              return (
+                <div className="d-flex align-items-center gap-2">
+                  <Tag color={color}>{paymentStatus}</Tag>
+                  {paymentStatus === 'Chưa thanh toán' && record.paymentMethod === 'cash' && (
+                    <AdminButton
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleUpdatePaymentStatus(record.id, 'Đã thanh toán')}
+                    >
+                      Xác nhận
+                    </AdminButton>
+                  )}
+                </div>
+              );
+            },
+          },
+          {
             title: 'Tổng tiền',
             dataIndex: 'totalPrice',
             key: 'totalPrice',
             sorter: (a, b) => a.totalPrice - b.totalPrice,
+            render: (price: number) => `${Number(price || 0).toLocaleString('vi-VN')}₫`,
           },
           {
             title: 'Ngày đặt',

@@ -2,13 +2,17 @@ import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import { Button } from '@/components/common/Button/Button';
 import { Card, CardBody } from '@/components/common/Card/Card';
 import { Search } from '@/components/common/Search/Search';
+import SEO from '@/components/common/SEO';
+import { ROUTES } from '@/constants';
 import { MainApiRequest } from '@/services/MainApiRequest';
+import { createOrderTrackingUrl, createFeedbackUrl } from '@/utils/slugify';
 import { message } from 'antd';
 import { Calendar, CheckCircle, Clock, Truck } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { FaEye, FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import './HistoryOrder.scss';
+import { useSystemContext } from '@/hooks/useSystemContext';
 
 interface OrderSummary {
   id: number;
@@ -18,6 +22,8 @@ interface OrderSummary {
   branchId: number;
   branchName?: string;
   productIDs: (number | null)[];
+  paymentMethod?: string;
+  paymentStatus?: string;
 }
 
 interface OrderDetail {
@@ -40,14 +46,16 @@ interface ProductDetail {
   }[];
 }
 
+// SAU
 const statusMap: Record<string, { label: string; color: string; icon: React.ComponentType }> = {
-  PENDING: { label: 'Chờ xác nhận', color: 'orange', icon: Clock },
-  CONFIRMED: { label: 'Đã xác nhận', color: 'blue', icon: CheckCircle },
-  PREPARING: { label: 'Đang chuẩn bị', color: 'orange', icon: Clock },
-  READY: { label: 'Sẵn sàng', color: 'green', icon: CheckCircle },
-  DELIVERING: { label: 'Đang giao', color: 'purple', icon: Truck },
-  COMPLETED: { label: 'Hoàn thành', color: 'green', icon: CheckCircle },
-  CANCELLED: { label: 'Đã hủy', color: 'red', icon: Clock },
+  'Nháp': { label: 'Nháp', color: 'gray', icon: Clock },
+  'Chờ xác nhận': { label: 'Chờ xác nhận', color: 'orange', icon: Clock },
+  'Đã xác nhận': { label: 'Đã xác nhận', color: 'blue', icon: CheckCircle },
+  'Đang chuẩn bị': { label: 'Đang chuẩn bị', color: 'orange', icon: Clock },
+  'Sẵn sàng': { label: 'Sẵn sàng', color: 'green', icon: CheckCircle },
+  'Đang giao': { label: 'Đang giao', color: 'purple', icon: Truck },
+  'Hoàn thành': { label: 'Hoàn thành', color: 'green', icon: CheckCircle },
+  'Đã hủy': { label: 'Đã hủy', color: 'red', icon: Clock },
 };
 
 const HistoryOrder: React.FC = () => {
@@ -63,21 +71,21 @@ const HistoryOrder: React.FC = () => {
   );
 
   const navigate = useNavigate();
+  const { isLoggedIn, userInfo, isInitialized } = useSystemContext();
+
   useEffect(() => {
-    MainApiRequest.get<{ msg: string; data: { phone: string } }>('/auth/callback')
-      .then((r) => {
-        const phone = r.data.data.phone;
-        setPhone(phone);
-        setGuestHistory(null);
-      })
-      .catch(() => {
-        const history = JSON.parse(localStorage.getItem('guest_order_history') || '[]');
-        setGuestHistory(history);
-        if (history.length > 0) {
-          setPhone(history[0].phone);
-        }
-      });
-  }, []);
+    if (!isInitialized) return;
+
+    if (isLoggedIn && userInfo?.phone) {
+      setPhone(userInfo.phone);
+      setGuestHistory(null);
+      return;
+    }
+
+    const history = JSON.parse(localStorage.getItem('guest_order_history') || '[]');
+    setGuestHistory(history);
+    if (history.length > 0) setPhone(history[0].phone);
+  }, [isInitialized, isLoggedIn, userInfo?.phone]);
 
   useEffect(() => {
     if (phone) {
@@ -109,6 +117,8 @@ const HistoryOrder: React.FC = () => {
               branchId: order.branchId,
               branchName: order.branchName,
               productIDs: order.order_details?.map((d: any) => d.productId) || [],
+              paymentMethod: order.paymentMethod,
+              paymentStatus: order.paymentStatus,
             } as OrderSummary;
           } catch {
             return null;
@@ -197,9 +207,17 @@ const HistoryOrder: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="Lịch sử đơn hàng"
+        description="Quản lý và theo dõi tất cả đơn hàng của bạn tại SE347 Coffee Chain. Xem lịch sử mua hàng, trạng thái đơn hàng và đánh giá sản phẩm."
+        keywords="lịch sử đơn hàng, order history, quản lý đơn hàng, theo dõi đơn hàng"
+      />
       <Breadcrumbs
         title="Lịch sử đơn hàng"
-        items={[{ label: 'Trang chủ', to: '/' }, { label: 'Lịch sử đơn' }]}
+        items={[
+          { label: 'Trang chủ', to: ROUTES.HOME },
+          { label: 'Lịch sử đơn hàng', to: ROUTES.HISTORY_ORDERS },
+        ]}
       />
 
       <div className="history-order-container">
@@ -276,6 +294,16 @@ const HistoryOrder: React.FC = () => {
                         <span className="order-type">
                           {order.serviceType === 'TAKE AWAY' ? 'Giao hàng' : 'Tại cửa hàng'}
                         </span>
+                        <span className="order-payment">
+                          {order.paymentMethod === 'vnpay' ? 'VNPay' : 'Tiền mặt (COD)'}
+                        </span>
+                        <span
+                          className={`payment-status ${
+                            order.paymentStatus === 'Đã thanh toán' ? 'paid' : 'unpaid'
+                          }`}
+                        >
+                          {order.paymentStatus || 'Chưa thanh toán'}
+                        </span>
                       </div>
                     </div>
                     <div className="order-status">{getStatusBadge(order.status)}</div>
@@ -322,7 +350,7 @@ const HistoryOrder: React.FC = () => {
                           variant="secondary"
                           size="sm"
                           icon={<FaEye />}
-                          onClick={() => window.open(`/tracking-order/${order.id}`, '_blank')}
+                          onClick={() => window.open(createOrderTrackingUrl(order.id), '_blank')}
                         >
                           Xem chi tiết
                         </Button>
@@ -353,16 +381,12 @@ const HistoryOrder: React.FC = () => {
                                 Giá: {(item.price * item.quantity).toLocaleString('vi-VN')}₫
                               </div>
                             </div>
-                            {order.status === 'COMPLETED' && (
+                            {order.status === 'Hoàn thành' && (
                               <Button
                                 variant="primary"
                                 size="sm"
                                 icon={<FaStar />}
-                                onClick={() =>
-                                  navigate(
-                                    `/feedback?orderId=${order.id}&productId=${item.productId}`
-                                  )
-                                }
+                                onClick={() => navigate(createFeedbackUrl(order.id))}
                               >
                                 Đánh giá
                               </Button>

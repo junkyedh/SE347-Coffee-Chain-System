@@ -16,13 +16,6 @@ interface LocationStateItem {
   mood?: string;
 }
 
-interface ProductDetail {
-  id: string;
-  name: string;
-  image: string;
-  sizes: { sizeName: string; price: number }[];
-}
-
 interface OrderItem {
   productId: number;
   name: string;
@@ -104,39 +97,43 @@ export const Checkout: React.FC = () => {
     const loadItems = async () => {
       try {
         if (state?.initialItems && Array.isArray(state.initialItems) && state.initialItems.length > 0) {
-          console.log('[Checkout] Loading items from state:', state.initialItems);
           const mapped = await Promise.all(
             (state.initialItems as LocationStateItem[]).map(async (it) => {
-              const { data: res } = await MainApiRequest.get<ProductDetail>(
-                `/product/${it.productId}`
-              );
+              // Fetch product details với đầy đủ thông tin
+              const { data: product } = await MainApiRequest.get<{
+                id: string;
+                name: string;
+                image: string;
+                category: string;
+                sizes: { sizeName: string; price: number }[];
+              }>(`/product/${it.productId}`);
               
-              // Xác định category để tính giá đúng
-              const productFull = await MainApiRequest.get<{category: string}>(`/product/${it.productId}`);
-              const isCake = productFull.data.category === 'Bánh ngọt';
+              const isCake = product.category === 'Bánh ngọt';
               
               let price = 0;
               if (isCake) {
                 // Với bánh ngọt: whole = piece × 8
                 if (it.size === 'whole') {
-                  const piecePrice = res.sizes.find((s) => s.sizeName === 'piece')?.price || res.sizes[0]?.price || 0;
+                  const piecePrice = product.sizes.find((s) => s.sizeName === 'piece')?.price || product.sizes[0]?.price || 0;
                   price = piecePrice * 8;
                 } else if (it.size === 'piece') {
-                  price = res.sizes.find((s) => s.sizeName === 'piece')?.price || res.sizes[0]?.price || 0;
+                  price = product.sizes.find((s) => s.sizeName === 'piece')?.price || product.sizes[0]?.price || 0;
                 } else {
-                  const sz = res.sizes.find((s) => s.sizeName === it.size);
-                  price = sz?.price || 0;
+                  const sz = product.sizes.find((s) => s.sizeName === it.size);
+                  price = sz?.price || product.sizes[0]?.price || 0;
                 }
               } else {
                 // Với đồ uống và sản phẩm khác
-                const sz = res.sizes.find((s) => s.sizeName === it.size);
-                price = sz?.price || 0;
+                const sz = product.sizes.find((s) => s.sizeName === it.size);
+                price = sz?.price || product.sizes[0]?.price || 0;
               }
               
+              console.log(`[Checkout] Product: ${product.name}, Size: ${it.size}, Price: ${price}`);
+              
               return {
-                productId: Number(res.id),
-                name: res.name,
-                image: res.image,
+                productId: Number(product.id),
+                name: product.name,
+                image: product.image,
                 size: it.size,
                 mood: it.mood,
                 quantity: it.quantity,
@@ -144,7 +141,7 @@ export const Checkout: React.FC = () => {
               } as OrderItem;
             })
           );
-          console.log('[Checkout] Loaded items:', mapped);
+          console.log('[Checkout] Loaded items with prices:', mapped);
           setItems(mapped);
         } else {
           console.log('[Checkout] Loading items from cart');
@@ -344,28 +341,31 @@ export const Checkout: React.FC = () => {
       alert('Số tiền thanh toán qua VNPay phải từ 5,000đ trở lên. Vui lòng thêm sản phẩm hoặc chọn phương thức thanh toán khác.');
       return;
     }
-
+    
     setLoading(true);
     try {
+      const orderStatus = paymentMethod === 'vnpay' ? 'Nháp' : 'Chờ xác nhận';
+      
       const { data: o } = await MainApiRequest.post<{ id: number }>('/order', {
         phoneCustomer: phone,
         name,
         address,
         serviceType: deliveryMethod === 'delivery' ? 'TAKE AWAY' : 'DINE IN',
         orderDate: new Date().toISOString(),
-        status: 'PENDING',
+        status: orderStatus,
         productIDs: items.map((it) => Number((it as any).productId)),
         branchId: selectedBranch!,
       });
       const orderId = o.id;
+
       await MainApiRequest.put(`/order/${orderId}`, {
         phoneCustomer: phone,
         serviceType: deliveryMethod === 'delivery' ? 'TAKE AWAY' : 'DINE IN',
         totalPrice: finalTotal,
         orderDate: new Date().toISOString(),
-        status: 'PENDING',
+        status: orderStatus,
         paymentMethod: paymentMethod, // 'cash' hoặc 'vnpay'
-        paymentStatus: paymentMethod === 'vnpay' ? 'Đã thanh toán' : 'Chưa thanh toán', // VNPay = đã thanh toán, Cash = chưa thanh toán
+        paymentStatus: 'Chưa thanh toán',
       });
 
       await Promise.all(
@@ -391,16 +391,13 @@ export const Checkout: React.FC = () => {
       // If VNPay payment method is selected, redirect to payment URL
       if (paymentMethod === 'vnpay') {
         try {
-          console.log('[VNPay] Creating payment with amount:', finalTotal);
           const { data: paymentData } = await MainApiRequest.post('/payment/vnpay/create', {
             orderId,
             amount: finalTotal,
             orderInfo: `Thanh toan don hang ${orderId}`,
             returnUrl: `${window.location.origin}/vnpay-callback`,
           });
-          
-          console.log('[VNPay] Payment data received:', paymentData);
-          
+                    
           if (paymentData.paymentUrl) {
             // Redirect to VNPay payment page
             window.location.href = paymentData.paymentUrl;

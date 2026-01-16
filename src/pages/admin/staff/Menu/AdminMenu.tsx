@@ -243,7 +243,7 @@ const AdminMenu = () => {
         totalPrice: finalTotal,
         tableID: orderInfo?.tableID || null,
         orderDate: new Date().toISOString(),
-        status: 'PENDING',
+        status: 'Chờ xác nhận',
         staffName: orderInfo?.staffName || null,
       };
 

@@ -30,7 +30,6 @@ const Footer = () => {
   }
 
   const handleClick: HandleClick = (section) => {
-    console.log(`Navigating to ${section}`);
   };
 
   return (

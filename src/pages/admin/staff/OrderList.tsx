@@ -53,10 +53,12 @@ export const OrderList = () => {
         'Mã đơn': order.id,
         'Số điện thoại': order.phoneCustomer,
         'Loại phục vụ': order.serviceType,
+        'Phương thức thanh toán': order.paymentMethod || 'Tiền mặt',
+        'Trạng thái thanh toán': order.paymentStatus || 'Chưa thanh toán',
         'Tổng tiền': order.totalPrice,
         'Ngày đặt': moment(order.orderDate).format('DD-MM-YYYY HH:mm:ss'),
         'Nhân viên': order.staffName,
-        'Trạng thái': order.status,
+        'Trạng thái': statusMap[order.status]?.label || order.status,
       }))
     );
     const workbook = XLSX.utils.book_new();
@@ -92,7 +94,7 @@ export const OrderList = () => {
     }
     try {
       await AdminApiRequest.put(`/branch-order/status/${id}`, {
-        status: 'CANCELLED',
+        status: 'Đã hủy',
         staffName,
       });
       message.success('Đơn hàng đã được hủy.');
@@ -103,15 +105,29 @@ export const OrderList = () => {
     }
   };
 
-  const statusMap: Record<string, { label: string; color: string }> = {
-    PENDING: { label: 'Chờ xác nhận', color: 'orange' },
-    CONFIRMED: { label: 'Đã xác nhận', color: 'blue' },
-    PREPARING: { label: 'Đang chuẩn bị', color: 'purple' },
-    READY: { label: 'Sẵn sàng', color: 'cyan' },
-    DELIVERING: { label: 'Đang giao', color: 'geekblue' },
-    COMPLETED: { label: 'Hoàn thành', color: 'green' },
-    CANCELLED: { label: 'Đã hủy', color: 'red' },
+  const handleUpdatePaymentStatus = async (orderId: number, newStatus: string) => {
+    try {
+      await AdminApiRequest.put(`/order/${orderId}`, {
+        paymentStatus: newStatus,
+      });
+      message.success('Cập nhật trạng thái thanh toán thành công!');
+      fetchManagerOrderList();
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      message.error('Không thể cập nhật trạng thái thanh toán.');
+    }
   };
+
+const statusMap: Record<string, { label: string; color: string }> = {
+  'Nháp': { label: 'Nháp', color: 'default' },
+  'Chờ xác nhận': { label: 'Chờ xác nhận', color: 'orange' },
+  'Đã xác nhận': { label: 'Đã xác nhận', color: 'blue' },
+  'Đang chuẩn bị': { label: 'Đang chuẩn bị', color: 'purple' },
+  'Sẵn sàng': { label: 'Sẵn sàng', color: 'cyan' },
+  'Đang giao': { label: 'Đang giao', color: 'geekblue' },
+  'Hoàn thành': { label: 'Hoàn thành', color: 'green' },
+  'Đã hủy': { label: 'Đã hủy', color: 'red' },
+};
 
   return (
     <div className="container-fluid m-2">
@@ -162,6 +178,47 @@ export const OrderList = () => {
             dataIndex: 'serviceType',
             key: 'serviceType',
             sorter: (a, b) => a.serviceType.localeCompare(b.serviceType),
+          },
+          {
+            title: 'Phương thức TT',
+            dataIndex: 'paymentMethod',
+            key: 'paymentMethod',
+            render: (method: string) => {
+              const paymentMethod = method || 'cash';
+              let color = 'blue';
+              let text = 'Tiền mặt (COD)';
+              if (paymentMethod === 'vnpay') {
+                color = 'orange';
+                text = 'VNPay';
+              }
+              return <Tag color={color}>{text}</Tag>;
+            },
+          },
+          {
+            title: 'Trạng thái TT',
+            dataIndex: 'paymentStatus',
+            key: 'paymentStatus',
+            render: (status: string, record: any) => {
+              const paymentStatus = status || 'Chưa thanh toán';
+              let color = 'default';
+              if (paymentStatus === 'Đã thanh toán') color = 'green';
+              else if (paymentStatus === 'Chưa thanh toán') color = 'orange';
+              
+              return (
+                <div className="d-flex align-items-center gap-2">
+                  <Tag color={color}>{paymentStatus}</Tag>
+                  {paymentStatus === 'Chưa thanh toán' && record.paymentMethod === 'cash' && (
+                    <AdminButton
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleUpdatePaymentStatus(record.id, 'Đã thanh toán')}
+                    >
+                      Xác nhận
+                    </AdminButton>
+                  )}
+                </div>
+              );
+            },
           },
           {
             title: 'Tổng tiền',

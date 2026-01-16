@@ -37,11 +37,11 @@ export const VNPayCallback: React.FC = () => {
         });
 
         setResult(data);
-      } catch (error) {
-        console.error('Payment verification failed:', error);
+      } catch (error: any) {
+        console.error('[VNPayCallback] Error details:', error.response?.data);
         setResult({
           isSuccess: false,
-          message: 'Không thể xác thực thanh toán. Vui lòng liên hệ với chúng tôi.',
+          message: error.response?.data?.message || 'Không thể xác thực thanh toán. Vui lòng liên hệ với chúng tôi.',
         });
       } finally {
         setVerifying(false);
@@ -54,6 +54,9 @@ export const VNPayCallback: React.FC = () => {
   const handleContinue = () => {
     if (result?.isSuccess && result.orderId) {
       navigate(ROUTES.TRACKING_ORDER(result.orderId));
+    } else if (result?.orderId) {
+      // If payment failed but orderId exists, navigate to order history
+      navigate(ROUTES.HISTORY_ORDERS);
     } else {
       navigate(ROUTES.HOME);
     }
@@ -89,7 +92,12 @@ export const VNPayCallback: React.FC = () => {
               {result?.isSuccess ? 'Thanh toán thành công!' : 'Thanh toán thất bại!'}
             </h1>
 
-            <p className="callback-message">{result?.message}</p>
+            <p className="callback-message">
+              {result?.message}
+              {!result?.isSuccess && result?.orderId && (
+                <><br /><small>Đơn hàng #{result.orderId} đã được lưu ở trạng thái Nháp trong lịch sử của bạn.</small></>
+              )}
+            </p>
 
             {result?.isSuccess && (
               <div className="payment-details">
@@ -128,7 +136,11 @@ export const VNPayCallback: React.FC = () => {
 
             <div className="callback-actions">
               <button className="primaryBtn" onClick={handleContinue}>
-                {result?.isSuccess ? 'Theo dõi đơn hàng' : 'Quay về trang chủ'}
+                {result?.isSuccess 
+                  ? 'Theo dõi đơn hàng' 
+                  : result?.orderId 
+                    ? 'Xem lịch sử đơn hàng'
+                    : 'Quay về trang chủ'}
               </button>
             </div>
           </div>

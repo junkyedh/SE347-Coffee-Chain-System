@@ -83,6 +83,11 @@
         font-size: var(--smallText);
         font-weight: 600;
 
+        &.draft {
+          background: #f3f4f6;
+          color: #6b7280;
+        }
+
         &.pending {
           background: #fef3c7;
           color: #92400e;
@@ -143,6 +148,24 @@
 
           span {
             color: var(--subTextClr);
+          }
+
+          .payment-status {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+
+            &.paid {
+              background-color: #d1fae5;
+              color: #065f46;
+            }
+
+            &.unpaid {
+              background-color: #fed7aa;
+              color: #c2410c;
+            }
           }
         }
       }

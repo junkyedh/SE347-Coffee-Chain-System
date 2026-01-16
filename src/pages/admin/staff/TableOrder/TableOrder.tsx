@@ -128,7 +128,7 @@ const AdminTableOrder = () => {
 
       await AdminApiRequest.post('/branch-order', orderData);
       message.success('Đơn hàng đã được tạo thành công!');
-      navigate(ROUTES.STAFF.ORDER_MENU);
+      navigate(ROUTES.STAFF.ORDER_SELECT_TABLE);
     } catch (error) {
       console.error('Error creating order:', error);
       message.error('Không thể tạo đơn hàng!');
