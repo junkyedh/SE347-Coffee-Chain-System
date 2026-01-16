@@ -1,6 +1,6 @@
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
-import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { ROUTES } from '@/constants';
+import { AdminApiRequest } from '@/services/AdminApiRequest';
 import {
   CoffeeOutlined,
   DeleteOutlined,
@@ -11,24 +11,11 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { Button, Card, Form, message, Modal, Select, Tooltip } from 'antd';
-import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TableOrder.scss';
 
 const { Option } = Select;
-
-interface TokenPayload {
-  id?: number;
-  phone?: string;
-  role?: string;
-  branchId?: number;
-  type?: 'staff' | 'customer';
-}
-
-const token = localStorage.getItem('token');
-const decoded: TokenPayload | null = token ? jwtDecode(token) : null;
-const staffId = decoded?.id;
 
 const AdminTableOrder = () => {
   const [tableList, setTableList] = useState<any[]>([]);
@@ -95,53 +82,46 @@ const AdminTableOrder = () => {
   };
 
   const handleChooseProduct = async (table: any, serviceType: 'Dine In' | 'Take Away') => {
-    try {
-      if (serviceType === 'Dine In' && table?.phoneOrder) {
-        try {
-          await AdminApiRequest.get(`/customer/${table.phoneOrder}`);
-        } catch (error: any) {
-          if (error.response?.status === 404) {
-            const customerData = {
-              name: table.name || 'Khách vãng lai',
-              phone: table.phoneOrder,
-              gender: 'Khác',
-              registrationDate: new Date().toISOString(),
-            };
-            await AdminApiRequest.post('/customer', customerData);
-          } else {
-            throw error;
-          }
-        }
-      }
+    const navigationState = {
+      serviceType,
+      tableId: serviceType === 'Dine In' ? table?.id : null,
+      tableName: table?.id ? `Bàn ${table.id}` : 'Mang đi',
+      phoneCustomer: table?.phoneOrder || null, // Nếu bàn đã đặt thì có sđt
+      customerName: table?.name || null,
+      tableSeats: table?.seat || 0,
+      isNewOrder: true, // Đánh dấu đây là đơn mới chưa lưu xuống DB
+    };
 
-      const orderData = {
-        phoneCustomer: table?.phoneOrder || null,
-        serviceType,
-        totalPrice: 0,
-        staffID: staffId,
-        tableID: serviceType === 'Dine In' ? table?.id : null,
-        orderDate: new Date().toISOString(),
-        status: 'PENDING',
-        productIDs: [],
-        branchId: table?.branchId || 1,
-      };
-
-      await AdminApiRequest.post('/branch-order', orderData);
-      message.success('Đơn hàng đã được tạo thành công!');
-      navigate(ROUTES.STAFF.ORDER_SELECT_TABLE);
-    } catch (error) {
-      console.error('Error creating order:', error);
-      message.error('Không thể tạo đơn hàng!');
-    }
+    navigate(ROUTES.STAFF.ORDER_PLACE, { state: navigationState });
   };
 
-  const handleCompleteTable = async (table: any) => {
+  const handleViewActiveOrder = async (table: any) => {
     try {
-      await AdminApiRequest.put(`/table/complete/${table.id}`);
-      message.success(`Bàn ${table.id} đã hoàn tất!`);
-      fetchTableList();
+      setLoading(true);
+      const res = await AdminApiRequest.get('branch-order/list');
+      const activeOrders = res.data.filter(
+        (order: any) =>
+          order.tableId === table.id &&
+          ['Chờ xác nhận', 'Đang chuẩn bị', 'Sẵn sàng', 'Đang giao'].includes(order.status)
+      );
+
+      if (activeOrders) {
+        navigate(ROUTES.STAFF.ORDER_PLACE, {
+          state: {
+            orderId: activeOrders[0].id,
+            isNewOrder: false,
+            tableId: table.id,
+            tableName: `Bàn ${table.id}`,
+            serviceType: 'Dine In',
+          },
+        });
+      } else {
+        message.error('Không tìm thấy đơn hàng của bàn này.');
+      }
     } catch (error) {
-      message.error('Hoàn tất bàn thất bại!');
+      message.error('Có lỗi xảy ra khi lấy đơn hàng.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -337,8 +317,8 @@ const AdminTableOrder = () => {
                 )}
 
                 {table.status === 'Occupied' && (
-                  <Button className="action-btn success" onClick={() => handleCompleteTable(table)}>
-                    Complete
+                  <Button className="action-btn info" onClick={() => handleViewActiveOrder(table)}>
+                    View Order
                   </Button>
                 )}
 

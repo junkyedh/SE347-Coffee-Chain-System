@@ -4,9 +4,10 @@ import { ROUTES } from '@/constants';
 import { DeleteOutlined, ShoppingCartOutlined, UserAddOutlined } from '@ant-design/icons';
 import { AutoComplete, Button, Form, Input, message, Modal, Pagination } from 'antd';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AdminProductCard from '../AdminCard/AdminProductCard';
 import './AdminMenu.scss';
+import { printInvoice } from '@/utils/invoicePrinter';
 
 const categories = ['All', 'Cà phê', 'Trà trái cây', 'Trà sữa', 'Nước ép', 'Bánh ngọt'];
 
@@ -43,12 +44,20 @@ const AdminMenu = () => {
   const [form] = Form.useForm();
   const [suggestions, setSuggestions] = useState<{ phone: string; name: string }[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [couponCode, setCouponCode] = useState('');
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
   const pageSize = 8;
 
+  const location = useLocation();
+  const { state } = location;
+  const [currentOrderInfo, setCurrenOrderInfo] = useState<any>(state || null);
+
   const navigate = useNavigate();
+
+  const [couponCode, setCouponCode] = useState('');
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [totalPrice] = useState(0);
+
+  const [memberDiscountValue, setMemberDiscountValue] = useState(0);
+  const [couponDiscountVal, setCouponDiscountVal] = useState(0);
 
   const fetchMenuList = async () => {
     try {
@@ -80,12 +89,55 @@ const AdminMenu = () => {
   }, []);
 
   useEffect(() => {
-    const calculateTotalPrice = () => {
-      const total = Object.values(order).reduce((sum, item) => sum + item.price * item.quantity, 0);
-      setTotalPrice(total);
+    const initOrder = async () => {
+      if (!state) return;
+
+      if (state.isNewOrder) {
+        setCurrenOrderInfo({
+          id: null,
+          serviceType: state.serviceType,
+          tableID: state.tableId,
+          tableName: state.tableName,
+          phoneCustomer: state.phoneCustomer,
+          customerName: state.customerName,
+          status: 'Nháp',
+          tableSeats: state.tableSeats,
+        });
+        // Reset giỏ hàng/Order list về rỗng
+        setOrder({});
+        if (state.phoneCustomer) {
+          setPhone(state.phoneCustomer);
+        }
+      } else if (state.orderId) {
+        try {
+          const res = await AdminApiRequest.get(`/branch-order/${state.orderId}`);
+          const data = res.data;
+          data.tableSeats = state.tableSeats || data.tableSeats || 0;
+          
+          setCurrenOrderInfo(res.data);
+        } catch (err) {
+          console.error(err);
+        }
+      }
     };
-    calculateTotalPrice();
-  }, [order]);
+    initOrder();
+  }, [state]);
+
+  useEffect(() => {
+    let finalDiscount = 0;
+
+    // QUY TẮC: Ưu tiên mã giảm giá.
+    // Nếu có mã giảm giá (couponDiscountVal > 0) -> Dùng Coupon, bỏ qua Membership.
+    if (couponDiscountVal > 0) {
+      finalDiscount = couponDiscountVal;
+    } else {
+      // Nếu không dùng mã giảm giá -> Mới xét đến Membership
+      finalDiscount = memberDiscountValue;
+    }
+
+    // Đảm bảo tiền giảm không vượt quá tổng tiền đơn hàng
+    setDiscountAmount(Math.min(finalDiscount, totalPrice));
+  }, [totalPrice, memberDiscountValue, couponDiscountVal]);
 
   const filteredProducts = menuList
     .filter((product) => selectedCategory === 'All' || product.category === selectedCategory)
@@ -129,7 +181,6 @@ const AdminMenu = () => {
       let price = 0;
 
       if (product.category === 'Bánh ngọt') {
-        // Lấy giá đúng cho "piece" hoặc "whole"
         if (size === 'piece') {
           price = product.sizes[0]?.price || 0;
         } else if (size === 'whole') {
@@ -167,55 +218,86 @@ const AdminMenu = () => {
     });
   };
 
+  const checkMemberRank = async (phone: string) => {
+    if (!phone) {
+      setMemberDiscountValue(0);
+      return;
+    }
+    try {
+      const customerRes = await AdminApiRequest.get(`/customer/${phone}`);
+      const customer = customerRes.data;
+
+      if (customer?.rank) {
+        const membershipRes = await AdminApiRequest.get(`/membership/${customer.rank}`);
+        const discountValue = membershipRes.data.discount || 0;
+
+        setMemberDiscountValue(discountValue);
+
+        // Kiểm tra ưu tiên áp dụng mã giảm giá nếu có
+        if (couponDiscountVal > 0) {
+          message.info(
+            `Khách hàng hạng ${customer.rank}, không áp dụng chiết khấu thành viên do đã sử dụng mã giảm giá.`
+          );
+        } else {
+          message.success(
+            `Khách hàng hạng ${customer.rank}, được giảm ${discountValue.toLocaleString()}đ`
+          );
+        }
+      } else {
+        setMemberDiscountValue(0);
+      }
+    } catch (error) {
+      console.error('Lỗi khi kiểm tra hạng thành viên:', error);
+      setMemberDiscountValue(0);
+    }
+  };
+
   const handleApplyCoupon = async () => {
     try {
-      let couponDiscount = 0;
-      let membershipDiscount = 0;
+      if (!couponCode) {
+        setCouponDiscountVal(0);
+        return;
+      }
 
-      if (couponCode) {
-        const response = await AdminApiRequest.get('/promote/coupon/list');
-        const coupon = response.data.find(
-          (c: Coupon) => c.code === couponCode && c.status === 'Có hiệu lực'
-        );
+      const response = await AdminApiRequest.get('/promote/coupon/list');
+      const coupon = response.data.find(
+        (c: Coupon) => c.code === couponCode && c.status === 'Có hiệu lực'
+      );
 
-        if (coupon) {
-          const discount = coupon.promote.discount;
-          if (coupon.promote.promoteType === 'Phần trăm') {
-            couponDiscount = (totalPrice * discount) / 100;
-          } else if (coupon.promote.promoteType === 'Cố định') {
-            couponDiscount = discount;
-          }
+      if (coupon) {
+        let val = 0;
+        const discount = coupon.promote.discount;
+
+        if (coupon.promote.promoteType === 'Phần trăm') {
+          val = (totalPrice * discount) / 100;
+        } else if (coupon.promote.promoteType === 'Cố định') {
+          val = discount;
+        }
+
+        setCouponDiscountVal(val);
+
+        // Thông báo áp dụng mã thành công
+        if (memberDiscountValue > 0) {
+          message.success('Áp dụng mã thành công!');
         } else {
-          message.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!');
-          return;
+          message.success('Áp dụng mã giảm giá thành công!');
         }
+      } else {
+        setCouponDiscountVal(0);
+        message.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!');
       }
-
-      if (phone) {
-        const customerResponse = await AdminApiRequest.get(`/customer/${phone}`);
-        const customer = customerResponse.data;
-
-        if (customer?.rank) {
-          const membershipResponse = await AdminApiRequest.get(`/membership/${customer.rank}`);
-          const membership = membershipResponse.data;
-
-          if (membership?.discount) {
-            membershipDiscount = membership.discount;
-          }
-        }
-      }
-
-      setDiscountAmount(couponDiscount + membershipDiscount);
-      message.success('Áp dụng chiết khấu thành công!');
     } catch (error) {
-      console.error('Lỗi khi áp dụng chiết khấu:', error);
-      message.error('Có lỗi xảy ra khi áp dụng chiết khấu!');
+      console.error('Lỗi khi áp dụng mã giảm giá:', error);
+      message.error('Có lỗi xảy ra khi áp dụng mã giảm giá!');
+      setCouponDiscountVal(0);
     }
   };
 
   const handlePayment = async () => {
     try {
       let finalTotal = totalPrice - discountAmount;
+      let orderId = currentOrderInfo?.id;
+
       if (finalTotal < 0) finalTotal = 0;
 
       if (Object.keys(order).length === 0 || totalPrice === 0) {
@@ -223,29 +305,31 @@ const AdminMenu = () => {
         return;
       }
 
-      const payload = {
-        phoneCustomer: phone || null,
-        serviceType: orderInfo?.serviceType || 'DINE IN',
-        totalPrice: finalTotal,
-        tableID: orderInfo?.tableID || null,
-        orderDate: new Date().toISOString(),
-        status: 'Chờ xác nhận',
-        staffName: orderInfo?.staffName || null,
-      };
+      if (!orderId) {
+        const payload = {
+          phoneCustomer: phone || null,
+          serviceType: orderInfo?.serviceType || 'DINE IN',
+          totalPrice: finalTotal,
+          tableID: orderInfo?.tableID || null,
+          orderDate: new Date().toISOString(),
+          status: 'Chờ xác nhận',
+          staffName: orderInfo?.staffName || null,
+        };
 
-      const res = await AdminApiRequest.post('/branch-order', payload);
-      if (!res?.data?.id) {
-        message.error('Đặt đơn hàng thất bại! Không nhận được ID đơn hàng.');
-        return;
-      }
-
-      const orderId = res.data.id;
+        const res = await AdminApiRequest.post('/branch-order', payload);
+        orderId = res.data.id;
+        
+        if (currentOrderInfo?.tableID) {
+          await AdminApiRequest.put(`/table/${currentOrderInfo.tableID}`, { status: 'Occupied' });
+        }
+      } else {}
 
       const orderItems = Object.keys(order).map((productKey) => {
         const item = order[productKey];
         const [id] = productKey.split('-');
+        const product = menuList.find((p) => String(p.id) === id);
         return {
-          productID: Number(id),
+          productName: product?.name || '',
           size: item.size,
           mood: item.mood,
           quantity: item.quantity,
@@ -257,10 +341,27 @@ const AdminMenu = () => {
         await AdminApiRequest.post(`/branch-order/detail/${orderId}`, item);
       }
 
-      message.success('Đơn hàng đặt thành công!');
+      // Gọi hàm in hóa đơn
+      printInvoice({
+        orderId,
+        serviceType: orderInfo?.serviceType || 'DINE IN',
+        staffName: orderInfo?.staffName || 'Nhân viên',
+        totalPrice: totalPrice,
+        discountAmount: discountAmount,
+        finalTotal: finalTotal,
+        items: orderItems,
+      });
+
+      message.success(currentOrderInfo?.id ? 'Cập nhật đơn hàng thành công!' : 'Tạo đơn hàng thành công!');
+      // Reset toàn bộ state
       setOrder({});
       setCouponCode('');
       setDiscountAmount(0);
+      setMemberDiscountValue(0);
+      setCouponDiscountVal(0);
+      setName('');
+      setPhone('');
+
       navigate(ROUTES.STAFF.ORDER_LIST);
     } catch (error) {
       console.error('Error during payment:', error);
@@ -312,6 +413,7 @@ const AdminMenu = () => {
     setPhone(value);
     const selected = suggestions.find((s) => s.phone === value);
     setName(selected ? selected.name : '');
+    checkMemberRank(value);
   };
 
   return (
@@ -385,11 +487,17 @@ const AdminMenu = () => {
               <div className="info-item">
                 <span className="label">Loại:</span>
                 <span className="value">
-                  {orderInfo?.serviceType === 'Take Away'
+                  { currentOrderInfo?.tableName || (currentOrderInfo?.serviceType === 'Take Away')
                     ? 'Mang đi'
-                    : `Bàn ${orderInfo?.tableID || '2'}`}
+                    : `Bàn ${currentOrderInfo?.tableID || '2'}` }
                 </span>
               </div>
+              {currentOrderInfo?.serviceType === 'Dine In' && currentOrderInfo?.tableSeats >0 && (
+                <div className="info-item">
+                  <span className="label">Số chỗ:</span>
+                  <span className="value">{currentOrderInfo.tableSeats}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -410,6 +518,11 @@ const AdminMenu = () => {
                 onChange={(value) => {
                   setPhone(value);
                   fetchCustomerSuggestions(value);
+
+                  if (!value) {
+                    setName('');
+                    setMemberDiscountValue(0);
+                  }
                 }}
                 onSelect={handleSelect}
                 options={suggestions.map((suggestion) => ({

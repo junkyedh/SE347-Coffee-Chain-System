@@ -68,19 +68,37 @@ export const OrderList = () => {
   };
 
   const handleChangeStatus = async (id: number, newStatus: string) => {
-    const staffName = staffInput[id] || managerOrderList.find((o) => o.id === id)?.staffName || '';
-    if (!staffName) {
+    // Tim đơn hàng hiện tại
+    const currentOrder = managerOrderList.find((o) => o.id === id);
+    if (!currentOrder) {
+      message.error('Đơn hàng không tồn tại.');
+      return;
+    }
+
+    const inputName = staffInput[id];
+    const existingStaffName = currentOrder.staffName;
+
+    // Nếu chưa có nhân viên được gán
+    if (!existingStaffName && !inputName) {
       message.warning('Vui lòng nhập tên nhân viên trước khi đổi trạng thái!');
       return;
     }
+
     try {
       await AdminApiRequest.put(`/branch-order/status/${id}`, {
         status: newStatus,
-        staffName: staffName,
+        staffName: existingStaffName || inputName,
       });
+
       message.success('Cập nhật trạng thái và nhân viên thành công.');
       fetchManagerOrderList();
-      setStaffInput((prev) => ({ ...prev, [id]: '' }));
+
+      // Clear input after successful update
+      setStaffInput((prev) => {
+        const newState = { ...prev };
+        delete newState[id];
+        return newState;
+      });
     } catch (error) {
       message.error('Không thể cập nhật trạng thái.');
     }
@@ -99,16 +117,16 @@ export const OrderList = () => {
     }
   };
 
-const statusMap: Record<string, { label: string; color: string }> = {
-  'Nháp': { label: 'Nháp', color: 'default' },
-  'Chờ xác nhận': { label: 'Chờ xác nhận', color: 'orange' },
-  'Đã xác nhận': { label: 'Đã xác nhận', color: 'blue' },
-  'Đang chuẩn bị': { label: 'Đang chuẩn bị', color: 'purple' },
-  'Sẵn sàng': { label: 'Sẵn sàng', color: 'cyan' },
-  'Đang giao': { label: 'Đang giao', color: 'geekblue' },
-  'Hoàn thành': { label: 'Hoàn thành', color: 'green' },
-  'Đã hủy': { label: 'Đã hủy', color: 'red' },
-};
+  const statusMap: Record<string, { label: string; color: string }> = {
+    Nháp: { label: 'Nháp', color: 'default' },
+    'Chờ xác nhận': { label: 'Chờ xác nhận', color: 'orange' },
+    'Đã xác nhận': { label: 'Đã xác nhận', color: 'blue' },
+    'Đang chuẩn bị': { label: 'Đang chuẩn bị', color: 'purple' },
+    'Sẵn sàng': { label: 'Sẵn sàng', color: 'cyan' },
+    'Đang giao': { label: 'Đang giao', color: 'geekblue' },
+    'Hoàn thành': { label: 'Hoàn thành', color: 'green' },
+    'Đã hủy': { label: 'Đã hủy', color: 'red' },
+  };
 
   return (
     <div className="container-fluid m-2">
@@ -184,7 +202,7 @@ const statusMap: Record<string, { label: string; color: string }> = {
               let color = 'default';
               if (paymentStatus === 'Đã thanh toán') color = 'green';
               else if (paymentStatus === 'Chưa thanh toán') color = 'orange';
-              
+
               return (
                 <div className="d-flex align-items-center gap-2">
                   <Tag color={color}>{paymentStatus}</Tag>
@@ -218,20 +236,26 @@ const statusMap: Record<string, { label: string; color: string }> = {
             title: 'Nhân viên',
             dataIndex: 'staffName',
             key: 'staffName',
-            render: (staffName: string, record: any) => (
-              <Input
-                value={staffInput[record.id] ?? staffName ?? ''}
-                placeholder="Tên nhân viên"
-                size="small"
-                style={{ width: 120 }}
-                onChange={(e) =>
-                  setStaffInput((prev) => ({
-                    ...prev,
-                    [record.id]: e.target.value,
-                  }))
-                }
-              />
-            ),
+            render: (staffName: string, record: any) => {
+              if (staffName) {
+                return <span style={{ fontWeight: 500, color: '#1890ff' }}>{staffName}</span>;
+              }
+
+              return (
+                <Input
+                  value={staffInput[record.id] || ''}
+                  placeholder="Tên nhân viên"
+                  size="small"
+                  style={{ width: 140 }}
+                  onChange={(e) =>
+                    setStaffInput((prev) => ({
+                      ...prev,
+                      [record.id]: e.target.value,
+                    }))
+                  }
+                />
+              );
+            },
           },
 
           {
