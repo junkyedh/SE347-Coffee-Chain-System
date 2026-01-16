@@ -45,13 +45,6 @@ interface Branch {
   phone: string;
 }
 
-interface Membership {
-  id: number;
-  rank: string;
-  mPrice: number;
-  discount: number;
-}
-
 export const Checkout: React.FC = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -70,7 +63,6 @@ export const Checkout: React.FC = () => {
   const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<number | null>(null);
-  const [membershipList, setMembershipList] = useState<Membership[]>([]);
   const [membershipDiscount, setMembershipDiscount] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -85,12 +77,6 @@ export const Checkout: React.FC = () => {
     MainApiRequest.get<Coupon[]>('/promote/coupon/list')
       .then((res) => setAvailableCoupons(res.data))
       .catch((err) => console.error('Failed to fetch coupons:', err));
-  }, []);
-
-  useEffect(() => {
-    MainApiRequest.get<Membership[]>('/membership/list')
-      .then((res) => setMembershipList(res.data))
-      .catch((err) => console.error('Failed to fetch membership:', err));
   }, []);
 
   useEffect(() => {
@@ -127,9 +113,7 @@ export const Checkout: React.FC = () => {
                 const sz = product.sizes.find((s) => s.sizeName === it.size);
                 price = sz?.price || product.sizes[0]?.price || 0;
               }
-              
-              console.log(`[Checkout] Product: ${product.name}, Size: ${it.size}, Price: ${price}`);
-              
+                            
               return {
                 productId: Number(product.id),
                 name: product.name,
@@ -141,10 +125,8 @@ export const Checkout: React.FC = () => {
               } as OrderItem;
             })
           );
-          console.log('[Checkout] Loaded items with prices:', mapped);
           setItems(mapped);
         } else {
-          console.log('[Checkout] Loading items from cart');
           await fetchCart();
           const cartItems = cart.map((it) => ({
             productId: Number(it.productId),
@@ -155,7 +137,6 @@ export const Checkout: React.FC = () => {
             quantity: it.quantity,
             price: it.price,
           }));
-          console.log('[Checkout] Cart items:', cartItems);
           setItems(cartItems);
         }
       } catch (error) {
@@ -163,7 +144,7 @@ export const Checkout: React.FC = () => {
       }
     };
     loadItems();
-  }, [state]);
+  }, [state, cart, fetchCart]);
 
   // Load from cart if no state provided
   useEffect(() => {

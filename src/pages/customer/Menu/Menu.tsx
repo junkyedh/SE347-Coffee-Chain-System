@@ -2,8 +2,9 @@ import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import EmptyState from '@/components/common/EmtyState/EmptyState';
 import LoadingIndicator from '@/components/common/LoadingIndicator/Loading';
 import LoginPromptModal from '@/components/common/LoginPromptModal/LoginPromptModal';
-import SEO from '@/components/common/SEO';
 import { Pagination } from '@/components/common/Pagination/Pagination';
+import SEO from '@/components/common/SEO';
+import BranchFilter from '@/components/customer/BranchFilter/BranchFilter';
 import CardListView from '@/components/customer/CardListView/CardListView';
 import CardProduct from '@/components/customer/CardProduct/CardProduct';
 import CategoryFilter, { Category } from '@/components/customer/CategoryFilter/CategoryFilter';
@@ -11,15 +12,14 @@ import PriceFilter, { PriceOption } from '@/components/customer/PriceFilter/Pric
 import SearchBar from '@/components/customer/Searchbar/Searchbar';
 import SortDropdown from '@/components/customer/SortDropdown/SortDropdown';
 import ViewToggle from '@/components/customer/ViewToggle/ViewToggle';
-import BranchFilter from '@/components/customer/BranchFilter/BranchFilter';
 import { ROUTES } from '@/constants';
 import { useCart } from '@/hooks/cartContext';
 import { useAuth } from '@/hooks/useAuth';
 import { MainApiRequest } from '@/services/MainApiRequest';
-import { message } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import { createProductUrl } from '@/utils/slugify';
+import { message } from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import './Menu.scss';
 
 interface RawProduct {
@@ -123,7 +123,7 @@ const Menu: React.FC = () => {
   };
 
   // Fetch filtered products from backend
-  const fetchFilteredProducts = async () => {
+  const fetchFilteredProducts = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -135,10 +135,7 @@ const Menu: React.FC = () => {
         params.append('category', selectedCategory);
       }
 
-
-      const res = await MainApiRequest.get<RawProduct[]>(
-        `/product/filter?${params.toString()}`
-      );
+      const res = await MainApiRequest.get<RawProduct[]>(`/product/filter?${params.toString()}`);
 
       const mapped: Product[] = res.data.map((p) => ({
         ...p,
@@ -152,7 +149,7 @@ const Menu: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedBranch, selectedCategory]);
 
   // Handler cho product click
   const handleProductClick = (productId: string, productName: string) => {
@@ -209,7 +206,7 @@ const Menu: React.FC = () => {
   // Fetch filtered products when category or branch changes
   useEffect(() => {
     fetchFilteredProducts();
-  }, [selectedCategory, selectedBranch]);
+  }, [fetchFilteredProducts]);
 
   // Generate categories with counts from all products
   const categories: Category[] = useMemo(() => {
@@ -227,16 +224,16 @@ const Menu: React.FC = () => {
           cat === 'Cà phê'
             ? '☕'
             : cat === 'Trà trái cây'
-              ? '🍃'
-              : cat === 'Trà sữa'
-                ? '🧋'
-                : cat === 'Nước ép'
-                  ? '🥤'
-                  : cat === 'Sinh tố'
-                    ? '🥭'
-                    : cat === 'Bánh ngọt'
-                      ? '🧁'
-                      : undefined,
+            ? '🍃'
+            : cat === 'Trà sữa'
+            ? '🧋'
+            : cat === 'Nước ép'
+            ? '🥤'
+            : cat === 'Sinh tố'
+            ? '🥭'
+            : cat === 'Bánh ngọt'
+            ? '🧁'
+            : undefined,
       })),
     ];
   }, [allProducts]);
@@ -302,20 +299,23 @@ const Menu: React.FC = () => {
   return (
     <>
       <SEO
-        title={selectedCategory !== 'all' ? `${selectedCategory} - Thực đơn` : "Thực đơn"}
-        description={`Xem thực đơn ${selectedCategory !== 'all' ? selectedCategory : 'đầy đủ'} tại SE347 Coffee Chain. Cà phê, trà sửa, bánh ngọt và nhiều thức uống hấp dẫn khác. Đặt hàng online giá tốt.`}
-        keywords={`thực đơn, menu, ${selectedCategory !== 'all' ? selectedCategory : 'cà phê, trà sửa, bánh ngọt'}, đồ uống, giá cả, đặt hàng online`}
+        title={selectedCategory !== 'all' ? `${selectedCategory} - Thực đơn` : 'Thực đơn'}
+        description={`Xem thực đơn ${
+          selectedCategory !== 'all' ? selectedCategory : 'đầy đủ'
+        } tại SE347 Coffee Chain. Cà phê, trà sửa, bánh ngọt và nhiều thức uống hấp dẫn khác. Đặt hàng online giá tốt.`}
+        keywords={`thực đơn, menu, ${
+          selectedCategory !== 'all' ? selectedCategory : 'cà phê, trà sửa, bánh ngọt'
+        }, đồ uống, giá cả, đặt hàng online`}
       />
-      <LoginPromptModal
-        isOpen={showLoginPrompt}
-        onClose={() => setShowLoginPrompt(false)}
-      />
+      <LoginPromptModal isOpen={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
       <Breadcrumbs
         title={selectedCategory !== 'all' ? selectedCategory : 'Menu'}
         items={[
           { label: 'Trang chủ', to: ROUTES.HOME },
           { label: 'Thực đơn', to: ROUTES.MENU },
-          ...(selectedCategory !== 'all' ? [{ label: selectedCategory, to: `${ROUTES.MENU}?category=${selectedCategory}` }] : [])
+          ...(selectedCategory !== 'all'
+            ? [{ label: selectedCategory, to: `${ROUTES.MENU}?category=${selectedCategory}` }]
+            : []),
         ]}
       />
       <div className="menu-page">
@@ -373,26 +373,26 @@ const Menu: React.FC = () => {
                     <div className={viewMode === 'grid' ? 'menu-page__grid' : 'menu-page__list'}>
                       {viewMode === 'grid'
                         ? paginatedProducts.map((prod) => (
-                          <CardProduct
-                            key={prod.id}
-                            product={prod}
-                            onAddToCart={(size, quantity, mood) =>
-                              handleAddToCart(Number(prod.id), size, quantity, mood)
-                            }
-                            onProductClick={() => handleProductClick(prod.id, prod.name)}
-                          />
-                        ))
-                        : paginatedProducts.map((prod) => (
-                          <div key={prod.id} className="menu-page__list-item">
-                            <CardListView
+                            <CardProduct
+                              key={prod.id}
                               product={prod}
-                              onAddToCart={(productId, size, quantity, mood) =>
-                                handleAddToCart(productId, size, quantity, mood)
+                              onAddToCart={(size, quantity, mood) =>
+                                handleAddToCart(Number(prod.id), size, quantity, mood)
                               }
                               onProductClick={() => handleProductClick(prod.id, prod.name)}
                             />
-                          </div>
-                        ))}
+                          ))
+                        : paginatedProducts.map((prod) => (
+                            <div key={prod.id} className="menu-page__list-item">
+                              <CardListView
+                                product={prod}
+                                onAddToCart={(productId, size, quantity, mood) =>
+                                  handleAddToCart(productId, size, quantity, mood)
+                                }
+                                onProductClick={() => handleProductClick(prod.id, prod.name)}
+                              />
+                            </div>
+                          ))}
                     </div>
 
                     {totalPages > 1 && (

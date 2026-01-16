@@ -8,7 +8,7 @@ import { MainApiRequest } from '@/services/MainApiRequest';
 import { createOrderTrackingUrl, createFeedbackUrl } from '@/utils/slugify';
 import { message } from 'antd';
 import { Calendar, CheckCircle, Clock, Truck } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FaEye, FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import './HistoryOrder.scss';
@@ -48,7 +48,7 @@ interface ProductDetail {
 
 // SAU
 const statusMap: Record<string, { label: string; color: string; icon: React.ComponentType }> = {
-  'Nháp': { label: 'Nháp', color: 'gray', icon: Clock },
+  Nháp: { label: 'Nháp', color: 'gray', icon: Clock },
   'Chờ xác nhận': { label: 'Chờ xác nhận', color: 'orange', icon: Clock },
   'Đã xác nhận': { label: 'Đã xác nhận', color: 'blue', icon: CheckCircle },
   'Đang chuẩn bị': { label: 'Đang chuẩn bị', color: 'orange', icon: Clock },
@@ -134,11 +134,6 @@ const HistoryOrder: React.FC = () => {
     }
   }, [phone, guestHistory]);
 
-  useEffect(() => {
-    if (!orders.length) return;
-    orders.forEach((order) => fetchDetails(order.id));
-  }, [orders]);
-
   // Filter orders based on search and status
   useEffect(() => {
     let filtered = orders;
@@ -158,40 +153,48 @@ const HistoryOrder: React.FC = () => {
     setFilteredOrders(filtered);
   }, [orders, searchTerm, statusFilter]);
 
-  const fetchDetails = async (orderId: number) => {
-    if (details[orderId]) return;
-    try {
-      const res = await MainApiRequest.get<{
-        order_details: {
-          productId: number;
-          size: string;
-          mood?: string;
-          quantity: number;
-        }[];
-      }>(`/order/customer/${encodeURIComponent(phone)}/${orderId}`);
-      const rawDetails = res.data.order_details;
+  const fetchDetails = useCallback(
+    async (orderId: number) => {
+      if (details[orderId]) return;
+      try {
+        const res = await MainApiRequest.get<{
+          order_details: {
+            productId: number;
+            size: string;
+            mood?: string;
+            quantity: number;
+          }[];
+        }>(`/order/customer/${encodeURIComponent(phone)}/${orderId}`);
+        const rawDetails = res.data.order_details;
 
-      const enriched = await Promise.all(
-        rawDetails.map(async (d) => {
-          const { data: p } = await MainApiRequest.get<ProductDetail>(`/product/${d.productId}`);
-          const sz = p.sizes.find((s) => s.sizeName === d.size) || { sizeName: d.size, price: 0 };
-          return {
-            productId: p.id,
-            name: p.name,
-            image: p.image,
-            size: sz.sizeName,
-            mood: d.mood,
-            quantity: d.quantity,
-            price: sz.price,
-          } as OrderDetail;
-        })
-      );
-      setDetails((prev) => ({ ...prev, [orderId]: enriched }));
-    } catch (err) {
-      console.error(err);
-      message.error('Không tải được chi tiết đơn');
-    }
-  };
+        const enriched = await Promise.all(
+          rawDetails.map(async (d) => {
+            const { data: p } = await MainApiRequest.get<ProductDetail>(`/product/${d.productId}`);
+            const sz = p.sizes.find((s) => s.sizeName === d.size) || { sizeName: d.size, price: 0 };
+            return {
+              productId: p.id,
+              name: p.name,
+              image: p.image,
+              size: sz.sizeName,
+              mood: d.mood,
+              quantity: d.quantity,
+              price: sz.price,
+            } as OrderDetail;
+          })
+        );
+        setDetails((prev) => ({ ...prev, [orderId]: enriched }));
+      } catch (err) {
+        console.error(err);
+        message.error('Không tải được chi tiết đơn');
+      }
+    },
+    [details, phone]
+  );
+
+  useEffect(() => {
+    if (!orders.length) return;
+    orders.forEach((order) => fetchDetails(order.id));
+  }, [orders, fetchDetails]);
 
   const getStatusBadge = (status: string) => {
     const info = statusMap[status] || { label: status, color: 'gray', icon: Clock };
