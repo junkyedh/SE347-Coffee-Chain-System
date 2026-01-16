@@ -27,9 +27,9 @@ ChartJS.register(
 const OrderRevenue14 = ({ data }: { data: any }) => {
   const [chartData, setChartData] = useState<any>(null);
 
-  const sampleData = data?.last14DaysOrder || [];
-
+  
   useEffect(() => {
+    const sampleData = data?.last14DaysOrder || [];
     const labels = sampleData.map((item: any) => moment(item.date).format('DD/MM/YYYY'));
     const orderValues = sampleData.map((item: any) => item.amount);
     const revenueValues = (data?.last14DaysOrderValue || []).map((item: any) => item.amount);

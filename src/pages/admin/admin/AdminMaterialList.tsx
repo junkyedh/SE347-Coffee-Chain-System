@@ -6,7 +6,7 @@ import { useToast } from "@/components/common/Toast/Toast";
 import { AdminApiRequest } from "@/services/AdminApiRequest";
 import { DownloadOutlined } from "@ant-design/icons";
 import { Form, Modal, Space, Table, message } from "antd";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../adminPage.scss";
 
@@ -19,7 +19,7 @@ const AdminMaterialList = () => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
-  const fetchMaterialList = async () => {
+  const fetchMaterialList = useCallback(async () => {
     try {
       setLoading(true);
       const res = await AdminApiRequest.get("/material/list");
@@ -30,11 +30,11 @@ const AdminMaterialList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchMaterialList();
-  }, []);
+  }, [fetchMaterialList]);
 
   const exportExcel = () => {
     const exportData = materialList.map((material) => ({
@@ -148,7 +148,7 @@ const AdminMaterialList = () => {
     if (!searchKeyword.trim()) {
       fetchMaterialList();
     }
-  }, [searchKeyword]);
+  }, [searchKeyword, fetchMaterialList]);
 
   return (
     <div className="container-fluid">
@@ -239,6 +239,7 @@ const AdminMaterialList = () => {
         className="custom-table"
         rowKey="id"
         dataSource={materialList}
+        loading={loading}
         pagination={{
           pageSize: 9,
           showSizeChanger: true,

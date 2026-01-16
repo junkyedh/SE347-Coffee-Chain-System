@@ -1,16 +1,12 @@
 import SearchInput from '@/components/common/SearchInput/SearchInput';
 import { MainApiRequest } from '@/services/MainApiRequest';
-import { Form, message, Table } from 'antd';
+import { message, Table } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import '../adminPage.scss';
 
 const StaffList = () => {
-  const [form] = Form.useForm();
   const [staffList, setStaffList] = useState<any[]>([]);
-
-  const [openCreateStaffModal, setOpenCreateStaffModal] = useState(false);
-  const [editingStaff, setEditingStaff] = useState<any | null>(null);
 
   const fetchStaffList = async () => {
     try {
@@ -25,44 +21,6 @@ const StaffList = () => {
   useEffect(() => {
     fetchStaffList();
   }, []);
-
-  const onOpenCreateStaffModal = () => {
-    setEditingStaff(null);
-    form.setFieldsValue({});
-    setOpenCreateStaffModal(true);
-  };
-
-  const onOKCreateStaff = async () => {
-    try {
-      const data = form.getFieldsValue();
-      data.name = data.name || '';
-      data.gender = data.gender || '';
-      data.birth = data.birth ? data.birth.format('YYYY-MM-DD') : null;
-      data.startDate = moment().format('YYYY-MM-DD');
-      data.typeStaff = data.typeStaff || 'Nhân viên phục vụ';
-      data.workHours = data.workHours || 8;
-      data.activestatus = true;
-      data.roleid = 2;
-      data.password = editingStaff ? editingStaff.password : 'default123';
-
-      console.log('Dữ liệu gửi:', data);
-
-      if (editingStaff) {
-        const { ...rest } = data;
-        await MainApiRequest.put(`/staff/${editingStaff.id}`, rest);
-      } else {
-        await MainApiRequest.post('/staff', data);
-      }
-      console.log(data);
-      fetchStaffList();
-      setOpenCreateStaffModal(false);
-      form.resetFields();
-      setEditingStaff(null);
-    } catch (error) {
-      console.error('Error creating/updating staff:', error);
-      message.error('Failed to create staff. Please try again.');
-    }
-  };
 
   const [searchKeyword, setSearchKeyword] = useState('');
   const handleSearchKeyword = () => {

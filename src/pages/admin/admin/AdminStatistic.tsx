@@ -9,14 +9,14 @@ import Revenue30Days from '@/components/Statistic/Revenue30Days';
 import Top5Drinks from '@/components/Statistic/Top5Drinks';
 import TopBranchRevenue from '@/components/Statistic/TopBranchRevenue';
 import { MainApiRequest } from '@/services/MainApiRequest';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import '../Statistic.scss';
 
 const Statistic: React.FC = () => {
   const [chartData, setChartData] = useState<any>({});
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const res = await MainApiRequest.get('/report/system');
     setChartData(res.data);
 
@@ -48,12 +48,12 @@ const Statistic: React.FC = () => {
     if (res.data.totalBranch && totalBranch) {
       totalBranch.innerText = res.data.totalBranch;
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
     console.log(chartData);
-  }, []);
+  }, [fetchData, chartData]);
 
   return (
     <div className="container-fluid">

@@ -10,20 +10,6 @@ import './AdminMenu.scss';
 
 const categories = ['All', 'Cà phê', 'Trà trái cây', 'Trà sữa', 'Nước ép', 'Bánh ngọt'];
 
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  image: string;
-  available: boolean;
-  hot: boolean;
-  cold: boolean;
-  sizes: {
-    sizeName: string;
-    price: number;
-  }[];
-}
-
 interface Coupon {
   id: number;
   code: string;
@@ -42,8 +28,8 @@ interface Coupon {
 const AdminMenu = () => {
   const [menuList, setMenuList] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [search, setSearch] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [search] = useState<string>('');
+  const [, setLoading] = useState<boolean>(false);
   const [order, setOrder] = useState<{
     [key: string]: { size: string; mood: string; quantity: number; price: number };
   }>({});

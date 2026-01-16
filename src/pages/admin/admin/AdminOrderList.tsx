@@ -5,7 +5,7 @@ import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { DownloadOutlined } from '@ant-design/icons';
 import { message, Table, Tag } from 'antd';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import '../adminPage.scss';
 
@@ -16,7 +16,7 @@ export const AdminOrderList = () => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
-  const fetchAdminOrderList = async () => {
+  const fetchAdminOrderList = useCallback(async () => {
     try {
       setLoading(true);
       const res = await AdminApiRequest.get('/order/list');
@@ -28,11 +28,7 @@ export const AdminOrderList = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchAdminOrderList();
-  }, []);
+  }, [toast]);
 
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();
@@ -54,7 +50,11 @@ export const AdminOrderList = () => {
     if (!searchKeyword.trim()) {
       fetchAdminOrderList();
     }
-  }, [searchKeyword]);
+  }, [searchKeyword, fetchAdminOrderList]);
+
+    useEffect(() => {
+    fetchAdminOrderList();
+  }, [fetchAdminOrderList]);
 
   const handleExportAdminOrderList = () => {
     const worksheet = XLSX.utils.json_to_sheet(
@@ -109,6 +109,7 @@ export const AdminOrderList = () => {
               variant="primary"
               icon={<DownloadOutlined />}
               onClick={handleExportAdminOrderList}
+              loading={loading}
             />
           </div>
         </div>

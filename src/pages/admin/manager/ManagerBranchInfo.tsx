@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Descriptions, Spin, message, Button, Modal, Form, Input, Tag } from 'antd';
 import moment from 'moment';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
@@ -12,7 +12,7 @@ const ManagerBranchInfo = () => {
   const [form] = Form.useForm();
   const { branchId } = useSystemContext();
 
-  const fetchBranchInfo = async () => {
+  const fetchBranchInfo = useCallback(async () => {
     if (!branchId) return;
 
     setLoading(true);
@@ -25,7 +25,7 @@ const ManagerBranchInfo = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [branchId]);
 
   const handleEdit = () => {
     form.setFieldsValue({
@@ -51,7 +51,7 @@ const ManagerBranchInfo = () => {
 
   useEffect(() => {
     fetchBranchInfo();
-  }, [branchId]);
+  }, [branchId, fetchBranchInfo]);
 
   return (
     <div className="container-fluid">

@@ -302,17 +302,19 @@ const handleLogout = () => {
                   !subRoute.roles.includes(localStorage.getItem("role") || "")
                 )
                   return null;
+                
+                // Check if subRoute.link is absolute path (starts with '/') or relative
+                const subRouteUrl = subRoute.link?.startsWith('/') 
+                  ? subRoute.link 
+                  : `${route.link}/${subRoute.link}`;
+                
                 return (
                   <li key={subIndex} className="side-item">
                     <Link
-                      to={`${route.link}/${subRoute.link}`}
-                      // THÊM TITLE Ở ĐÂY CHO SUB MENU
+                      to={subRouteUrl}
                       title={subRoute.title}
                       className={`side-link ${
-                        comparePathname(
-                          `${route.link}/${subRoute.link}`,
-                          currentPath
-                        )
+                        comparePathname(subRouteUrl, currentPath)
                           ? "side-link-active"
                           : ""
                       }`}
@@ -322,10 +324,7 @@ const handleLogout = () => {
                       </span>
                       <span
                         className={`title ${
-                          comparePathname(
-                            `${route.link}/${subRoute.link}`,
-                            currentPath
-                          )
+                          comparePathname(subRouteUrl, currentPath)
                             ? "title-active"
                             : ""
                         }`}
@@ -396,7 +395,7 @@ const handleLogout = () => {
         {/* THÊM TITLE VÀO NÚT LOGOUT */}
         <button className="logout-box" onClick={handleLogout} title="Đăng xuất">
           <i className="fa-solid fa-sign-out"></i>
-          <span className="logout-text">LOG OUT</span>
+          <span className="logout-text">ĐĂNG XUẤT</span>
         </button>
       </div>
     </>

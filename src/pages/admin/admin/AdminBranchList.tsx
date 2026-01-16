@@ -258,7 +258,7 @@ const AdminBranchList = () => {
             render: (manager: any) => manager?.name || '---',
           },
           {
-            title: 'Actions',
+            title: 'Hành động',
             key: 'actions',
             render: (text, record) => (
               <Space size="middle">

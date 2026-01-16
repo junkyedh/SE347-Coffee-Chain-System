@@ -15,9 +15,8 @@ ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearS
 const DrinkChart = ({ data }: { data: any }) => {
   const [chartData, setChartData] = useState<any>(null);
 
-  const sampleData = data?.salesByCategory || [];
-
   useEffect(() => {
+    const sampleData = data?.salesByCategory || [];
     const labels = sampleData.map((item: any) => item.category);
     const values = sampleData.map((item: any) => item.amount);
 

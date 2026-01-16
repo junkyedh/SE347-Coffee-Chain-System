@@ -86,25 +86,6 @@ export const OrderList = () => {
     }
   };
 
-  const handleCancelOrder = async (id: number) => {
-    const staffName = staffInput[id] || managerOrderList.find((o) => o.id === id)?.staffName || '';
-    if (!staffName) {
-      message.warning('Vui lòng nhập tên nhân viên trước khi hủy!');
-      return;
-    }
-    try {
-      await AdminApiRequest.put(`/branch-order/status/${id}`, {
-        status: 'Đã hủy',
-        staffName,
-      });
-      message.success('Đơn hàng đã được hủy.');
-      fetchManagerOrderList();
-      setStaffInput((prev) => ({ ...prev, [id]: '' }));
-    } catch (error) {
-      message.error('Không thể hủy đơn hàng.');
-    }
-  };
-
   const handleUpdatePaymentStatus = async (orderId: number, newStatus: string) => {
     try {
       await AdminApiRequest.put(`/order/${orderId}`, {

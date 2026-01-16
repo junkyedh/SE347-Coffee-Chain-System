@@ -1,7 +1,6 @@
-import React from 'react';
-import { forwardRef } from 'react';
-import './Card.scss';
 import { cn } from '@/modules/utils';
+import React, { forwardRef } from 'react';
+import './Card.scss';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'flat' | 'glass' | 'primary' | 'accent';
@@ -41,8 +40,10 @@ const CardHeader = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
 CardHeader.displayName = 'CardHeader';
 
 const CardTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn('card-title', className)} {...props} />
+  ({ className, children, ...props }, ref) => (
+    <h3 ref={ref} className={cn('card-title', className)} {...props}>
+      {children}
+    </h3>
   )
 );
 CardTitle.displayName = 'CardTitle';
@@ -72,4 +73,4 @@ export const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes
   ({ className, ...props }, ref) => <div ref={ref} className={cn('p-4', className)} {...props} />
 );
 
-export { Card, CardHeader, CardTitle, CardSubtitle, CardBody, CardFooter };
+export { Card, CardBody, CardFooter, CardHeader, CardSubtitle, CardTitle };

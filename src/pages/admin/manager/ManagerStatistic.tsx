@@ -1,5 +1,5 @@
 import { MainApiRequest } from '@/services/MainApiRequest';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import '../Statistic.scss';
 import { useSystemContext } from '@/hooks/useSystemContext';
@@ -16,7 +16,7 @@ const ManagerStatistic: React.FC = () => {
   const [chartData, setChartData] = useState<any>({});
   const { branchId } = useSystemContext();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (!branchId) return;
 
@@ -46,12 +46,12 @@ const ManagerStatistic: React.FC = () => {
     } catch (error) {
       console.error('Error fetching branch report:', error);
     }
-  };
+  }, [branchId]);
 
   useEffect(() => {
     fetchData();
-  }, []);
-
+  }, [fetchData]);
+  
   return (
     <div className="container-fluid">
       <div className="sticky-header-wrapper">

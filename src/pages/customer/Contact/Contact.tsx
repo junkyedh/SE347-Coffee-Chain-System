@@ -48,14 +48,14 @@ const Contact = () => {
                     Gọi cho chúng tôi để được hỗ trợ nhanh chóng và hiệu quả.
                   </p>
                   <div className="d-block justify-content-between">
-                    <a type="button" className="btn btn-light me-2 btn-sm">
+                    <button type="button" className="btn btn-light me-2 btn-sm">
                       <i className="bi bi-phone me-1"></i>
                       +84 336126905
-                    </a>
-                    <a type="button" className="btn btn-light me-2 btn-sm">
+                    </button>
+                    <button type="button" className="btn btn-light me-2 btn-sm">
                       <i className="bi bi-telephone me-1"></i>
                       +84 336126905
-                    </a>
+                    </button>
                   </div>
                 </Card.Body>
               </Card>
@@ -74,10 +74,10 @@ const Contact = () => {
                     Gửi email cho chúng tôi để nhận được phản hồi chi tiết và đầy đủ nhất.
                   </p>
                   <div className="d-block justify-content-between">
-                    <a type="button" className="btn btn-light me-2 btn-sm">
+                    <button type="button" className="btn btn-light me-2 btn-sm">
                       <i className="bi bi-envelope me-2"></i>
                       anhhan@gmail.com
-                    </a>
+                    </button>
                   </div>
                 </Card.Body>
               </Card>

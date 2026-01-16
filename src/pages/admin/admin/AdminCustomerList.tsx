@@ -17,7 +17,7 @@ const AdminCustomerList = () => {
   const [openCreateCustomerModal, setOpenCreateCustomerModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<any | null>(null);
   const [form] = Form.useForm();
-  const { success, error, loading } = useToast();
+  const { success } = useToast();
 
   const fetchCustomerList = async () => {
     try {

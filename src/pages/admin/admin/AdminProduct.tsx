@@ -28,17 +28,6 @@ type ProductSize = {
   sizeName: string;
   price: number;
 };
-type Product = {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  upsize?: number;
-  image?: string;
-  mood?: string;
-  available: boolean;
-  sizes?: ProductSize[];
-};
 
 type UploadRequestOption = Parameters<GetProp<UploadProps, "customRequest">>[0];
 
@@ -50,24 +39,10 @@ const AdminProductList = () => {
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [fileList, setFileList] = useState<any[]>([]);
   const [imageUrl, setImageUrl] = useState<string>("");
-  const selectedCategory = Form.useWatch("category", form);
-  const [filteredProductList, setFilteredProductList] = useState<Product[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [materials, setMaterials] = useState<{ id: number; name: string }[]>(
     []
   );
-
-  useEffect(() => {
-    if (selectedCategory) {
-      const filtered = products.filter(
-        (product) => product.category === selectedCategory
-      );
-      setFilteredProductList(filtered);
-    } else {
-      setFilteredProductList(products);
-    }
-  }, [selectedCategory, products]);
 
   const fetchAdminProductList = async () => {
     const res = await AdminApiRequest.get("/product/list");
@@ -76,6 +51,7 @@ const AdminProductList = () => {
   useEffect(() => {
     fetchAdminProductList();
   }, []);
+
   useEffect(() => {
     const fetchMaterials = async () => {
       const res = await AdminApiRequest.get("/material/list");
@@ -99,6 +75,7 @@ const AdminProductList = () => {
         onProgress && onProgress({ percent });
       },
     };
+    
     fmData.append("file", file);
     try {
       const res = await AdminApiRequest.post("/file/upload", fmData, config);

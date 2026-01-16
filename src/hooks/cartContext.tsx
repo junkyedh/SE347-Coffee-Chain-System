@@ -175,8 +175,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
     }
 
-    const phoneCustomer = userInfo.phone;
-
     // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
     const productIdNumber = Number(productId);
     const existingItem = cart.find(
@@ -189,20 +187,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await updateItem(existingItem.id, { quantity: existingItem.quantity + quantity });
       return;
     }
-    // Nếu chưa có, thêm mới
-    const payload: any = {
-      productId: productIdNumber,
-      size,
-      mood,
-      quantity,
-      phoneCustomer,
-    };
-
-    const response = await MainApiRequest.post('/cart', payload).catch((err) => {
-      console.error('Add to cart failed', err.response?.data || err);
-      throw err;
-    });
-    await fetchCart();
   };
 
   // Cập nhật sản phẩm trong giỏ hàng
@@ -282,7 +266,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     fetchCart();
-  }, []);
+  }, [fetchCart]);
 
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
   const totalPrice = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);

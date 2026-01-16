@@ -35,7 +35,6 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
   onSelectSize,
   onSelectMood,
   onAddToOrder,
-  isCurrentProduct,
   cartQuantity,
 }) => {
   const isCake = product.category === 'Bánh ngọt';

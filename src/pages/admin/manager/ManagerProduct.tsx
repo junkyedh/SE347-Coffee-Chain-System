@@ -48,8 +48,8 @@ const ManagerProductList = () => {
   const [fileList, setFileList] = useState<any[]>([]);
   const [imageUrl, setImageUrl] = useState<string>('');
   const selectedCategory = Form.useWatch('category', form);
-  const [filteredProductList, setFilteredProductList] = useState<Product[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [, setFilteredProductList] = useState<Product[]>([]);
+  const [products] = useState<Product[]>([]);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
 
   useEffect(() => {

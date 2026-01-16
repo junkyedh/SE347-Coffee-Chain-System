@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useSystemContext } from '@/hooks/useSystemContext';
-import { FaPhoneAlt, FaLock } from 'react-icons/fa';
 import { ROUTES } from '@/constants';
-import './AdminLogin.scss';
+import { useSystemContext } from '@/hooks/useSystemContext';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { message } from 'antd';
+import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { FaLock, FaPhoneAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import './AdminLogin.scss';
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
-  const { setAuth, logout } = useSystemContext();
+  const { setAuth } = useSystemContext();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
@@ -32,7 +32,7 @@ const AdminLogin: React.FC = () => {
           // setAuth will handle storing token properly
           setAuth(token, role);
           message.success('Đăng nhập thành công!');
-          
+
           // Navigate based on role
           switch (role) {
             case 'ADMIN_SYSTEM':
@@ -68,7 +68,6 @@ const AdminLogin: React.FC = () => {
         <div className="text-center mb-3 mt-2">
           <span className="text-muted">Dành cho quản trị viên, nhân viên, quản lý chi nhánh</span>
         </div>
-
 
         <form method="POST" className="needs-validation">
           <div className="my-3">
@@ -108,6 +107,7 @@ const AdminLogin: React.FC = () => {
                 id="remember"
                 className="form-check-input"
                 onChange={(e) => setRemember(e.target.checked)}
+                checked={remember}
               />
               <label htmlFor="remember" className="form-check-label ms-2 mt-1">
                 Ghi nhớ đăng nhập

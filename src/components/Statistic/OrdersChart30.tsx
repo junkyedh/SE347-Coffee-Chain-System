@@ -15,9 +15,9 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const OrdersChart30 = ({ data }: { data: any }) => {
   const [chartData, setChartData] = useState<any>(null);
-  const sampleData = data?.last30DaysOrder || [];
-
+  
   useEffect(() => {
+    const sampleData = data?.last30DaysOrder || [];
     if (sampleData.length > 0) {
       const labels = sampleData.map((item: any) => moment(item.date).format('DD/MM/YYYY'));
       const values = sampleData.map((item: any) => item.amount);
@@ -35,7 +35,7 @@ const OrdersChart30 = ({ data }: { data: any }) => {
         ],
       });
     }
-  }, [sampleData]);
+  }, [data]);
 
   return (
     <div className="chart">

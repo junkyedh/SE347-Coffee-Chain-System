@@ -17,9 +17,9 @@ ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, T
 const Revenue14Days = ({ data }: { data: any }) => {
   const [chartData, setChartData] = useState<any>(null);
 
-  const sampleData = data?.last14DaysOrderValue || [];
-
+  
   useEffect(() => {
+    const sampleData = data?.last14DaysOrderValue || [];
     const labels = sampleData.map((item: any) => moment(item.date).format('DD/MM/YYYY'));
     const values = sampleData.map((item: any) => item.amount);
 

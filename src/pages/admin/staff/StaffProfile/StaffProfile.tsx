@@ -21,7 +21,7 @@ const staffId = decoded?.id;
 const StaffProfile = () => {
   const [form] = Form.useForm();
   const [staff, setStaff] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [branchName, setBranchName] = useState<string | null>(null);
 

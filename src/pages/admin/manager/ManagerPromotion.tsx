@@ -1,10 +1,11 @@
-import { Form, Input, message, Modal, Table, Tag } from 'antd';
+import { Form, Input, message, Modal, Space, Table, Tag } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import '../adminPage.scss';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
 import AdminButton from '@/components/admin/AdminButton/AdminButton';
+import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
 
 const ManagerPromotion = () => {
   const [promoteForm] = Form.useForm();
@@ -77,7 +78,7 @@ const ManagerPromotion = () => {
     }
   };
 
-  const onOpenCreatePromoteModal = (record: any = null) => {
+  const onOpenCreatePromote = (record: any = null) => {
     setEditPromote(record);
     if (record) {
       promoteForm.setFieldsValue({
@@ -153,7 +154,7 @@ const ManagerPromotion = () => {
   };
 
   //Các hàm xử lý cho Coupon
-  const onOpenCreateCouponModal = (record: any = null) => {
+  const onOpenCreateCoupon = (record: any = null) => {
     setEditCoupon(record);
     if (record) {
       couponForm.setFieldsValue(record);
@@ -341,6 +342,14 @@ const ManagerPromotion = () => {
       {/* Danh sách Khuyến mãi và Coupon */}
       <div className="d-flex me-2 align-items-center">
         <h4 className="h4 mt-3">Danh sách Khuyến mãi</h4>
+        <div className='d-flex'>
+          <AdminButton
+            variant="primary"
+            size="sm"
+            icon={<i className="fas fa-plus"></i>}
+            onClick={() => onOpenCreatePromote()}
+          ></AdminButton>
+        </div>
       </div>
 
       <Table
@@ -379,11 +388,44 @@ const ManagerPromotion = () => {
             key: 'endAt',
             render: (endAt: string) => moment(endAt).format('YYYY-MM-DD HH:mm:ss'),
           },
+          { title: 'Hành động', key: 'action', render: (_: any, record: any) => (
+              <div className="d-flex align-items-center gap-2">
+                <Space size="middle">
+                  <AdminButton
+                    variant="secondary"
+                    size="sm"
+                    icon={<i className="fas fa-edit"></i>}
+                    onClick={() => onOpenEditPromote(record)}
+                  ></AdminButton>
+                  <AdminPopConfirm
+                    title="Bạn có chắc chắn muốn xóa khuyến mãi này?"
+                    onConfirm={() => onDeletePromote(record.id)}
+                    okText="Đồng ý"
+                    cancelText="Hủy"
+                  >
+                    <AdminButton
+                      variant="destructive"
+                      size='sm'
+                      icon={<i className="fas fa-trash-alt"></i>}
+                    ></AdminButton>
+                  </AdminPopConfirm>
+                </Space>
+              </div>
+            )
+          },
         ]}
       />
 
       <div className="d-flex me-2 align-items-center">
         <h4 className="h4">Danh sách Coupon</h4>
+        <div className='d-flex'>
+          <AdminButton
+            variant="primary"
+            size="sm"
+            icon={<i className="fas fa-plus"></i>}
+            onClick={() => onOpenCreateCoupon()}
+          ></AdminButton>
+        </div>
       </div>
       <Table
         className="custom-table"
@@ -410,6 +452,31 @@ const ManagerPromotion = () => {
             },
           },
           { title: 'Mã Code', dataIndex: 'code', key: 'code' },
+          { title: 'Hành động', key: 'action', render: (_: any, record: any) => (
+              <div className="d-flex align-items-center gap-2">
+                <Space size="middle">
+                  <AdminButton
+                    variant="secondary"
+                    size="sm"
+                    icon={<i className="fas fa-edit"></i>}
+                    onClick={() => onOpenEditCoupon(record)}
+                  ></AdminButton>
+                  <AdminPopConfirm
+                    title="Bạn có chắc chắn muốn xóa coupon này?"
+                    onConfirm={() => onDeleteCoupon(record.id)}
+                    okText="Đồng ý"
+                    cancelText="Hủy"
+                  >
+                    <AdminButton
+                      variant="destructive"
+                      size='sm'
+                      icon={<i className="fas fa-trash-alt"></i>}
+                    ></AdminButton>
+                  </AdminPopConfirm>
+                </Space>
+              </div>
+            )
+          },
         ]}
       />
     </div>

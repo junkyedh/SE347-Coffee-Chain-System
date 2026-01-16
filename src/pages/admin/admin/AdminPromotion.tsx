@@ -388,7 +388,7 @@ const AdminPromotion = () => {
             render: (endAt: string) => moment(endAt).format('YYYY-MM-DD HH:mm:ss'),
           },
           {
-            title: 'Actions',
+            title: 'Hành động',
             key: 'actions',
             render: (text, record) => (
               <Space size="middle">
