@@ -1,6 +1,6 @@
-import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
-import { ROUTES } from '@/constants';
-import { AdminApiRequest } from '@/services/AdminApiRequest';
+import FloatingLabelInput from "@/components/common/FloatingInput/FloatingLabelInput";
+import { ROUTES } from "@/constants";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
 import {
   CoffeeOutlined,
   DeleteOutlined,
@@ -9,11 +9,11 @@ import {
   PlusOutlined,
   TableOutlined,
   UserOutlined,
-} from '@ant-design/icons';
-import { Button, Card, Form, message, Modal, Select, Tooltip } from 'antd';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './TableOrder.scss';
+} from "@ant-design/icons";
+import { Button, Card, Form, message, Modal, Select, Tooltip } from "antd";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./TableOrder.scss";
 
 const { Option } = Select;
 
@@ -21,7 +21,7 @@ const AdminTableOrder = () => {
   const [tableList, setTableList] = useState<any[]>([]);
   const [filteredTableList, setFilteredTableList] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedSeats, setSelectedSeats] = useState<string | number>('');
+  const [selectedSeats, setSelectedSeats] = useState<string | number>("");
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingTable, setEditingTable] = useState<any | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -33,11 +33,11 @@ const AdminTableOrder = () => {
   const fetchTableList = async () => {
     try {
       setLoading(true);
-      const res = await AdminApiRequest.get('/table/list');
+      const res = await AdminApiRequest.get("/table/list");
       setTableList(res.data);
       setFilteredTableList(res.data);
     } catch (error) {
-      message.error('Lấy danh sách bàn thất bại!');
+      message.error("Lấy danh sách bàn thất bại!");
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,9 @@ const AdminTableOrder = () => {
   const handleFilterChange = (value: string | number) => {
     setSelectedSeats(value);
     if (value) {
-      const filtered = tableList.filter((table) => table.seat.toString() === value);
+      const filtered = tableList.filter(
+        (table) => table.seat.toString() === value,
+      );
       setFilteredTableList(filtered);
     } else {
       setFilteredTableList(tableList);
@@ -70,22 +72,25 @@ const AdminTableOrder = () => {
   const handleSubmit = async (values: any) => {
     try {
       const { status, seat } = values;
-      await AdminApiRequest.post('/table', { status, seat });
-      message.success('Bàn đã được thêm thành công!');
+      await AdminApiRequest.post("/table", { status, seat });
+      message.success("Bàn đã được thêm thành công!");
       setIsModalVisible(false);
       form.resetFields();
       fetchTableList();
     } catch (error) {
-      message.error('Có lỗi xảy ra khi thêm bàn!');
-      console.error('Error adding table:', error);
+      message.error("Có lỗi xảy ra khi thêm bàn!");
+      console.error("Error adding table:", error);
     }
   };
 
-  const handleChooseProduct = async (table: any, serviceType: 'Dine In' | 'Take Away') => {
+  const handleChooseProduct = async (
+    table: any,
+    serviceType: "Dine In" | "Take Away",
+  ) => {
     const navigationState = {
       serviceType,
-      tableId: serviceType === 'Dine In' ? table?.id : null,
-      tableName: table?.id ? `Bàn ${table.id}` : 'Mang đi',
+      tableId: serviceType === "Dine In" ? table?.id : null,
+      tableName: table?.id ? `Bàn ${table.id}` : "Mang đi",
       phoneCustomer: table?.phoneOrder || null, // Nếu bàn đã đặt thì có sđt
       customerName: table?.name || null,
       tableSeats: table?.seat || 0,
@@ -98,11 +103,13 @@ const AdminTableOrder = () => {
   const handleViewActiveOrder = async (table: any) => {
     try {
       setLoading(true);
-      const res = await AdminApiRequest.get('branch-order/list');
+      const res = await AdminApiRequest.get("branch-order/list");
       const activeOrders = res.data.filter(
         (order: any) =>
           order.tableId === table.id &&
-          ['Chờ xác nhận', 'Đang chuẩn bị', 'Sẵn sàng', 'Đang giao'].includes(order.status)
+          ["Chờ xác nhận", "Đang chuẩn bị", "Sẵn sàng", "Đang giao"].includes(
+            order.status,
+          ),
       );
 
       if (activeOrders) {
@@ -112,14 +119,14 @@ const AdminTableOrder = () => {
             isNewOrder: false,
             tableId: table.id,
             tableName: `Bàn ${table.id}`,
-            serviceType: 'Dine In',
+            serviceType: "Dine In",
           },
         });
       } else {
-        message.error('Không tìm thấy đơn hàng của bàn này.');
+        message.error("Không tìm thấy đơn hàng của bàn này.");
       }
     } catch (error) {
-      message.error('Có lỗi xảy ra khi lấy đơn hàng.');
+      message.error("Có lỗi xảy ra khi lấy đơn hàng.");
     } finally {
       setLoading(false);
     }
@@ -127,17 +134,17 @@ const AdminTableOrder = () => {
 
   const handleDeleteTable = (tableId: number) => {
     Modal.confirm({
-      title: 'Xác nhận xóa bàn',
-      content: 'Bạn có chắc chắn muốn xóa bàn này không?',
-      okText: 'Xóa',
-      cancelText: 'Hủy',
+      title: "Xác nhận xóa bàn",
+      content: "Bạn có chắc chắn muốn xóa bàn này không?",
+      okText: "Xóa",
+      cancelText: "Hủy",
       onOk: async () => {
         try {
           await AdminApiRequest.delete(`/table/${tableId}`);
-          message.success('Xóa bàn thành công!');
+          message.success("Xóa bàn thành công!");
           fetchTableList();
         } catch (error) {
-          message.error('Xóa bàn thất bại!');
+          message.error("Xóa bàn thất bại!");
         }
       },
     });
@@ -161,38 +168,38 @@ const AdminTableOrder = () => {
 
     try {
       await AdminApiRequest.put(`/table/${editingTable.id}`, values);
-      message.success('Cập nhật bàn thành công!');
+      message.success("Cập nhật bàn thành công!");
       setIsEditModalVisible(false);
       editForm.resetFields();
       setEditingTable(null);
       fetchTableList();
     } catch (error) {
-      console.error('Error updating table:', error);
-      message.error('Có lỗi xảy ra khi cập nhật bàn!');
+      console.error("Error updating table:", error);
+      message.error("Có lỗi xảy ra khi cập nhật bàn!");
     }
   };
 
   const getTableStatusColor = (status: string) => {
     switch (status) {
-      case 'Available':
-        return '#10b981';
-      case 'Reserved':
-        return '#f59e0b';
-      case 'Occupied':
-        return '#ef4444';
+      case "Available":
+        return "#10b981";
+      case "Reserved":
+        return "#f59e0b";
+      case "Occupied":
+        return "#ef4444";
       default:
-        return '#6b7280';
+        return "#6b7280";
     }
   };
 
   const getTableStatusText = (status: string) => {
     switch (status) {
-      case 'Available':
-        return 'Trống';
-      case 'Reserved':
-        return 'Đã đặt';
-      case 'Occupied':
-        return 'Đang sử dụng';
+      case "Available":
+        return "Trống";
+      case "Reserved":
+        return "Đã đặt";
+      case "Occupied":
+        return "Đang sử dụng";
       default:
         return status;
     }
@@ -200,14 +207,14 @@ const AdminTableOrder = () => {
 
   const getTableStatusIcon = (status: string) => {
     switch (status) {
-      case 'Available':
-        return '✓';
-      case 'Reserved':
-        return '⏰';
-      case 'Occupied':
-        return '👥';
+      case "Available":
+        return "✓";
+      case "Reserved":
+        return "⏰";
+      case "Occupied":
+        return "👥";
       default:
-        return '?';
+        return "?";
     }
   };
 
@@ -219,7 +226,9 @@ const AdminTableOrder = () => {
           <div className="title-section">
             <TableOutlined className="title-icon" />
             <h1 className="page-title">Table Management</h1>
-            <span className="subtitle">Manage restaurant tables and orders</span>
+            <span className="subtitle">
+              Manage restaurant tables and orders
+            </span>
           </div>
 
           <div className="header-actions">
@@ -244,7 +253,7 @@ const AdminTableOrder = () => {
               <Button
                 className="takeaway-btn"
                 icon={<CoffeeOutlined />}
-                onClick={() => handleChooseProduct(null, 'Take Away')}
+                onClick={() => handleChooseProduct(null, "Take Away")}
               >
                 Take Away
               </Button>
@@ -281,7 +290,9 @@ const AdminTableOrder = () => {
                 >
                   {getTableStatusIcon(table.status)}
                 </span>
-                <span className="status-text">{getTableStatusText(table.status)}</span>
+                <span className="status-text">
+                  {getTableStatusText(table.status)}
+                </span>
               </div>
             </div>
 
@@ -307,25 +318,28 @@ const AdminTableOrder = () => {
 
             <div className="table-actions">
               <div className="primary-actions">
-                {table.status === 'Available' && (
+                {table.status === "Available" && (
                   <Button
                     className="action-btn primary"
-                    onClick={() => handleChooseProduct(table, 'Dine In')}
+                    onClick={() => handleChooseProduct(table, "Dine In")}
                   >
                     Take Order
                   </Button>
                 )}
 
-                {table.status === 'Occupied' && (
-                  <Button className="action-btn info" onClick={() => handleViewActiveOrder(table)}>
+                {table.status === "Occupied" && (
+                  <Button
+                    className="action-btn info"
+                    onClick={() => handleViewActiveOrder(table)}
+                  >
                     View Order
                   </Button>
                 )}
 
-                {table.status === 'Reserved' && (
+                {table.status === "Reserved" && (
                   <Button
                     className="action-btn warning"
-                    onClick={() => handleChooseProduct(table, 'Dine In')}
+                    onClick={() => handleChooseProduct(table, "Dine In")}
                   >
                     Start Order
                   </Button>
@@ -360,7 +374,11 @@ const AdminTableOrder = () => {
             <TableOutlined className="empty-icon" />
             <h3>No Tables Found</h3>
             <p>Add your first table to get started</p>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleOpenModal}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleOpenModal}
+            >
               Add Table
             </Button>
           </div>
@@ -381,11 +399,13 @@ const AdminTableOrder = () => {
               label="Table Status"
               name="status"
               component="select"
-              rules={[{ required: true, message: 'Please select table status!' }]}
+              rules={[
+                { required: true, message: "Please select table status!" },
+              ]}
               options={[
-                { value: 'Available', label: 'Available' },
-                { value: 'Reserved', label: 'Reserved' },
-                { value: 'Occupied', label: 'Occupied' },
+                { value: "Available", label: "Available" },
+                { value: "Reserved", label: "Reserved" },
+                { value: "Occupied", label: "Occupied" },
               ]}
             />
 
@@ -394,7 +414,9 @@ const AdminTableOrder = () => {
               name="seat"
               component="input"
               type="number"
-              rules={[{ required: true, message: 'Please enter number of seats!' }]}
+              rules={[
+                { required: true, message: "Please enter number of seats!" },
+              ]}
               componentProps={{ min: 1 }}
             />
           </div>
@@ -428,11 +450,13 @@ const AdminTableOrder = () => {
               label="Table Status"
               name="status"
               component="select"
-              rules={[{ required: true, message: 'Please select table status!' }]}
+              rules={[
+                { required: true, message: "Please select table status!" },
+              ]}
               options={[
-                { value: 'Available', label: 'Available' },
-                { value: 'Reserved', label: 'Reserved' },
-                { value: 'Occupied', label: 'Occupied' },
+                { value: "Available", label: "Available" },
+                { value: "Reserved", label: "Reserved" },
+                { value: "Occupied", label: "Occupied" },
               ]}
             />
 
@@ -441,7 +465,9 @@ const AdminTableOrder = () => {
               name="seat"
               component="input"
               type="number"
-              rules={[{ required: true, message: 'Please enter number of seats!' }]}
+              rules={[
+                { required: true, message: "Please enter number of seats!" },
+              ]}
               componentProps={{ min: 1 }}
             />
           </div>
@@ -454,7 +480,12 @@ const AdminTableOrder = () => {
               type="text"
             />
 
-            <FloatingLabelInput label="Customer Name" name="name" component="input" type="text" />
+            <FloatingLabelInput
+              label="Customer Name"
+              name="name"
+              component="input"
+              type="text"
+            />
           </div>
 
           <div className="form-grid">
@@ -463,7 +494,7 @@ const AdminTableOrder = () => {
               name="bookingTime"
               component="input"
               type="text"
-              componentProps={{ placeholder: 'YYYY-MM-DD HH:mm:ss' }}
+              componentProps={{ placeholder: "YYYY-MM-DD HH:mm:ss" }}
             />
 
             <FloatingLabelInput
@@ -471,7 +502,7 @@ const AdminTableOrder = () => {
               name="seatingTime"
               component="input"
               type="text"
-              componentProps={{ placeholder: 'YYYY-MM-DD HH:mm:ss' }}
+              componentProps={{ placeholder: "YYYY-MM-DD HH:mm:ss" }}
             />
           </div>
 
