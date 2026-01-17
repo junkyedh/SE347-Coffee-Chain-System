@@ -225,9 +225,9 @@ const AdminTableOrder = () => {
         <div className="header-content">
           <div className="title-section">
             <TableOutlined className="title-icon" />
-            <h1 className="page-title">Table Management</h1>
+            <h1 className="page-title">Quản lý bàn</h1>
             <span className="subtitle">
-              Manage restaurant tables and orders
+              Quản lý bàn và quản lý đơn hàng
             </span>
           </div>
 
@@ -237,15 +237,15 @@ const AdminTableOrder = () => {
                 className="filter-select"
                 value={selectedSeats}
                 onChange={handleFilterChange}
-                placeholder="Filter by seats"
+                placeholder="Lọc theo chỗ ngồi"
                 allowClear
                 suffixIcon={<FilterOutlined />}
               >
-                <Option value="">All Tables</Option>
-                <Option value="2">2 Seats</Option>
-                <Option value="4">4 Seats</Option>
-                <Option value="6">6 Seats</Option>
-                <Option value="8">8 Seats</Option>
+                <Option value="">Tất cả bàn</Option>
+                <Option value="2">2 chỗ ngồi</Option>
+                <Option value="4">4 chỗ ngồi</Option>
+                <Option value="6">6 chỗ ngồi</Option>
+                <Option value="8">8 chỗ ngồi</Option>
               </Select>
             </div>
 
@@ -255,7 +255,7 @@ const AdminTableOrder = () => {
                 icon={<CoffeeOutlined />}
                 onClick={() => handleChooseProduct(null, "Take Away")}
               >
-                Take Away
+                Mang đi
               </Button>
               <Button
                 className="add-table-btn"
@@ -263,7 +263,7 @@ const AdminTableOrder = () => {
                 icon={<PlusOutlined />}
                 onClick={handleOpenModal}
               >
-                Add Table
+                Tạo bàn mới
               </Button>
             </div>
           </div>
@@ -280,7 +280,7 @@ const AdminTableOrder = () => {
           >
             <div className="table-card-header">
               <div className="table-number">
-                <span className="table-label">Table</span>
+                <span className="table-label">Bàn</span>
                 <span className="table-id">#{table.id}</span>
               </div>
               <div className="table-status">
@@ -299,18 +299,18 @@ const AdminTableOrder = () => {
             <div className="table-info">
               <div className="info-row">
                 <UserOutlined className="info-icon" />
-                <span className="info-label">Seats:</span>
+                <span className="info-label">Chỗ ngồi:</span>
                 <span className="info-value">{table.seat}</span>
               </div>
               {table.phoneOrder && (
                 <div className="info-row">
-                  <span className="info-label">Phone:</span>
+                  <span className="info-label">Số điện thoại:</span>
                   <span className="info-value">{table.phoneOrder}</span>
                 </div>
               )}
               {table.name && (
                 <div className="info-row">
-                  <span className="info-label">Customer:</span>
+                  <span className="info-label">Khách hàng:</span>
                   <span className="info-value">{table.name}</span>
                 </div>
               )}
@@ -323,7 +323,7 @@ const AdminTableOrder = () => {
                     className="action-btn primary"
                     onClick={() => handleChooseProduct(table, "Dine In")}
                   >
-                    Take Order
+                    Nhận đơn
                   </Button>
                 )}
 
@@ -332,7 +332,7 @@ const AdminTableOrder = () => {
                     className="action-btn info"
                     onClick={() => handleViewActiveOrder(table)}
                   >
-                    View Order
+                    Xem đơn hàng
                   </Button>
                 )}
 
@@ -341,13 +341,13 @@ const AdminTableOrder = () => {
                     className="action-btn warning"
                     onClick={() => handleChooseProduct(table, "Dine In")}
                   >
-                    Start Order
+                    Bắt đầu đơn hàng
                   </Button>
                 )}
               </div>
 
               <div className="secondary-actions">
-                <Tooltip title="Edit Table">
+                <Tooltip title="Chỉnh sửa bàn">
                   <Button
                     className="icon-btn edit"
                     icon={<EditOutlined />}
@@ -355,7 +355,7 @@ const AdminTableOrder = () => {
                   />
                 </Tooltip>
 
-                <Tooltip title="Delete Table">
+                <Tooltip title="Xóa bàn">
                   <Button
                     className="icon-btn delete"
                     icon={<DeleteOutlined />}
@@ -372,14 +372,14 @@ const AdminTableOrder = () => {
         {filteredTableList.length === 0 && !loading && (
           <div className="empty-state">
             <TableOutlined className="empty-icon" />
-            <h3>No Tables Found</h3>
-            <p>Add your first table to get started</p>
+            <h3>Không tìm thấy bàn</h3>
+            <p>Tạo bàn mới để bắt đầu</p>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={handleOpenModal}
             >
-              Add Table
+              Thêm bàn
             </Button>
           </div>
         )}
@@ -388,7 +388,7 @@ const AdminTableOrder = () => {
       {/* Add Table Modal */}
       <Modal
         className="modern-modal"
-        title="Add New Table"
+        title="Thêm bàn mới"
         open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
@@ -396,26 +396,26 @@ const AdminTableOrder = () => {
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <div className="form-grid">
             <FloatingLabelInput
-              label="Table Status"
+              label="Trạng thái bàn"
               name="status"
               component="select"
               rules={[
-                { required: true, message: "Please select table status!" },
+                { required: true, message: "Vui lòng chọn trạng thái của bàn!" },
               ]}
               options={[
-                { value: "Available", label: "Available" },
-                { value: "Reserved", label: "Reserved" },
-                { value: "Occupied", label: "Occupied" },
+                { value: "Available", label: "Còn trống" },
+                { value: "Reserved", label: "Đã được đặt" },
+                { value: "Occupied", label: "Không còn trống" },
               ]}
             />
 
             <FloatingLabelInput
-              label="Number of Seats"
+              label="Số lượng chỗ ngồi"
               name="seat"
               component="input"
               type="number"
               rules={[
-                { required: true, message: "Please enter number of seats!" },
+                { required: true, message: "Vui lòng nhập số lượng chỗ ngồi!" },
               ]}
               componentProps={{ min: 1 }}
             />
@@ -423,10 +423,10 @@ const AdminTableOrder = () => {
 
           <div className="modal-footer">
             <Button className="cancel-btn" onClick={handleCancel}>
-              Cancel
+              Hủy
             </Button>
-            <Button className="submit-btn" htmlType="submit">
-              Add Table
+            <Button className="" htmlType="submit">
+              Thêm bàn
             </Button>
           </div>
         </Form>
@@ -435,7 +435,7 @@ const AdminTableOrder = () => {
       {/* Edit Table Modal */}
       <Modal
         className="modern-modal"
-        title="Edit Table Information"
+        title="Chỉnh sửa thông tin bàn"
         open={isEditModalVisible}
         onCancel={() => {
           setIsEditModalVisible(false);
@@ -447,21 +447,21 @@ const AdminTableOrder = () => {
         <Form form={editForm} layout="vertical" onFinish={handleSaveTable}>
           <div className="form-grid">
             <FloatingLabelInput
-              label="Table Status"
+              label="Trạng thái bàn"
               name="status"
               component="select"
               rules={[
-                { required: true, message: "Please select table status!" },
+                { required: true, message: "Vui lòng chọn trạng thái bàn!" },
               ]}
               options={[
-                { value: "Available", label: "Available" },
-                { value: "Reserved", label: "Reserved" },
-                { value: "Occupied", label: "Occupied" },
+                { value: "Available", label: "Còn trống" },
+                { value: "Reserved", label: "Đã được đặt" },
+                { value: "Occupied", label: "Không còn trống" },
               ]}
             />
 
             <FloatingLabelInput
-              label="Number of Seats"
+              label="Số lượng chỗ  ngồi"
               name="seat"
               component="input"
               type="number"
@@ -474,14 +474,14 @@ const AdminTableOrder = () => {
 
           <div className="form-grid">
             <FloatingLabelInput
-              label="Phone Number"
+              label="Số điện thoại"
               name="phoneOrder"
               component="input"
               type="text"
             />
 
             <FloatingLabelInput
-              label="Customer Name"
+              label="Tên khách hàng"
               name="name"
               component="input"
               type="text"
@@ -490,7 +490,7 @@ const AdminTableOrder = () => {
 
           <div className="form-grid">
             <FloatingLabelInput
-              label="Booking Time"
+              label="Thời gian đặt"
               name="bookingTime"
               component="input"
               type="text"
@@ -498,7 +498,7 @@ const AdminTableOrder = () => {
             />
 
             <FloatingLabelInput
-              label="Seating Time"
+              label="Thời gian ngồi"
               name="seatingTime"
               component="input"
               type="text"
@@ -515,10 +515,10 @@ const AdminTableOrder = () => {
                 setEditingTable(null);
               }}
             >
-              Cancel
+              Hủy
             </Button>
-            <Button className="submit-btn" htmlType="submit">
-              Save Changes
+            <Button className="" htmlType="submit">
+              Lưu thay đổi
             </Button>
           </div>
         </Form>

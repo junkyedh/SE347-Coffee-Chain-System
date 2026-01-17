@@ -121,31 +121,31 @@ const Contact = () => {
             <Col xl="6" md="6">
               <Card className="bg-light p-4 border-0 shadow-sm">
                 <div className="form-box">
-                  <h1 className="h3 font-bold mb-4">Send us message</h1>
+                  <h1 className="h3 font-bold mb-4">Gửi phản hồi cho chúng tôi</h1>
                   <Form>
                     <Row>
                       <Col md="6">
-                        <FloatingLabel controlId="name" label="Full Name" className="mb-4">
-                          <Form.Control type="text" placeholder="Full Name" />
+                        <FloatingLabel controlId="name" label="Họ và tên" className="mb-4">
+                          <Form.Control type="text" placeholder="Họ và tên" />
                         </FloatingLabel>
                       </Col>
                       <Col md="6">
-                        <FloatingLabel controlId="email" label="Email address" className="mb-4">
+                        <FloatingLabel controlId="email" label="Địa chỉ email" className="mb-4">
                           <Form.Control type="email" placeholder="name@example.com" />
                         </FloatingLabel>
                       </Col>
 
                       <Col md="12">
-                        <FloatingLabel controlId="phone" label="Phone Number" className="mb-4">
-                          <Form.Control type="text" placeholder="Phone Number" />
+                        <FloatingLabel controlId="phone" label="Số điện thoại" className="mb-4">
+                          <Form.Control type="text" placeholder="Số điện thoại" />
                         </FloatingLabel>
                       </Col>
 
                       <Col md="12">
-                        <FloatingLabel controlId="message" label="Message">
+                        <FloatingLabel controlId="message" label="Lời nhắn">
                           <Form.Control
                             as="textarea"
-                            placeholder="Message"
+                            placeholder="Lời nhắn"
                             style={{ height: '126px' }}
                           />
                         </FloatingLabel>
@@ -153,7 +153,7 @@ const Contact = () => {
                     </Row>
                     <button className="primaryBtn mt-3" type="button">
                       {' '}
-                      Send Message
+                      Gửi
                     </button>
                   </Form>
                 </div>

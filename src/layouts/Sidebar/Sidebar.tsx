@@ -33,55 +33,55 @@ const Sidebar: React.FC = () => {
   if (role === "ADMIN_SYSTEM") {
     routes = [
       {
-        title: "THỐNG KÊ",
+        title: "Thống kê",
         link: ROUTES.ADMIN.STATISTICS,
         icon: "fa-solid fa-chart-line",
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "DANH SÁCH CHI NHÁNH",
+        title: "Danh sách chi nhánh",
         link: ROUTES.ADMIN.BRANCHES,
         icon: "fa-solid fa-building",
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "DANH SÁCH NGUYÊN LIỆU",
+        title: "Danh sách nguyên liệu",
         link: ROUTES.ADMIN.MATERIALS,
         icon: "fa-solid fa-boxes-stacked",
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "DANH SÁCH SẢN PHẨM",
+        title: "Danh sách sản phẩm",
         link: ROUTES.ADMIN.PRODUCTS,
         icon: "fa-solid fa-box",
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "DANH SÁCH ĐƠN HÀNG",
+        title: "Danh sách đơn hàng",
         link: ROUTES.ADMIN.ORDERS,
         icon: "fa-solid fa-receipt",
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "DANH SÁCH NHÂN VIÊN",
+        title: "Danh sách nhân viên",
         link: ROUTES.ADMIN.EMPLOYEES,
         icon: "fa-solid fa-users",
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "DANH SÁCH KHÁCH HÀNG",
+        title: "Danh sách khách hàng",
         link: ROUTES.ADMIN.CUSTOMERS,
         icon: "fa-solid fa-user",
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "KHUYẾN MÃI",
+        title: "Khuyễn mãi",
         link: ROUTES.ADMIN.PROMOTIONS,
         icon: "fa-solid fa-ticket",
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "ĐÁNH GIÁ",
+        title: "Đánh giá",
         link: ROUTES.ADMIN.RATINGS,
         icon: "fa-solid fa-star",
         roles: ["ADMIN_SYSTEM"],
@@ -153,7 +153,7 @@ const Sidebar: React.FC = () => {
   } else if (role === "STAFF") {
     routes = [
       {
-        title: "ĐẶT MÓN",
+        title: "Đặt món",
         link: "/nhan-vien/don-hang",
         icon: "fa-solid fa-cart-plus",
         roles: ["STAFF"],
