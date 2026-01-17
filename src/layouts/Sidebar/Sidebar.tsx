@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ROUTES } from "../../constants";
 import { useSystemContext } from "../../hooks/useSystemContext";
 import { comparePathname } from "../../utils/uri";
@@ -22,8 +22,6 @@ const Sidebar: React.FC = () => {
   const [openSubRoutes, setOpenSubRoutes] = useState<SubRoutesState>({});
   const location = useLocation();
   const { role } = useSystemContext();
-  const { logout } = useSystemContext();
-  const navigate = useNavigate();
 
   let routes: Route[] = [];
 
@@ -31,6 +29,7 @@ const Sidebar: React.FC = () => {
     setCurrentPath(location.pathname);
   }, [location]);
 
+  // --- (Giữ nguyên phần định nghĩa routes như cũ của bạn) ---
   if (role === "ADMIN_SYSTEM") {
     routes = [
       {
@@ -155,25 +154,25 @@ const Sidebar: React.FC = () => {
     routes = [
       {
         title: "ĐẶT MÓN",
-        link: ROUTES.STAFF.ROOT + "/don-hang",
+        link: "/nhan-vien/don-hang",
         icon: "fa-solid fa-cart-plus",
         roles: ["STAFF"],
         children: [
           {
             title: "Chọn bàn",
-            link: ROUTES.STAFF.ORDER_SELECT_TABLE,
+            link: "chon-ban",
             icon: "fa-solid fa-mug-saucer",
             roles: ["STAFF"],
           },
           {
             title: "Gọi món",
-            link: ROUTES.STAFF.ORDER_PLACE,
+            link: "dat-mon",
             icon: "fa-solid fa-cart-plus",
             roles: ["STAFF"],
           },
           {
             title: "Danh sách đơn hàng",
-            link: ROUTES.STAFF.ORDER_LIST,
+            link: "danh-sach-don-hang",
             icon: "fa-solid fa-receipt",
             roles: ["STAFF"],
           },
@@ -242,10 +241,13 @@ const Sidebar: React.FC = () => {
     }));
   };
 
-const handleLogout = () => {
-  logout();
-  navigate(ROUTES.ADMIN.LOGIN, { replace: true });
-};
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("isBrand");
+    window.location.href = ROUTES.ADMIN.LOGIN;
+  };
 
   const renderNavigationList = () => {
     return routes.map((route, index) => {
@@ -266,7 +268,7 @@ const handleLogout = () => {
           className={`side-item ${hasChildren ? "dropdown" : ""}`}
         >
           <Link
-            to={hasChildren ? "#" : route.link ?? "#"}
+            to={hasChildren ? "#" : (route.link ?? "#")}
             className={`side-link ${isActive ? "side-link-active" : ""}`}
             // THÊM TITLE Ở ĐÂY ĐỂ HIỆN TOOLTIP NATIVE
             title={route.title}
@@ -302,19 +304,17 @@ const handleLogout = () => {
                   !subRoute.roles.includes(localStorage.getItem("role") || "")
                 )
                   return null;
-                
-                // Check if subRoute.link is absolute path (starts with '/') or relative
-                const subRouteUrl = subRoute.link?.startsWith('/') 
-                  ? subRoute.link 
-                  : `${route.link}/${subRoute.link}`;
-                
                 return (
                   <li key={subIndex} className="side-item">
                     <Link
-                      to={subRouteUrl}
+                      to={`${route.link}/${subRoute.link}`}
+                      // THÊM TITLE Ở ĐÂY CHO SUB MENU
                       title={subRoute.title}
                       className={`side-link ${
-                        comparePathname(subRouteUrl, currentPath)
+                        comparePathname(
+                          `${route.link}/${subRoute.link}`,
+                          currentPath,
+                        )
                           ? "side-link-active"
                           : ""
                       }`}
@@ -324,7 +324,10 @@ const handleLogout = () => {
                       </span>
                       <span
                         className={`title ${
-                          comparePathname(subRouteUrl, currentPath)
+                          comparePathname(
+                            `${route.link}/${subRoute.link}`,
+                            currentPath,
+                          )
                             ? "title-active"
                             : ""
                         }`}
@@ -395,7 +398,7 @@ const handleLogout = () => {
         {/* THÊM TITLE VÀO NÚT LOGOUT */}
         <button className="logout-box" onClick={handleLogout} title="Đăng xuất">
           <i className="fa-solid fa-sign-out"></i>
-          <span className="logout-text">ĐĂNG XUẤT</span>
+          <span className="logout-text">Đăng xuất</span>
         </button>
       </div>
     </>

@@ -1,29 +1,29 @@
-import AdminButton from '@/components/admin/AdminButton/AdminButton';
-import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
-import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
-import SearchInput from '@/components/common/SearchInput/SearchInput';
-import { AdminApiRequest } from '@/services/AdminApiRequest';
-import { DownloadOutlined } from '@ant-design/icons';
-import { Form, message, Modal, Space, Table } from 'antd';
-import moment from 'moment';
-import { useEffect, useState } from 'react';
-import * as XLSX from 'xlsx';
-import '../adminPage.scss';
+import AdminButton from "@/components/admin/AdminButton/AdminButton";
+import AdminPopConfirm from "@/components/admin/PopConfirm/AdminPopConfirm";
+import FloatingLabelInput from "@/components/common/FloatingInput/FloatingLabelInput";
+import SearchInput from "@/components/common/SearchInput/SearchInput";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
+import { DownloadOutlined } from "@ant-design/icons";
+import { Form, message, Modal, Space, Table, Tag } from "antd";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import * as XLSX from "xlsx";
+import "../adminPage.scss";
 
 const CustomerList = () => {
   const [customerList, setCustomerList] = useState<any[]>([]);
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [openCreateCustomerModal, setOpenCreateCustomerModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<any | null>(null);
   const [form] = Form.useForm();
 
   const fetchCustomerList = async () => {
     try {
-      const res = await AdminApiRequest.get('/customer/list');
+      const res = await AdminApiRequest.get("/customer/list");
       setCustomerList(res.data);
     } catch (error) {
-      console.error('Error fetching customer list:', error);
-      message.error('Failed to fetch customer list.');
+      console.error("Error fetching customer list:", error);
+      message.error("Failed to fetch customer list.");
     }
   };
 
@@ -39,11 +39,15 @@ const CustomerList = () => {
     }
 
     const filtered = customerList.filter((customer) => {
-      const name = (customer.name ?? '').toLowerCase();
-      const id = String(customer.id ?? '').toLowerCase();
-      const phone = (customer.phone ?? '').toLowerCase();
+      const name = (customer.name ?? "").toLowerCase();
+      const id = String(customer.id ?? "").toLowerCase();
+      const phone = (customer.phone ?? "").toLowerCase();
 
-      return name.includes(keyword) || id.includes(keyword) || phone.includes(keyword);
+      return (
+        name.includes(keyword) ||
+        id.includes(keyword) ||
+        phone.includes(keyword)
+      );
     });
     setCustomerList(filtered);
   };
@@ -56,18 +60,19 @@ const CustomerList = () => {
   const exportExcel = () => {
     const exportData = customerList.map((customer) => ({
       ID: customer.id,
-      'Tên khách hàng': customer.name,
-      'Giới tính': customer.gender,
-      'Số điện thoại': customer.phone,
-      'Tổng tiền': customer.total,
-      'Ngày đăng ký': moment(customer.registrationDate).format('DD-MM-YYYY HH:mm:ss'),
-      'Hạng thành viên': customer.rank,
+      "Tên khách hàng": customer.name,
+      "Giới tính": customer.gender,
+      "Số điện thoại": customer.phone,
+      "Tổng tiền": customer.total,
+      "Ngày đăng ký": moment(customer.registrationDate).format(
+        "DD-MM-YYYY HH:mm:ss",
+      ),
+      "Hạng thành viên": customer.rank,
     }));
-
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'DanhSachKhachHang');
-    XLSX.writeFile(workbook, 'DanhSachKhachHang.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachKhachHang");
+    XLSX.writeFile(workbook, "DanhSachKhachHang.xlsx");
   };
 
   const onOpenCreateCustomerModal = (record: any = null) => {
@@ -81,7 +86,7 @@ const CustomerList = () => {
       form.setFieldsValue({
         registrationDate: moment(),
         total: 0,
-        image: 'https://via.placeholder.com/150',
+        image: "https://via.placeholder.com/150",
       });
       setEditingCustomer(null);
     }
@@ -101,15 +106,15 @@ const CustomerList = () => {
           address,
           image,
         });
-        message.success('Cập nhật khách hàng thành công!');
+        message.success("Cập nhật khách hàng thành công!");
       } else {
-        await AdminApiRequest.post('/customer', {
+        await AdminApiRequest.post("/customer", {
           ...data,
           total: 0,
-          image: data.image || 'https://via.placeholder.com/150',
-          rank: '',
+          image: data.image || "https://via.placeholder.com/150",
+          rank: "",
         });
-        message.success('Thêm khách hàng thành công!');
+        message.success("Thêm khách hàng thành công!");
       }
 
       fetchCustomerList();
@@ -117,8 +122,8 @@ const CustomerList = () => {
       form.resetFields();
       setEditingCustomer(null);
     } catch (error) {
-      console.error('Lỗi khi tạo/chỉnh sửa khách hàng:', error);
-      message.error('Không thể lưu khách hàng. Vui lòng thử lại.');
+      console.error("Lỗi khi tạo/chỉnh sửa khách hàng:", error);
+      message.error("Không thể lưu khách hàng. Vui lòng thử lại.");
     }
   };
 
@@ -140,10 +145,10 @@ const CustomerList = () => {
     try {
       await AdminApiRequest.delete(`/customer/${id}`);
       fetchCustomerList();
-      message.success('Xóa khách hàng thành công!');
+      message.success("Xóa khách hàng thành công!");
     } catch (error) {
-      console.error('Lỗi khi xóa khách hàng:', error);
-      message.error('Không thể xóa khách hàng. Vui lòng thử lại.');
+      console.error("Lỗi khi xóa khách hàng:", error);
+      message.error("Không thể xóa khách hàng. Vui lòng thử lại.");
     }
   };
 
@@ -184,7 +189,7 @@ const CustomerList = () => {
 
       <Modal
         className="custom-modal"
-        title={editingCustomer ? 'Chỉnh sửa khách hàng' : 'Thêm khách hàng'}
+        title={editingCustomer ? "Chỉnh sửa khách hàng" : "Thêm khách hàng"}
         open={openCreateCustomerModal}
         onOk={onOKCreateCustomer}
         onCancel={onCancelCreateCustomer}
@@ -196,17 +201,19 @@ const CustomerList = () => {
               name="name"
               label="Tên khách hàng"
               component="input"
-              rules={[{ required: true, message: 'Tên khách hàng là bắt buộc' }]}
+              rules={[
+                { required: true, message: "Tên khách hàng là bắt buộc" },
+              ]}
             />
             <FloatingLabelInput
               name="gender"
               label="Giới tính"
               component="select"
-              rules={[{ required: true, message: 'Giới tính là bắt buộc' }]}
+              rules={[{ required: true, message: "Giới tính là bắt buộc" }]}
               options={[
-                { value: 'Nam', label: 'Nam' },
-                { value: 'Nữ', label: 'Nữ' },
-                { value: 'Khác', label: 'Khác' },
+                { value: "Nam", label: "Nam" },
+                { value: "Nữ", label: "Nữ" },
+                { value: "Khác", label: "Khác" },
               ]}
             ></FloatingLabelInput>
           </div>
@@ -217,7 +224,7 @@ const CustomerList = () => {
               label="Số điện thoại"
               component="input"
               type="text"
-              rules={[{ required: true, message: 'Số điện thoại là bắt buộc' }]}
+              rules={[{ required: true, message: "Số điện thoại là bắt buộc" }]}
               disabled={!!editingCustomer}
             />
             <FloatingLabelInput
@@ -227,14 +234,26 @@ const CustomerList = () => {
               disabled
             />
           </div>
-          <FloatingLabelInput name="address" label="Địa chỉ" component="input" />
+          <FloatingLabelInput
+            name="address"
+            label="Địa chỉ"
+            component="input"
+          />
 
           <div className="modal-footer-custom">
-            <AdminButton variant="secondary" size="sm" onClick={onCancelCreateCustomer}>
+            <AdminButton
+              variant="secondary"
+              size="sm"
+              onClick={onCancelCreateCustomer}
+            >
               Hủy
             </AdminButton>
-            <AdminButton variant="primary" size="sm" onClick={onOKCreateCustomer}>
-              {editingCustomer ? 'Lưu thay đổi' : 'Tạo mới'}
+            <AdminButton
+              variant="primary"
+              size="sm"
+              onClick={onOKCreateCustomer}
+            >
+              {editingCustomer ? "Lưu thay đổi" : "Tạo mới"}
             </AdminButton>
           </div>
         </Form>
@@ -244,55 +263,112 @@ const CustomerList = () => {
         className="custom-table"
         rowKey="id"
         dataSource={customerList}
+        // --- CẤU HÌNH RESPONSIVE ---
+        scroll={{ x: "max-content" }}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
         }}
         columns={[
-          { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
           {
-            title: 'Tên',
-            dataIndex: 'name',
-            key: 'name',
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 70, // Cố định chiều rộng cột ID
+            align: "center",
+            sorter: (a, b) => a.id - b.id,
+          },
+          {
+            title: "Tên",
+            dataIndex: "name",
+            key: "name",
+            width: 180, // Đủ rộng cho tên
+            fixed: "left", // Ghim cột tên bên trái
             sorter: (a, b) => a.name.localeCompare(b.name),
+            render: (text) => <span style={{ fontWeight: 600 }}>{text}</span>,
           },
           {
-            title: 'Giới tính',
-            dataIndex: 'gender',
-            key: 'gender',
+            title: "Giới tính",
+            dataIndex: "gender",
+            key: "gender",
+            width: 100,
+            align: "center",
             sorter: (a, b) => a.gender.localeCompare(b.gender),
+            render: (gender) => (
+              <Tag
+                color={
+                  gender === "Nam"
+                    ? "blue"
+                    : gender === "Nữ"
+                      ? "pink"
+                      : "default"
+                }
+              >
+                {gender || "Khác"}
+              </Tag>
+            ),
           },
-          { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },
           {
-            title: 'Tổng chi tiêu',
-            dataIndex: 'total',
-            key: 'total',
+            title: "Số điện thoại",
+            dataIndex: "phone",
+            key: "phone",
+            width: 140,
+          },
+          {
+            title: "Tổng chi tiêu",
+            dataIndex: "total",
+            key: "total",
+            width: 150,
+            align: "right", // Căn phải số tiền
             sorter: (a, b) => a.total - b.total,
             render: (total: number) =>
-              total
-                ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+              total ? (
+                <span style={{ color: "#faad14", fontWeight: 700 }}>
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
                     .format(total)
-                    .replace('₫', 'đ')
-                : '0đ',
+                    .replace("₫", "đ")}
+                </span>
+              ) : (
+                "0đ"
+              ),
           },
           {
-            title: 'Hạng thành viên',
-            dataIndex: 'rank',
-            key: 'rank',
+            title: "Hạng thành viên",
+            dataIndex: "rank",
+            key: "rank",
+            width: 150,
+            align: "center",
             sorter: (a, b) => a.rank.localeCompare(b.rank),
-            render: (rank: string) => (rank ? rank : 'Thường'),
+            render: (rank: string) => {
+              let color = "default";
+              if (rank === "Vàng") color = "gold";
+              if (rank === "Bạc") color = "cyan";
+              if (rank === "Kim Cương") color = "purple";
+              return <Tag color={color}>{rank || "Thường"}</Tag>;
+            },
           },
           {
-            title: 'Ngày đăng ký',
-            dataIndex: 'registrationDate',
-            key: 'registrationDate',
-            sorter: (a, b) => moment(a.registrationDate).unix() - moment(b.registrationDate).unix(),
+            title: "Ngày đăng ký",
+            dataIndex: "registrationDate",
+            key: "registrationDate",
+            width: 180,
+            align: "center",
+            sorter: (a, b) =>
+              moment(a.registrationDate).unix() -
+              moment(b.registrationDate).unix(),
             render: (registrationDate: string) =>
-              registrationDate ? moment(registrationDate).format('DD-MM-YYYY HH:mm:ss') : '-',
+              registrationDate
+                ? moment(registrationDate).format("DD-MM-YYYY HH:mm")
+                : "-",
           },
           {
-            title: 'Hành động',
-            key: 'actions',
+            title: "Hành động",
+            key: "actions",
+            width: 140, // Cố định chiều rộng cột hành động
+            align: "center",
             render: (_, record) => (
               <Space size="middle">
                 <AdminButton

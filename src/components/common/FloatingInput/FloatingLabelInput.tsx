@@ -1,8 +1,15 @@
-import { DatePicker, Form, FormItemProps, Input, InputNumber, Select } from 'antd';
-import { useState } from 'react';
-import './FloatingLabelInput.scss';
+import {
+  DatePicker,
+  Form,
+  FormItemProps,
+  Input,
+  InputNumber,
+  Select,
+} from "antd";
+import { useState } from "react";
+import "./FloatingLabelInput.scss";
 
-type ComponentType = 'input' | 'select' | 'date' | 'textarea';
+type ComponentType = "input" | "select" | "date" | "textarea";
 
 interface FloatingLabelInputProps extends FormItemProps {
   label: string;
@@ -32,7 +39,8 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const fieldValue = Form.useWatch(name, Form.useFormInstance());
-  const hasValue = fieldValue !== undefined && fieldValue !== null && fieldValue !== '';
+  const hasValue =
+    fieldValue !== undefined && fieldValue !== null && fieldValue !== "";
 
   const renderComponent = () => {
     const commonProps = {
@@ -43,15 +51,15 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
       ...componentProps,
     };
 
-    if (component === 'input') {
-      if (type === 'number') {
+    if (component === "input") {
+      if (type === "number") {
         const min = componentProps?.min ?? 0;
         return (
           <Form.Item name={name} noStyle>
             <InputNumber
               {...commonProps}
               placeholder=" "
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               min={min}
               onChange={onChange}
             />
@@ -66,35 +74,35 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
       );
     }
 
-    if (component === 'select') {
+    if (component === "select") {
       return (
         <Form.Item name={name} noStyle>
           <Select
             {...commonProps}
             options={options}
             placeholder=" "
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             onChange={onChange}
           />
         </Form.Item>
       );
     }
 
-    if (component === 'date') {
+    if (component === "date") {
       return (
         <Form.Item name={name} noStyle>
           <DatePicker
             showTime
             {...commonProps}
             placeholder=" "
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             onChange={onChange}
           />
         </Form.Item>
       );
     }
 
-    if (component === 'textarea') {
+    if (component === "textarea") {
       return (
         <Form.Item name={name} noStyle>
           <Input.TextArea {...commonProps} placeholder=" " autoSize />
@@ -106,7 +114,9 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   };
 
   return (
-    <div className={`floating-wrapper ${isFocused || hasValue ? 'active' : ''}`}>
+    <div
+      className={`floating-wrapper ${isFocused || hasValue ? "active" : ""}`}
+    >
       {renderComponent()}
       <label className="floating-label">{label}</label>
     </div>
