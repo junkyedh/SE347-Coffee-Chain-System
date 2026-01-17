@@ -34,7 +34,6 @@ const FeedbackPage: React.FC = () => {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Feedback data:', { reservationCode, rating, comments });
 
       alert('Gửi phản hồi thành công!');
       navigate(ROUTES.HISTORY_ORDERS);

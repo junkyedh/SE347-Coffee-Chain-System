@@ -8,68 +8,69 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AdminProductCard from '../AdminCard/AdminProductCard';
 import './AdminMenu.scss';
 import { printInvoice } from '@/utils/invoicePrinter';
+import { getProductDisplayInfo } from '@/utils/productSize';
+import { calculateOrderTotal, Coupon } from '@/utils/priceCalculator';
 
 const categories = ['All', 'Cà phê', 'Trà trái cây', 'Trà sữa', 'Nước ép', 'Bánh ngọt'];
-
-interface Coupon {
-  id: number;
-  code: string;
-  status: string;
-  promote: {
-    id: number;
-    name: string;
-    description: string;
-    discount: number;
-    promoteType: string;
-    startAt: string;
-    endAt: string;
-  };
-}
 
 const AdminMenu = () => {
   const [menuList, setMenuList] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [search] = useState<string>('');
   const [, setLoading] = useState<boolean>(false);
+  
+  // State đơn hàng
   const [order, setOrder] = useState<{
     [key: string]: { size: string; mood: string; quantity: number; price: number };
   }>({});
-  const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
-  const [selectedMoods, setSelectedMoods] = useState<{ [key: string]: string }>({});
-  const [currentProductId, setCurrentProductId] = useState<string | null>(null);
-  const [orderInfo, setOrderInfo] = useState<any | null>(null);
-  const [phone, setPhone] = useState('');
-  const [name, setName] = useState('');
+  
+  const [selectedSizes, setSelectedSizes] = useState<{ [key: number]: string }>({});
+  const [selectedMoods, setSelectedMoods] = useState<{ [key: number]: string }>({});
+  const [currentProductId, setCurrentProductId] = useState<number | null>(null);
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [suggestions, setSuggestions] = useState<{ phone: string; name: string }[]>([]);
+  const [phone, setPhone] = useState('');
+  const [name, setName] = useState('');
+  const [, setIsCustomerLoading] = useState(false);
+
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null); // Lưu object Coupon
+  const [customerRank, setCustomerRank] = useState<string>(''); // Lưu tên hạng (Vàng, Bạc...)
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { tableId, tableName, serviceType: initialServiceType } = location.state || {};
+
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
 
-  const location = useLocation();
-  const { state } = location;
-  const [currentOrderInfo, setCurrenOrderInfo] = useState<any>(state || null);
-
-  const navigate = useNavigate();
-
-  const [couponCode, setCouponCode] = useState('');
-  const [discountAmount, setDiscountAmount] = useState(0);
-
-  const totalPrice = Object.values(order).reduce(
+  const subtotal = Object.values(order).reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
-  const [memberDiscountValue, setMemberDiscountValue] = useState(0);
-  const [couponDiscountVal, setCouponDiscountVal] = useState(0);
+  const { 
+    finalTotal, 
+    totalDiscount, 
+    couponDiscount, 
+    membershipDiscount, 
+    isMembershipSkipped 
+  } = calculateOrderTotal({
+    subtotal: subtotal,
+    deliveryFee: 0, 
+    coupon: appliedCoupon,
+    membershipRank: customerRank
+  });
 
   const fetchMenuList = async () => {
     try {
       setLoading(true);
-      const res = await AdminApiRequest.get('/product-branch/list');
-      setMenuList(res.data);
+      const res = await AdminApiRequest.get('/product/list');
+      setMenuList(res.data.data || res.data);
     } catch (error) {
-      message.error('Lấy danh sách sản phẩm thất bại!');
+      console.error('Error fetching menu list:', error);
+      message.error('Failed to fetch menu list.');
     } finally {
       setLoading(false);
     }
@@ -79,122 +80,51 @@ const AdminMenu = () => {
     fetchMenuList();
   }, []);
 
-  useEffect(() => {
-    const fetchNewOrder = async () => {
-      try {
-        const response = await AdminApiRequest.get('/branch-order/new');
-        const order = response.data;
-        setOrderInfo(order);
-      } catch (error) {
-        console.error('Không lấy được đơn hàng mới:', error);
-      }
-    };
-    fetchNewOrder();
-  }, []);
-
-  useEffect(() => {
-    const initOrder = async () => {
-      if (!state) return;
-
-      if (state.isNewOrder) {
-        setCurrenOrderInfo({
-          id: null,
-          serviceType: state.serviceType,
-          tableID: state.tableId,
-          tableName: state.tableName,
-          phoneCustomer: state.phoneCustomer,
-          customerName: state.customerName,
-          status: 'Nháp',
-          tableSeats: state.tableSeats,
-        });
-        // Reset giỏ hàng/Order list về rỗng
-        setOrder({});
-        if (state.phoneCustomer) {
-          setPhone(state.phoneCustomer);
-        }
-      } else if (state.orderId) {
-        try {
-          const res = await AdminApiRequest.get(`/branch-order/${state.orderId}`);
-          const data = res.data;
-          data.tableSeats = state.tableSeats || data.tableSeats || 0;
-
-          setCurrenOrderInfo(res.data);
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    };
-    initOrder();
-  }, [state]);
-
-  useEffect(() => {
-    let finalDiscount = 0;
-
-    // QUY TẮC: Ưu tiên mã giảm giá.
-    // Nếu có mã giảm giá (couponDiscountVal > 0) -> Dùng Coupon, bỏ qua Membership.
-    if (couponDiscountVal > 0) {
-      finalDiscount = couponDiscountVal;
-    } else {
-      // Nếu không dùng mã giảm giá -> Mới xét đến Membership
-      finalDiscount = memberDiscountValue;
+  const checkMemberRank = async (phoneNumber: string) => {
+    if (!phoneNumber) {
+      setCustomerRank('');
+      return;
     }
-
-    // Đảm bảo tiền giảm không vượt quá tổng tiền đơn hàng
-    setDiscountAmount(Math.min(finalDiscount, totalPrice));
-  }, [totalPrice, memberDiscountValue, couponDiscountVal]);
-
-  const filteredProducts = menuList
-    .filter((product) => selectedCategory === 'All' || product.category === selectedCategory)
-    .filter((product) => product.name.toLowerCase().includes(search.toLowerCase()));
-
-  const fetchCustomerSuggestions = async (value: string) => {
-    if (value.length > 0) {
-      try {
-        const response = await AdminApiRequest.get(`/customer/search?phone=${value}`);
-        setSuggestions(response.data);
-      } catch (error) {
-        console.error('Error fetching customer suggestions:', error);
+    try {
+      const customerRes = await AdminApiRequest.get(`/customer/${phoneNumber}`);
+      const customer = customerRes.data;
+      if (customer) {
+        setName(customer.name);
+        if (customer.rank) {
+          setCustomerRank(customer.rank);
+          message.success(`Khách hàng: ${customer.name} - Hạng: ${customer.rank}`);
+        } else {
+          setCustomerRank('');
+        }
+      } else {
+        setName('');
+        setCustomerRank('');
       }
-    } else {
-      setSuggestions([]);
+    } catch (error) {
+      setName('');
+      setCustomerRank('');
     }
   };
 
-  const handleSelectSize = (id: string, size: string) => {
-    if (currentProductId !== id) {
-      setSelectedSizes({});
-      setSelectedMoods({});
-    }
-    setCurrentProductId(id);
-    setSelectedSizes((prev) => ({ ...prev, [id]: size }));
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);
   };
 
-  const handleSelectMood = (id: string, mood: string) => {
-    if (currentProductId !== id) {
-      setSelectedSizes({});
-      setSelectedMoods({});
-    }
-    setCurrentProductId(id);
-    setSelectedMoods((prev) => ({ ...prev, [id]: mood }));
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const handleAddToOrder = (id: number, size: string) => {
     const product = menuList.find((p) => p.id === id);
     if (product && size) {
       const mood = product.hot || product.cold ? selectedMoods[id] : '';
-      let price = 0;
+      
+      const { price, isValid } = getProductDisplayInfo(product, size);
 
-      if (product.category === 'Bánh ngọt') {
-        if (size === 'piece') {
-          price = product.sizes[0]?.price || 0;
-        } else if (size === 'whole') {
-          price = (product.sizes[0]?.price || 0) * 8;
-        }
-      } else {
-        const sizeData = product.sizes.find(
-          (s: { sizeName: string }) => s.sizeName === selectedSizes[product.id]
-        );
-        price = sizeData?.price || 0;
+      if (!isValid) {
+        message.error('Kích thước hoặc sản phẩm không hợp lệ');
+        return;
       }
 
       const key = `${id}-${size}-${mood}`;
@@ -204,471 +134,427 @@ const AdminMenu = () => {
           size,
           mood,
           quantity: (prevOrder[key]?.quantity || 0) + 1,
-          price,
+          price, // Giá này đã được nhân nếu là cả bánh
         },
       }));
 
-      setSelectedSizes({});
-      setSelectedMoods({});
+      // Reset selection
+      setSelectedSizes((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      setSelectedMoods((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
       setCurrentProductId(null);
     }
   };
 
-  const handleRemoveItem = (productKey: string) => {
+  const handleRemoveItem = (key: string) => {
     setOrder((prevOrder) => {
       const newOrder = { ...prevOrder };
-      delete newOrder[productKey];
+      delete newOrder[key];
       return newOrder;
     });
   };
 
-  const checkMemberRank = async (phone: string) => {
-    if (!phone) {
-      setMemberDiscountValue(0);
-      return;
-    }
-    try {
-      const customerRes = await AdminApiRequest.get(`/customer/${phone}`);
-      const customer = customerRes.data;
-
-      if (customer?.rank) {
-        const membershipRes = await AdminApiRequest.get(`/membership/${customer.rank}`);
-        const discountValue = membershipRes.data.discount || 0;
-
-        setMemberDiscountValue(discountValue);
-
-        // Kiểm tra ưu tiên áp dụng mã giảm giá nếu có
-        if (couponDiscountVal > 0) {
-          message.info(
-            `Khách hàng hạng ${customer.rank}, không áp dụng chiết khấu thành viên do đã sử dụng mã giảm giá.`
-          );
+  const handleUpdateQuantity = (key: string, delta: number) => {
+    setOrder((prevOrder) => {
+      const newOrder = { ...prevOrder };
+      const item = newOrder[key];
+      if (item) {
+        const newQuantity = item.quantity + delta;
+        if (newQuantity > 0) {
+          newOrder[key] = { ...item, quantity: newQuantity };
         } else {
-          message.success(
-            `Khách hàng hạng ${customer.rank}, được giảm ${discountValue.toLocaleString()}đ`
-          );
+          delete newOrder[key];
         }
-      } else {
-        setMemberDiscountValue(0);
       }
-    } catch (error) {
-      console.error('Lỗi khi kiểm tra hạng thành viên:', error);
-      setMemberDiscountValue(0);
-    }
+      return newOrder;
+    });
   };
 
   const handleApplyCoupon = async () => {
     try {
-      if (!couponCode) {
-        setCouponDiscountVal(0);
+      if (!couponCode.trim()) {
+        setAppliedCoupon(null);
         return;
       }
-
       const response = await AdminApiRequest.get('/promote/coupon/list');
+      // Tìm coupon khớp mã và đang có hiệu lực
       const coupon = response.data.find(
-        (c: Coupon) => c.code === couponCode && c.status === 'Có hiệu lực'
+        (c: Coupon) => 
+          c.code.toLowerCase() === couponCode.toLowerCase() && 
+          (c as any).status === 'Có hiệu lực' 
       );
 
       if (coupon) {
-        let val = 0;
-        const discount = coupon.promote.discount;
-
-        if (coupon.promote.promoteType === 'Phần trăm') {
-          val = (totalPrice * discount) / 100;
-        } else if (coupon.promote.promoteType === 'Cố định') {
-          val = discount;
-        }
-
-        setCouponDiscountVal(val);
-
-        // Thông báo áp dụng mã thành công
-        if (memberDiscountValue > 0) {
-          message.success('Áp dụng mã thành công!');
+        setAppliedCoupon(coupon);
+        if(customerRank) {
+            message.success('Áp dụng mã thành công!');
+            message.info(`Ưu đãi hạng ${customerRank} sẽ không được áp dụng cùng voucher.`);
         } else {
-          message.success('Áp dụng mã giảm giá thành công!');
+            message.success('Áp dụng mã giảm giá thành công!');
         }
       } else {
-        setCouponDiscountVal(0);
+        setAppliedCoupon(null);
         message.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!');
       }
     } catch (error) {
-      console.error('Lỗi khi áp dụng mã giảm giá:', error);
-      message.error('Có lỗi xảy ra khi áp dụng mã giảm giá!');
-      setCouponDiscountVal(0);
+      console.error(error);
+      setAppliedCoupon(null);
+      message.error('Lỗi khi kiểm tra mã giảm giá!');
+    }
+  };
+
+  const handlePhoneSearch = async (value: string) => {
+    setPhone(value);
+    if (value.length >= 10) {
+      setIsCustomerLoading(true);
+      try {
+        await checkMemberRank(value);
+      } finally {
+        setIsCustomerLoading(false);
+      }
+    } else {
+      setName('');
+      setCustomerRank('');
+    }
+  };
+
+  const onFinish = async (values: any) => {
+    try {
+      await AdminApiRequest.post('/customer', values);
+      message.success('Thêm khách hàng thành công!');
+      setIsModalVisible(false);
+      form.resetFields();
+      setPhone(values.phone);
+      handlePhoneSearch(values.phone);
+    } catch (error) {
+      message.error('Có lỗi xảy ra khi thêm khách hàng!');
     }
   };
 
   const handlePayment = async () => {
+    if (Object.keys(order).length === 0) {
+      message.warning('Vui lòng chọn món trước khi thanh toán!');
+      return;
+    }
+
     try {
-      let finalTotal = totalPrice - discountAmount;
-      let orderId = currentOrderInfo?.id;
+      const orderPayload = {
+        phoneCustomer: phone || '0000000000',
+        serviceType: initialServiceType === 'Dine In' ? 'DINE IN' : 'TAKE AWAY',
+        totalPrice: finalTotal,
+        orderDate: new Date().toISOString(),
+        status: 'Hoàn thành',
+        tableID: tableId || null,
+        branchId: 1, 
+        paymentMethod: 'Tiền mặt',
+        paymentStatus: 'Đã thanh toán',
+        discount: totalDiscount
+      };
 
-      if (finalTotal < 0) finalTotal = 0;
+      const res = await AdminApiRequest.post('/order', orderPayload);
+      const orderId = res.data.id;
 
-      if (Object.keys(order).length === 0 || totalPrice === 0) {
-        message.warning('Đơn hàng không có sản phẩm hoặc tổng tiền không hợp lệ.');
-        return;
-      }
-
-      if (!orderId) {
-        const payload = {
-          phoneCustomer: phone || null,
-          serviceType: orderInfo?.serviceType || 'DINE IN',
-          totalPrice: finalTotal,
-          tableID: orderInfo?.tableID || null,
-          orderDate: new Date().toISOString(),
-          status: 'Chờ xác nhận',
-          staffName: orderInfo?.staffName || null,
-        };
-
-        const res = await AdminApiRequest.post('/branch-order', payload);
-        orderId = res.data.id;
-
-        if (currentOrderInfo?.tableID) {
-          await AdminApiRequest.put(`/table/${currentOrderInfo.tableID}`, { status: 'Occupied' });
-        }
-      } else {
-      }
-
-      const orderItems = Object.keys(order).map((productKey) => {
-        const item = order[productKey];
-        const [id] = productKey.split('-');
-        const product = menuList.find((p) => String(p.id) === id);
-        return {
-          productName: product?.name || '',
-          size: item.size,
-          mood: item.mood,
+      // Tạo chi tiết đơn hàng
+      const orderDetailsPromises = Object.entries(order).map(([key, item]) => {
+        const [productId] = key.split('-');
+        return AdminApiRequest.post(`/order/detail/${orderId}`, {
+          productID: parseInt(productId),
           quantity: item.quantity,
-          price: item.price,
-        };
+          size: item.size,
+          mood: item.mood || null,
+          price: item.price // Gửi giá tại thời điểm mua
+        });
       });
 
-      for (const item of orderItems) {
-        await AdminApiRequest.post(`/branch-order/detail/${orderId}`, item);
-      }
+      await Promise.all(orderDetailsPromises);
 
-      // Gọi hàm in hóa đơn
+      message.success('Thanh toán thành công!');
+      
+      // In hóa đơn
       printInvoice({
-        orderId,
-        serviceType: orderInfo?.serviceType || 'DINE IN',
-        staffName: orderInfo?.staffName || 'Nhân viên',
-        totalPrice: totalPrice,
-        discountAmount: discountAmount,
+        orderId: orderId,
+        serviceType: initialServiceType === 'Dine In' ? 'Tại chỗ' : 'Mang đi',
+        staffName: 'Staff',
+        totalPrice: subtotal,
+        discountAmount: totalDiscount,
         finalTotal: finalTotal,
-        items: orderItems,
+        items: Object.entries(order).map(([key, item]) => {
+            const product = menuList.find(p => p.id.toString() === key.split('-')[0]);
+            return {
+                productName: product?.name || 'Sản phẩm',
+                quantity: item.quantity,
+                price: item.price,
+                size: item.size,
+                mood: item.mood
+            };
+        }),
       });
 
-      message.success(
-        currentOrderInfo?.id ? 'Cập nhật đơn hàng thành công!' : 'Tạo đơn hàng thành công!'
-      );
-      // Reset toàn bộ state
+      // Reset trạng thái sau khi thanh toán thành công
       setOrder({});
-      setCouponCode('');
-      setDiscountAmount(0);
-      setMemberDiscountValue(0);
-      setCouponDiscountVal(0);
-      setName('');
       setPhone('');
-
-      navigate(ROUTES.STAFF.ORDER_LIST);
+      setName('');
+      setCustomerRank('');
+      setCouponCode('');
+      setAppliedCoupon(null);
+      navigate(ROUTES.STAFF.ORDER_SELECT_TABLE);
+      
     } catch (error) {
-      console.error('Error during payment:', error);
-      message.error('Có lỗi xảy ra khi thanh toán!');
+      console.error('Payment error:', error);
+      message.error('Thanh toán thất bại. Vui lòng thử lại!');
     }
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const filteredMenu = menuList.filter(
+    (item) =>
+      (selectedCategory === 'All' || item.category === selectedCategory) &&
+      item.name.toLowerCase().includes(search.toLowerCase())
+  );
 
-  const currentProducts = filteredProducts.slice(
+  const paginatedMenu = filteredMenu.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  const handleSubmit = async (values: any) => {
-    try {
-      const formattedValues = {
-        ...values,
-        registrationDate: values.registrationDate ? values.registrationDate.toISOString() : null,
-      };
-
-      await AdminApiRequest.post('/customer', formattedValues);
-      message.success('Thêm khách hàng thành công!');
-      setIsModalVisible(false);
-      form.resetFields();
-    } catch (error) {
-      console.error('Error adding customer:', error);
-      message.error('Thêm khách hàng thất bại!');
-    }
-  };
-
-  const updateQuantity = (productKey: string, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      handleRemoveItem(productKey);
-    } else {
-      setOrder((prevOrder) => ({
-        ...prevOrder,
-        [productKey]: {
-          ...prevOrder[productKey],
-          quantity: newQuantity,
-        },
-      }));
-    }
-  };
-
-  const handleSelect = (value: string, option: any) => {
-    setPhone(value);
-    const selected = suggestions.find((s) => s.phone === value);
-    setName(selected ? selected.name : '');
-    checkMemberRank(value);
-  };
-
   return (
     <div className="admin-menu-container">
-      <div className="admin-menu-layout">
-        {/* Main Content */}
-        <div className="admin-menu-main">
-          {/* Header */}
-          <div className="menu-header">
-            <h2 className="menu-title">GỌI MÓN</h2>
-
-            {/* Categories and Search */}
-            <div className="menu-controls">
-              <div className="category-section">
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
-                  >
-                    {category}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Products Grid */}
-          <div className="products-section">
-            <div className="products-grid">
-              {currentProducts.map((product) => (
-                <AdminProductCard
-                  key={product.id}
-                  product={product}
-                  selectedSize={selectedSizes[product.id]}
-                  selectedMood={selectedMoods[product.id]}
-                  onSelectSize={(size) => handleSelectSize(product.id, size)}
-                  onSelectMood={(mood) => handleSelectMood(product.id, mood)}
-                  onAddToOrder={(size) => handleAddToOrder(product.id, size)}
-                  isCurrentProduct={currentProductId === product.id}
-                />
-              ))}
-            </div>
-
-            {/* Pagination */}
-            <div className="pagination-wrapper">
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={filteredProducts.length}
-                onChange={handlePageChange}
-                showSizeChanger={false}
-                showTotal={(total, range) => `${range[0]}-${range[1]} của ${total} sản phẩm`}
-              />
-            </div>
+      {/* Cột Trái: Danh sách món */}
+      <div className="menu-section">
+        <div className="menu-header">
+          <h2 className="title">GỌI MÓN</h2>
+          <div className="categories">
+            {categories.map((cat) => (
+              <Button
+                key={cat}
+                type={selectedCategory === cat ? 'primary' : 'default'}
+                className="category-btn"
+                onClick={() => handleCategoryChange(cat)}
+              >
+                {cat}
+              </Button>
+            ))}
           </div>
         </div>
 
-        {/* Invoice Sidebar */}
-        <div className="invoice-sidebar">
-          <div className="invoice-header">
-            <div className="invoice-title">
-              <ShoppingCartOutlined />
-              <span>HÓA ĐƠN</span>
-            </div>
-            <div className="invoice-info">
-              <div className="info-item">
-                <span className="label">Mã HĐ:</span>
-                <span className="value">{orderInfo?.id || '88'}</span>
-              </div>
-              <div className="info-item">
-                <span className="label">Loại:</span>
-                <span className="value">
-                  {currentOrderInfo?.tableName || currentOrderInfo?.serviceType === 'Take Away'
-                    ? 'Mang đi'
-                    : `Bàn ${currentOrderInfo?.tableID || '2'}`}
-                </span>
-              </div>
-              {currentOrderInfo?.serviceType === 'Dine In' && currentOrderInfo?.tableSeats > 0 && (
-                <div className="info-item">
-                  <span className="label">Số chỗ:</span>
-                  <span className="value">{currentOrderInfo.tableSeats}</span>
-                </div>
-              )}
-            </div>
+        <div className="product-grid">
+          {paginatedMenu.map((product) => (
+            <AdminProductCard
+              key={product.id}
+              product={product}
+              selectedSize={selectedSizes[product.id]}
+              selectedMood={selectedMoods[product.id]}
+              onSelectSize={(size) =>
+                setSelectedSizes((prev) => ({ ...prev, [product.id]: size }))
+              }
+              onSelectMood={(mood) =>
+                setSelectedMoods((prev) => ({ ...prev, [product.id]: mood }))
+              }
+              onAddToOrder={(size) => handleAddToOrder(product.id, size)}
+              isCurrentProduct={currentProductId === product.id}
+              cartQuantity={Object.entries(order)
+                .filter(([key]) => key.startsWith(`${product.id}-`))
+                .reduce((sum, [, item]) => sum + item.quantity, 0)}
+            />
+          ))}
+        </div>
+
+        <div className="pagination-container">
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={filteredMenu.length}
+            onChange={handlePageChange}
+            showSizeChanger={false}
+          />
+        </div>
+      </div>
+
+      {/* Cột Phải: Hóa đơn & Thanh toán */}
+      <div className="order-sidebar">
+        <div className="sidebar-header">
+          <ShoppingCartOutlined className="icon" />
+          <h3>HÓA ĐƠN</h3>
+        </div>
+
+        <div className="order-info">
+          <div className="info-row">
+            <span>Mã HĐ: {Math.floor(Math.random() * 1000)}</span>
+            <span>Loại: {tableName || 'Mang đi'}</span>
           </div>
 
-          {/* Customer Info */}
-          <div className="customer-section">
-            <div className="section-header">
-              <span>Thông tin khách hàng</span>
+          <div className="customer-search">
+            <div className="search-box">
+              <AutoComplete
+                value={phone}
+                onChange={handlePhoneSearch}
+                placeholder="Số điện thoại khách hàng"
+                style={{ width: '100%' }}
+              />
               <Button
-                size="small"
                 icon={<UserAddOutlined />}
                 onClick={() => setIsModalVisible(true)}
               />
             </div>
-
-            <div className="customer-inputs">
-              <AutoComplete
-                value={phone}
-                onChange={(value) => {
-                  setPhone(value);
-                  fetchCustomerSuggestions(value);
-
-                  if (!value) {
-                    setName('');
-                    setMemberDiscountValue(0);
-                  }
-                }}
-                onSelect={handleSelect}
-                options={suggestions.map((suggestion) => ({
-                  value: suggestion.phone,
-                  label: `${suggestion.phone} - ${suggestion.name}`,
-                }))}
-                placeholder="Số điện thoại khách hàng"
-                className="customer-input"
-              />
-              <Input
-                placeholder="Tên khách hàng"
-                value={name}
-                className="customer-input"
-                readOnly
-              />
-            </div>
-          </div>
-
-          {/* Order Items */}
-          <div className="order-items">
-            <h4>Món đã chọn</h4>
-            <div className="order-list">
-              {Object.keys(order).length === 0 ? (
-                <div className="empty-order">
-                  <span>Chưa có món nào được chọn</span>
-                </div>
-              ) : (
-                Object.keys(order).map((productKey) => {
-                  const orderItem = order[productKey];
-                  const { size, mood, quantity, price } = orderItem;
-                  const [id] = productKey.split('-');
-                  const product = menuList.find((p) => String(p.id) === id);
-                  return (
-                    product && (
-                      <div key={productKey} className="order-item">
-                        <div className="item-info">
-                          <div className="item-name">{product.name}</div>
-                          <div className="item-details">
-                            Size: {size} {mood && `, ${mood}`}
-                          </div>
-                          <div className="item-price">{price.toLocaleString()}₫</div>
-                        </div>
-                        <div className="item-controls">
-                          <div className="quantity-controls">
-                            <Button
-                              size="small"
-                              onClick={() => updateQuantity(productKey, quantity - 1)}
-                            >
-                              -
-                            </Button>
-                            <span className="quantity">{quantity}</span>
-                            <Button
-                              size="small"
-                              onClick={() => updateQuantity(productKey, quantity + 1)}
-                            >
-                              +
-                            </Button>
-                          </div>
-                          <Button
-                            size="small"
-                            danger
-                            icon={<DeleteOutlined />}
-                            onClick={() => handleRemoveItem(productKey)}
-                          />
-                        </div>
-                      </div>
-                    )
-                  );
-                })
-              )}
-            </div>
-          </div>
-
-          {/* Order Summary */}
-          <div className="order-summary">
-            <div className="discount-section">
-              <Input
-                placeholder="Nhập mã giảm giá"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-                className="coupon-input"
-              />
-              <Button onClick={handleApplyCoupon} size="small">
-                Áp dụng
-              </Button>
-            </div>
-
-            <div className="summary-details">
-              <div className="summary-item">
-                <span>Tổng số món:</span>
-                <span>
-                  {Object.values(order).reduce((total, item) => total + item.quantity, 0)}
-                </span>
+            <Input
+              value={name}
+              placeholder="Tên khách hàng"
+              readOnly
+              className="customer-name-input"
+            />
+            {/* Hiển thị hạng thành viên nếu có */}
+            {customerRank && (
+              <div className="membership-badge">
+                Thành viên hạng: <strong>{customerRank}</strong>
               </div>
-              <div className="summary-item">
-                <span>Tổng tiền:</span>
-                <span>{totalPrice.toLocaleString()}₫</span>
-              </div>
-              <div className="summary-item discount">
-                <span>Chiết khấu:</span>
-                <span>-{discountAmount.toLocaleString()}₫</span>
-              </div>
-              <div className="summary-item total">
-                <span>Tổng hóa đơn:</span>
-                <span>{Math.max(0, totalPrice - discountAmount).toLocaleString()}₫</span>
-              </div>
-            </div>
-
-            <Button
-              type="primary"
-              size="large"
-              onClick={handlePayment}
-              disabled={Object.keys(order).length === 0}
-              className="payment-btn"
-              block
-            >
-              Thanh toán
-            </Button>
+            )}
           </div>
         </div>
+
+        {/* Danh sách món đã chọn */}
+        <div className="order-items-list">
+          <div className="list-header">
+            <span>Món đã chọn</span>
+          </div>
+          <div className="items-scroll">
+            {Object.entries(order).map(([key, item]) => {
+              const [id] = key.split('-');
+              const product = menuList.find((p) => p.id === parseInt(id));
+              return (
+                <div key={key} className="order-item">
+                  <div className="item-main">
+                    <div className="item-name">{product?.name}</div>
+                    <div className="item-details">
+                      Size: {item.size}
+                      {item.mood && ` | ${item.mood === 'hot' ? 'Nóng' : 'Lạnh'}`}
+                    </div>
+                    <div className="item-price">
+                      {(item.price * item.quantity).toLocaleString()}₫
+                    </div>
+                  </div>
+                  <div className="item-actions">
+                    <Button
+                      size="small"
+                      onClick={() => handleUpdateQuantity(key, -1)}
+                    >
+                      -
+                    </Button>
+                    <span className="quantity">{item.quantity}</span>
+                    <Button
+                      size="small"
+                      onClick={() => handleUpdateQuantity(key, 1)}
+                    >
+                      +
+                    </Button>
+                    <Button
+                      type="text"
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleRemoveItem(key)}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Phần nhập mã giảm giá */}
+        <div className="discount-section">
+          <div className="coupon-input-group">
+            <Input
+              placeholder="Nhập mã giảm giá"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              disabled={!!appliedCoupon} // Disable nếu đã áp dụng
+            />
+            {appliedCoupon ? (
+              <Button danger onClick={() => {
+                setAppliedCoupon(null);
+                setCouponCode('');
+                message.info('Đã hủy mã giảm giá');
+              }}>
+                Hủy
+              </Button>
+            ) : (
+              <Button type="primary" onClick={handleApplyCoupon}>
+                Áp dụng
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="summary-details">
+          <div className="summary-item">
+            <span>Tổng số món:</span>
+            <span>{Object.values(order).reduce((acc, i) => acc + i.quantity, 0)}</span>
+          </div>
+          <div className="summary-item">
+            <span>Tổng tiền hàng:</span>
+            <span>{subtotal.toLocaleString()}₫</span>
+          </div>
+          
+          {couponDiscount > 0 && (
+            <div className="summary-item discount-text">
+              <span>Voucher ({appliedCoupon?.code}):</span>
+              <span>-{couponDiscount.toLocaleString()}₫</span>
+            </div>
+          )}
+
+          {(membershipDiscount > 0 || (isMembershipSkipped && customerRank)) && (
+            <div className="summary-item discount-text" style={{ opacity: isMembershipSkipped ? 0.5 : 1 }}>
+              <span style={{ textDecoration: isMembershipSkipped ? 'line-through' : 'none' }}>
+                Thành viên ({customerRank}):
+              </span>
+              <span style={{ textDecoration: isMembershipSkipped ? 'line-through' : 'none' }}>
+                -{isMembershipSkipped ? '0' : membershipDiscount.toLocaleString()}₫
+              </span>
+            </div>
+          )}
+          
+          {isMembershipSkipped && (
+            <div style={{ fontSize: '11px', color: '#faad14', textAlign: 'right', marginTop: '-4px' }}>
+              (Ưu tiên áp dụng Voucher)
+            </div>
+          )}
+
+          <div className="summary-item total">
+            <span>Tổng hóa đơn:</span>
+            <span>{finalTotal.toLocaleString()}₫</span>
+          </div>
+        </div>
+
+        <Button
+          type="primary"
+          className="payment-btn"
+          size="large"
+          onClick={handlePayment}
+        >
+          Thanh toán
+        </Button>
       </div>
 
-      {/* Add Customer Modal */}
+      {/* Modal Thêm khách hàng mới */}
       <Modal
         title="Thêm khách hàng mới"
         open={isModalVisible}
-        onCancel={() => {
-          setIsModalVisible(false);
-          form.resetFields();
-        }}
+        onCancel={() => setIsModalVisible(false)}
         footer={null}
+        className="add-customer-modal"
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <div className="form-grid">
             <FloatingLabelInput
-              label="Tên khách hàng"
+              label="Họ và tên"
               name="name"
               component="input"
-              rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
             />
             <FloatingLabelInput
               label="Số điện thoại"

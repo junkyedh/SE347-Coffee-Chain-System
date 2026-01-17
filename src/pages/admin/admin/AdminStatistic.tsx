@@ -52,7 +52,6 @@ const Statistic: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    console.log(chartData);
   }, [fetchData, chartData]);
 
   return (

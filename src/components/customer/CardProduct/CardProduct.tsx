@@ -83,17 +83,6 @@ const CardProduct: React.FC<Props> = ({ product, onProductClick, onAddToCart }) 
     if (product.category === 'Trà sữa' && !mood) {
       mood = 'cold';
     }
-    console.log(
-      'Choose size:',
-      sizeName,
-      'selectedSizeIndex:',
-      selectedSizeIndex,
-      sizes,
-      'mood:',
-      mood,
-      'quantity:',
-      quantity
-    );
     
     // Nếu có onAddToCart từ parent, sử dụng nó (parent sẽ handle login check)
     if (onAddToCart) {

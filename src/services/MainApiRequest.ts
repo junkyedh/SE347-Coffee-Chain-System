@@ -78,7 +78,6 @@ MainApiRequest.interceptors.response.use(
     const url = error.config?.url;
 
     if (status === 401) {
-      console.log('[API] 401 error on:', url);
 
       // Show message only once and only if not on auth pages
       if (!shouldSilence401(url) && !isRedirecting401) {
@@ -89,7 +88,6 @@ MainApiRequest.interceptors.response.use(
       if (!isRedirecting401 && !shouldSilence401(url)) {
         isRedirecting401 = true;
 
-        console.log('[API] Clearing auth and redirecting due to 401');
         clearAuthStorage();
 
         // Use replace to avoid adding to history

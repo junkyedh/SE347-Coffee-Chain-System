@@ -88,7 +88,6 @@ const AdminStaffList = () => {
   useEffect(() => {
     fetchBranchList();
     fetchStaffList();
-    console.log("Staff list fetched:", branchList);
   }, [fetchBranchList, fetchStaffList, branchList]);
 
   const handleSearchKeyword = () => {
@@ -109,12 +108,6 @@ const AdminStaffList = () => {
   const handleImportExcel = (file: any) => {
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-      console.log("Imported Excel data:", jsonData);
       message.success(
         "Import thành công (chỉ hiển thị, không lưu vào hệ thống).",
       );

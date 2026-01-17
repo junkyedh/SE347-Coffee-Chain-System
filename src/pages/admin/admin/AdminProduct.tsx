@@ -213,7 +213,6 @@ const AdminProductList = () => {
         materialId: m.id || m.materialId,
         materialQuantity: m.quantity || m.materialQuantity,
       })) || [];
-    console.log(record.image);
 
     form.setFieldsValue({
       name: record.name,
@@ -240,7 +239,6 @@ const AdminProductList = () => {
         : []
     );
     setImageUrl(record.image || "");
-    console.log("url: ", imageUrl);
     setOpenCreateProductModal(true);
   };
 

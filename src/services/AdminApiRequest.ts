@@ -53,9 +53,7 @@ AdminApiRequest.interceptors.response.use(
     const status = error.response?.status;
     const url = error.config?.url;
 
-    if (status === 401) {
-      console.log('[Admin API] 401 error on:', url);
-      
+    if (status === 401) {      
       // Show message only once
       if (!shouldSilence401(url) && !isRedirecting401) {
         message.error({ key: ADMIN_AUTH_ERROR_KEY, content: 'Phiên đăng nhập hết hạn' });
@@ -65,7 +63,6 @@ AdminApiRequest.interceptors.response.use(
       if (!isRedirecting401 && !shouldSilence401(url)) {
         isRedirecting401 = true;
         
-        console.log('[Admin API] Clearing auth and redirecting due to 401');
         clearAuthStorage();
         window.location.replace(ROUTES.ADMIN.LOGIN);
         resetRedirectFlag();

@@ -41,7 +41,6 @@ const useProducts = () => {
           discount: item.discount || 0,
         }));
 
-        console.log("Mapped products:", mappedProducts);
         setProducts(mappedProducts);
       } catch (error) {
         console.error("Error fetching product list:", error);

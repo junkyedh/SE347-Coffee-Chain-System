@@ -115,7 +115,6 @@ const ManagerPromotion = () => {
         await AdminApiRequest.post('/promote', data);
       }
 
-      console.log('Promote data:', data);
       fetchManagerPromoteList();
       setOpenCreatePromoteModal(false);
       promoteForm.resetFields();

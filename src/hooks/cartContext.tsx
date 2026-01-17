@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { useSystemContext } from './useSystemContext';
+import { getProductDisplayInfo } from '@/utils/productSize';
 
 interface RawCartItem {
   id: string;
@@ -70,7 +71,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchCart = useCallback(async () => {
     try {
-      // Wait for initialization and check login status
       if (!isInitialized || !isLoggedIn || !userInfo?.phone) {
         setCart([]);
         return;
@@ -81,58 +81,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         `/cart?phoneCustomer=${encodeURIComponent(phoneCustomer)}`
       );
       const raw = res.data;
-      console.log('[CartContext] Raw cart data from backend:', raw);
 
-      // Enrich cart items with product details and calculate prices
       const enriched: CartItem[] = await Promise.all(
         raw.map(async (ci) => {
           const { data: p } = await MainApiRequest.get<Product>(`/product/${ci.productId}`);
-          const isCake = p.category === 'Bánh ngọt';
           
-          console.log(`[CartContext] Processing: ${p.name}, Category: ${p.category}, Size: ${ci.size}`);
-          console.log(`[CartContext] Available sizes:`, p.sizes);
+          const { price } = getProductDisplayInfo(p as any, ci.size);
 
-          // Tìm size tương ứng trong danh sách sizes
-          let price: number;
+          const isCake = p.category === 'Bánh ngọt';
 
-          if (isCake) {
-            // Với bánh ngọt:
-            // - piece: giá gốc từ backend (1 miếng)
-            // - whole: giá gốc × 8 (cả bánh = 8 miếng)
-            if (ci.size === 'whole') {
-              const piecePrice =
-                p.sizes.find((s) => s.sizeName === 'piece')?.price || p.sizes[0]?.price || 0;
-              price = piecePrice * 8;
-              console.log(`[CartContext] Cake whole: piecePrice=${piecePrice}, finalPrice=${price}`);
-            } else if (ci.size === 'piece') {
-              price = p.sizes.find((s) => s.sizeName === 'piece')?.price || p.sizes[0]?.price || 0;
-              console.log(`[CartContext] Cake piece: price=${price}`);
-            } else {
-              // Fallback cho các size khác
-              const sz = p.sizes.find((s) => s.sizeName === ci.size);
-              price = sz?.price || p.sizes[0]?.price || 0;
-              console.log(`[CartContext] Cake other size: price=${price}`);
-            }
-          } else {
-            // Với đồ uống và sản phẩm khác: lấy giá theo size
-            const sz = p.sizes.find((s) => s.sizeName === ci.size);
-            price = sz?.price || p.sizes[0]?.price || 0;
-            console.log(`[CartContext] Drink/Other: size=${ci.size}, price=${price}`);
-          }
-
-          // Tạo danh sách available sizes phù hợp
           const availableSizes = isCake
             ? [
                 {
                   name: 'piece',
-                  price:
-                    p.sizes.find((s) => s.sizeName === 'piece')?.price || p.sizes[0]?.price || 0,
+                  price: getProductDisplayInfo(p as any, 'piece').price,
                 },
                 {
                   name: 'whole',
-                  price:
-                    (p.sizes.find((s) => s.sizeName === 'piece')?.price || p.sizes[0]?.price || 0) *
-                    8,
+                  price: getProductDisplayInfo(p as any, 'whole').price,
                 },
               ]
             : p.sizes
@@ -170,19 +136,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     quantity: number = 1,
     mood?: string
   ) => {
-    // Kiểm tra đăng nhập trước
     if (!isLoggedIn || !userInfo?.phone) {
       throw new Error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
     }
 
-    // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
     const productIdNumber = Number(productId);
     const existingItem = cart.find(
       (item) =>
         Number(item.productId) === productIdNumber && item.size === size && item.mood === mood
     );
     if (existingItem) {
-      // Nếu đã có, chỉ cần cập nhật số lượng
       await updateItem(existingItem.id, { quantity: existingItem.quantity + quantity });
       return;
     }
@@ -203,7 +166,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
   };
 
-  // Cập nhật sản phẩm trong giỏ hàng
   const updateItem = async (
     id: string,
     updates: { quantity?: number; size?: string; mood?: string }
@@ -224,7 +186,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Xóa sản phẩm khỏi giỏ hàng
   const removeItem = async (id: string) => {
     try {
       if (!isLoggedIn || !userInfo?.phone) {
@@ -242,7 +203,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Xóa toàn bộ giỏ hàng
   const clearCart = async () => {
     try {
       if (!isLoggedIn || !userInfo?.phone) {
