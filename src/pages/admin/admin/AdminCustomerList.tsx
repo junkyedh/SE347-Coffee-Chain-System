@@ -25,7 +25,7 @@ const AdminCustomerList = () => {
       setCustomerList(res.data);
     } catch (error) {
       console.error('Error fetching customer list:', error);
-      message.error('Failed to fetch customer list.');
+      message.error('Lấy danh sách khách hàng thất bại.');
     }
   };
 

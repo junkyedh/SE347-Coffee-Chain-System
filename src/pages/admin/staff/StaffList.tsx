@@ -14,7 +14,7 @@ const StaffList = () => {
       setStaffList(res.data);
     } catch (error) {
       console.error("Error fetching staff list:", error);
-      message.error("Failed to fetch staff list. Please try again.");
+      message.error("Lấy danh sách nhân viên không thành công. Please try again.");
     }
   };
 

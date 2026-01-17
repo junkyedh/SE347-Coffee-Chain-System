@@ -23,7 +23,7 @@ const AdminPromotion = () => {
       setAdminPromoteList(res.data);
     } catch (error) {
       console.error('Error fetching promote list:', error);
-      message.error('Failed to fetch promote list.');
+      message.error('Lấy danh sách mã khuyến mãi thất bại.');
     }
   };
 
@@ -33,7 +33,7 @@ const AdminPromotion = () => {
       setAdminCouponList(res.data);
     } catch (error) {
       console.error('Error fetching coupon list:', error);
-      message.error('Failed to fetch coupon list.');
+      message.error('Lấy danh sách Coupon thất bại.');
     }
   };
 
@@ -98,13 +98,13 @@ const AdminPromotion = () => {
       if (data.startAt) {
         data.startAt = data.startAt.toISOString();
       } else {
-        message.error('Start date is required!');
+        message.error('Ngày bắt đầu là bắt buộc!');
         return;
       }
       if (data.endAt) {
         data.endAt = data.endAt.toISOString();
       } else {
-        message.error('End date is required!');
+        message.error('Ngày kết thúc là bắt buộc!');
         return;
       }
 
@@ -119,11 +119,11 @@ const AdminPromotion = () => {
       fetchAdminPromoteList();
       setOpenCreatePromoteModal(false);
       promoteForm.resetFields();
-      message.success('Promote saved successfully!');
+      message.success('Lưu mã khuyến mãi thành công!');
       setEditPromote(null);
     } catch (error) {
       console.error('Error saving promote:', error);
-      message.error('Failed to save promote. Please try again.');
+      message.error('Lưu mã khuyến mãi thất bại, thử  lại sau.');
     }
   };
 
@@ -146,10 +146,10 @@ const AdminPromotion = () => {
     try {
       await AdminApiRequest.delete(`/promote/${id}`);
       fetchAdminPromoteList();
-      message.success('Promote deleted successfully!');
+      message.success('Xóa mã khuyến mãi thành công!');
     } catch (error) {
       console.error('Error deleting promote:', error);
-      message.error('Failed to delete promote. Please try again.');
+      message.error('Xóa mã khuyễn mãi thất bại, thử lại sau.');
     }
   };
 
@@ -181,11 +181,11 @@ const AdminPromotion = () => {
       fetchAdminCouponList();
       setOpenCreateCouponModal(false);
       couponForm.resetFields();
-      message.success('Coupon saved successfully!');
+      message.success('Lưu Coupon thành công!');
       setEditCoupon(null);
     } catch (error) {
       console.error('Error saving coupon:', error);
-      message.error('Failed to save coupon. Please try again  ');
+      message.error('Lưu Coupon thất bại, thử lại sau.');
     }
   };
 
@@ -205,10 +205,10 @@ const AdminPromotion = () => {
     try {
       await AdminApiRequest.delete(`/promote/coupon/${id}`);
       fetchAdminCouponList();
-      message.success('Coupon deleted successfully!');
+      message.success('Xóa Coupon thành công!');
     } catch (error) {
       console.error('Error deleting coupon:', error);
-      message.error('Failed to delete coupon. Please try again.');
+      message.error('Xóa Coupon thất bại, thử lại sau.');
     }
   };
 
