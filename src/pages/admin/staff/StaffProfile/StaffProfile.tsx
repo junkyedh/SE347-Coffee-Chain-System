@@ -115,6 +115,7 @@ const StaffProfile = () => {
         onCancel={() => setEditModalVisible(false)}
         okText="Lưu"
         cancelText="Hủy"
+        loading={loading}
       >
         <Form form={form} layout="vertical">
           <FloatingLabelInput

@@ -55,7 +55,7 @@ const CustomerList = () => {
     if (!searchKeyword.trim()) {
       fetchCustomerList();
     }
-  }, [searchKeyword]);
+  }, [searchKeyword, fetchCustomerList]);
 
   const exportExcel = () => {
     const exportData = customerList.map((customer) => ({
