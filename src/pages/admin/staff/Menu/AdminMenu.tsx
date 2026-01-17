@@ -54,7 +54,11 @@ const AdminMenu = () => {
 
   const [couponCode, setCouponCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
-  const [totalPrice] = useState(0);
+
+  const totalPrice = Object.values(order).reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
 
   const [memberDiscountValue, setMemberDiscountValue] = useState(0);
   const [couponDiscountVal, setCouponDiscountVal] = useState(0);
@@ -113,7 +117,7 @@ const AdminMenu = () => {
           const res = await AdminApiRequest.get(`/branch-order/${state.orderId}`);
           const data = res.data;
           data.tableSeats = state.tableSeats || data.tableSeats || 0;
-          
+
           setCurrenOrderInfo(res.data);
         } catch (err) {
           console.error(err);
@@ -318,11 +322,12 @@ const AdminMenu = () => {
 
         const res = await AdminApiRequest.post('/branch-order', payload);
         orderId = res.data.id;
-        
+
         if (currentOrderInfo?.tableID) {
           await AdminApiRequest.put(`/table/${currentOrderInfo.tableID}`, { status: 'Occupied' });
         }
-      } else {}
+      } else {
+      }
 
       const orderItems = Object.keys(order).map((productKey) => {
         const item = order[productKey];
@@ -352,7 +357,9 @@ const AdminMenu = () => {
         items: orderItems,
       });
 
-      message.success(currentOrderInfo?.id ? 'Cập nhật đơn hàng thành công!' : 'Tạo đơn hàng thành công!');
+      message.success(
+        currentOrderInfo?.id ? 'Cập nhật đơn hàng thành công!' : 'Tạo đơn hàng thành công!'
+      );
       // Reset toàn bộ state
       setOrder({});
       setCouponCode('');
@@ -487,12 +494,12 @@ const AdminMenu = () => {
               <div className="info-item">
                 <span className="label">Loại:</span>
                 <span className="value">
-                  { currentOrderInfo?.tableName || (currentOrderInfo?.serviceType === 'Take Away')
+                  {currentOrderInfo?.tableName || currentOrderInfo?.serviceType === 'Take Away'
                     ? 'Mang đi'
-                    : `Bàn ${currentOrderInfo?.tableID || '2'}` }
+                    : `Bàn ${currentOrderInfo?.tableID || '2'}`}
                 </span>
               </div>
-              {currentOrderInfo?.serviceType === 'Dine In' && currentOrderInfo?.tableSeats >0 && (
+              {currentOrderInfo?.serviceType === 'Dine In' && currentOrderInfo?.tableSeats > 0 && (
                 <div className="info-item">
                   <span className="label">Số chỗ:</span>
                   <span className="value">{currentOrderInfo.tableSeats}</span>

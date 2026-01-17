@@ -369,14 +369,20 @@ export const Checkout: React.FC = () => {
         localStorage.setItem('guest_order_history', JSON.stringify(newHistory));
       }
 
-      // If VNPay payment method is selected, redirect to payment URL
+      const backendBaseUrl = String(MainApiRequest.defaults.baseURL || '').replace(/\/+$/, '');
+      const clientReturn =
+        (process.env.REACT_APP_VNPAY_RETURN_URL?.trim() ||
+          `${(process.env.REACT_APP_BASE_URL || window.location.origin).replace(/\/+$/, '')}/vnpay-callback`);
+      
+          // If VNPay payment method is selected, redirect to payment URL
       if (paymentMethod === 'vnpay') {
         try {
           const { data: paymentData } = await MainApiRequest.post('/payment/vnpay/create', {
             orderId,
             amount: finalTotal,
             orderInfo: `Thanh toan don hang ${orderId}`,
-            returnUrl: `${window.location.origin}/vnpay-callback`,
+            returnUrl: `${backendBaseUrl}/payment/vnpay/return?clientReturn=${encodeURIComponent(clientReturn)}`,
+
           });
                     
           if (paymentData.paymentUrl) {

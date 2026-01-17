@@ -182,11 +182,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         Number(item.productId) === productIdNumber && item.size === size && item.mood === mood
     );
     if (existingItem) {
-      console.log('[CartContext] Item exists, updating quantity...');
       // Nếu đã có, chỉ cần cập nhật số lượng
       await updateItem(existingItem.id, { quantity: existingItem.quantity + quantity });
       return;
     }
+
+    try {
+      const payload = {
+        productId: productIdNumber,
+        size,
+        quantity,
+        mood,
+        phoneCustomer: userInfo.phone,
+      };
+      await MainApiRequest.post('/cart', payload);
+      await fetchCart();
+    } catch (err) {
+      console.error('Add to cart failed', err);
+      throw err;
+      }
   };
 
   // Cập nhật sản phẩm trong giỏ hàng

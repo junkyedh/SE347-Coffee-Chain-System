@@ -2,13 +2,13 @@ import SearchInput from "@/components/common/SearchInput/SearchInput";
 import { MainApiRequest } from "@/services/MainApiRequest";
 import { message, Table, Tag } from "antd";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "../adminPage.scss";
 
 const StaffList = () => {
   const [staffList, setStaffList] = useState<any[]>([]);
 
-  const fetchStaffList = async () => {
+  const fetchStaffList = useCallback(async () => {
     try {
       const res = await MainApiRequest.get("/staff/list");
       setStaffList(res.data);
@@ -16,11 +16,11 @@ const StaffList = () => {
       console.error("Error fetching staff list:", error);
       message.error("Failed to fetch staff list. Please try again.");
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchStaffList();
-  }, []);
+  }, [fetchStaffList]);
 
   const [searchKeyword, setSearchKeyword] = useState("");
 

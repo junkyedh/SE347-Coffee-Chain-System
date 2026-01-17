@@ -5,10 +5,12 @@ import SEO from '@/components/common/SEO';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { ROUTES } from '@/constants';
 import { extractOrderIdFromSlug } from '@/utils/slugify';
-import { ArrowLeft, CheckCircle, Clock, Package, Truck } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, Package, Truck, CreditCard } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { message } from 'antd';
 import './TrackingOrder.scss';
+import { getProductDisplayInfo } from '@/utils/productSize';
 
 interface RawOrder {
   id: number;
@@ -57,10 +59,10 @@ const statusMap: Record<
   }
 > = {
   Nháp: {
-    label: 'Nháp',
+    label: 'Chờ thanh toán',
     color: '#9ca3af',
     icon: Clock,
-    description: 'Đơn hàng chưa hoàn tất thanh toán',
+    description: 'Đơn hàng chưa hoàn tất thanh toán.',
   },
   'Chờ xác nhận': {
     label: 'Chờ xác nhận',
@@ -123,13 +125,13 @@ export const TrackingOrder: React.FC = () => {
   const [order, setOrder] = useState<RawOrder | null>(null);
   const [items, setItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [custAddress, setCustAddress] = useState('');
 
   useEffect(() => {
     if (!slug) return;
 
-    // Trích xuất ID từ slug
     const id = extractOrderIdFromSlug(slug);
 
     const fetchOrderData = async () => {
@@ -168,15 +170,17 @@ export const TrackingOrder: React.FC = () => {
         const enriched = await Promise.all(
           o.order_details.map(async (d) => {
             const { data: p } = await MainApiRequest.get<ProductDetail>(`/product/${d.productId}`);
-            const sz = p.sizes.find((s) => s.sizeName === d.size) || { sizeName: d.size, price: 0 };
+
+            const { price, displaySize } = getProductDisplayInfo(p as any, d.size);
+
             return {
               productId: p.id,
               name: p.name,
               image: p.image,
-              size: d.size,
+              size: displaySize,
               mood: d.mood,
               quantity: d.quantity,
-              price: sz.price,
+              price: price,
             } as OrderItem;
           })
         );
@@ -190,6 +194,47 @@ export const TrackingOrder: React.FC = () => {
 
     fetchOrderData();
   }, [slug]);
+
+  // Logic tính tiền
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const deliveryFee = order?.deliveryFee ?? (order?.serviceType === 'TAKE AWAY' ? 10000 : 0);
+  const discount = order?.discount || 0;
+  const total = order?.totalPrice || subtotal + deliveryFee - discount;
+
+  // Logic xử lý thanh toán lại
+  const handleRetryPayment = async () => {
+    if (!order) return;
+    if (total < 5000) {
+      message.error('Số tiền tối thiểu thanh toán VNPay là 5,000đ');
+      return;
+    }
+
+    const backendBaseUrl = String(MainApiRequest.defaults.baseURL || '').replace(/\/+$/, '');
+    const clientReturn =
+      process.env.REACT_APP_VNPAY_RETURN_URL?.trim() ||
+      `${(process.env.REACT_APP_BASE_URL || window.location.origin).replace(/\/+$/, '')}/vnpay-callback`;
+
+    setIsProcessingPayment(true);
+    try {
+      const { data: paymentData } = await MainApiRequest.post('/payment/vnpay/create', {
+        orderId: String(order.id),
+        amount: total,
+        orderInfo: `Thanh toan lai don hang ${order.id}`,
+        returnUrl: `${backendBaseUrl}/payment/vnpay/return?clientReturn=${encodeURIComponent(clientReturn)}`,
+      });
+
+      if (paymentData.paymentUrl) {
+        window.location.href = paymentData.paymentUrl;
+      } else {
+        message.error('Không thể tạo liên kết thanh toán. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Retry payment error:', error);
+      message.error('Có lỗi xảy ra khi kết nối tới cổng thanh toán.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -230,11 +275,6 @@ export const TrackingOrder: React.FC = () => {
   };
   const StatusIcon = statusInfo.icon;
 
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const deliveryFee = order.deliveryFee ?? (order.serviceType === 'TAKE AWAY' ? 15000 : 0);
-  const discount = order.discount || 0;
-  const total = subtotal + deliveryFee - discount;
-
   const getProgressSteps = () => {
     const steps = [
       { key: 'Chờ xác nhận', label: 'Chờ xác nhận' },
@@ -249,24 +289,37 @@ export const TrackingOrder: React.FC = () => {
 
     steps.push({ key: 'Hoàn thành', label: 'Hoàn thành' });
 
+    const isDraft = order.status === 'Nháp';
     const currentIndex = steps.findIndex((step) => step.key === order.status);
 
     return steps.map((step, index) => ({
       ...step,
-      completed: index < currentIndex,
-      current: index === currentIndex,
-      upcoming: index > currentIndex,
+      completed: !isDraft && index < currentIndex,
+      current: !isDraft && index === currentIndex,
+      upcoming: isDraft || index > currentIndex,
     }));
   };
 
   const progressSteps = getProgressSteps();
 
+  // Chuẩn hoá thông tin thanh toán
+  const paymentMethodRaw = String(order.paymentMethod || '')
+    .trim()
+    .toLowerCase();
+  const paymentMethodLabel = paymentMethodRaw.includes('vnpay') ? 'VNPay' : 'Tiền mặt (COD)';
+
+  const paymentStatusRaw = (order.paymentStatus || '').trim();
+  const isPaid = paymentStatusRaw === 'Đã thanh toán';
+
+  // Chỉ cho thanh toán lại khi đơn còn ở Nháp và chưa thanh toán
+  const canRetryPayment = order.status === 'Nháp' && !isPaid;
+
   return (
     <>
       <SEO
         title={`Theo dõi đơn hàng #${order.id}`}
-        description={`Theo dõi trạng thái đơn hàng #${order.id} - ${statusInfo.label}. Cập nhật thời gian thực về tình trạng đơn hàng của bạn tại SE347 Coffee Chain.`}
-        keywords="theo dõi đơn hàng, tracking order, trạng thái đơn hàng, giao hàng"
+        description={`Theo dõi trạng thái đơn hàng #${order.id}.`}
+        keywords="theo dõi đơn hàng, tracking order"
       />
       <Breadcrumbs
         title="Theo dõi đơn hàng"
@@ -340,16 +393,13 @@ export const TrackingOrder: React.FC = () => {
                 <div className="detail-item">
                   <p>
                     <strong>Thanh toán:</strong>{' '}
-                    <span>{order.paymentMethod === 'vnpay' ? 'VNPay' : 'Tiền mặt (COD)'}</span>
+                    <span>{paymentMethodLabel}</span>
                   </p>
                   <p>
                     <strong>Trạng thái TT:</strong>{' '}
                     <span
-                      className={`payment-status ${
-                        order.paymentStatus === 'Đã thanh toán' ? 'paid' : 'unpaid'
-                      }`}
-                    >
-                      {order.paymentStatus || 'Chưa thanh toán'}
+                      className={`payment-status ${isPaid ? 'paid' : 'unpaid'}`}>
+                      {paymentStatusRaw || 'Chưa thanh toán'}
                     </span>
                   </p>
                 </div>
@@ -426,6 +476,30 @@ export const TrackingOrder: React.FC = () => {
                 <div className="total-amount">
                   Tổng cộng: <span>{total.toLocaleString('vi-VN')}₫</span>
                 </div>
+
+                {/* NÚT THANH TOÁN ĐƯỢC ĐẶT TẠI ĐÂY */}
+                {canRetryPayment && (
+                  <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button
+                      variant="primary"
+                      onClick={handleRetryPayment}
+                      disabled={isProcessingPayment}
+                      // Style nút cho nổi bật (Màu tối như trong ảnh bạn gửi)
+                      style={{
+                        backgroundColor: '#334155',
+                        borderColor: '#334155',
+                        fontSize: '15px',
+                        padding: '0 24px',
+                        height: '42px',
+                        fontWeight: 600,
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      }}
+                      icon={isProcessingPayment ? undefined : <CreditCard size={18} />}
+                    >
+                      {isProcessingPayment ? 'Đang chuyển hướng...' : 'THANH TOÁN VNPAY NGAY'}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
