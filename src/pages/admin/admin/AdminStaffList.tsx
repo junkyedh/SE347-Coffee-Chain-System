@@ -72,7 +72,7 @@ const AdminStaffList = () => {
       setStaffList(staffWithBranch);
     } catch (error) {
       console.error("Error fetching staff list:", error);
-      message.error("Failed to fetch staff list.");
+      message.error("Lấy danh sách nhân viên không thành công.");
     }
   }, [branchList]);
 
@@ -178,10 +178,10 @@ const AdminStaffList = () => {
     try {
       await AdminApiRequest.delete(`/staff/${id}`);
       fetchStaffList();
-      message.success("Staff deleted successfully!");
+      message.success("Xóa nhân viên thành công!");
     } catch (error) {
       console.error("Error deleting staff:", error);
-      message.error("Failed to delete staff. Please try again.");
+      message.error("Xóa nhân viên thất bại, thử  lại sau.");
     }
   };
 

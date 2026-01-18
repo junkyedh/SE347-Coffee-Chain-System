@@ -24,7 +24,7 @@ const AdminBranchList = () => {
       setAdminBranchList(res.data);
     } catch (error) {
       console.error('Error fetching branch list:', error);
-      message.error('Failed to fetch branch list.');
+      message.error('Tải chi nhánh thất bại.');
     }
   };
 
@@ -51,7 +51,7 @@ const AdminBranchList = () => {
       if (data.createAt) {
         data.createAt = data.createAt.toISOString();
       } else {
-        message.error('Create date is required!');
+        message.error('Ngày tạo là trường bắt buộc!');
         return;
       }
 
@@ -76,7 +76,7 @@ const AdminBranchList = () => {
       setEditBranch(null);
     } catch (error) {
       console.error('Error saving branch:', error);
-      message.error('Failed to save branch. Please try again.');
+      message.error('Lưu thất bại, thử lại sau.');
     }
   };
 
@@ -99,10 +99,10 @@ const AdminBranchList = () => {
     try {
       await AdminApiRequest.delete(`/branch/${id}`);
       fetchAdminBranchList();
-      message.success('Branch deleted successfully!');
+      message.success('Xóa chi nhánh thành công!');
     } catch (error) {
       console.error('Error deleting branch:', error);
-      message.error('Failed to delete branch. Please try again.');
+      message.error('Xóa chi nhánh thất bại, thử lại sau.');
     }
   };
 
