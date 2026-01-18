@@ -1,11 +1,22 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import SEO from '@/components/common/SEO';
 import { ROUTES } from '@/constants';
-import { extractOrderIdFromSlug } from '@/utils/slugify';
+import { extractOrderIdFromSlug, extractProductIdFromQuery } from '@/utils/slugify';
 import { MessageSquare, Send, Star } from 'lucide-react';
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './FeedbackPage.scss';
+import { message } from 'antd';
+import { MainApiRequest } from '@/services/MainApiRequest';
+import { useSystemContext } from '@/hooks/useSystemContext';
+
+type RatingPayload = {
+  phoneCustomer: string,
+  productId: number,
+  description: string,
+  star: number,
+  orderId: number
+}
 
 const FeedbackPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -14,33 +25,43 @@ const FeedbackPage: React.FC = () => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comments, setComments] = useState('');
-  
+  const { search } = useLocation();
+
+  const { userInfo } = useSystemContext();
+
   const reservationCode = slug ? extractOrderIdFromSlug(slug) : 'N/A';
+  const productId = slug ? extractProductIdFromQuery(search) : 'N/A';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (rating === 0) {
-      alert('Vui lòng chọn đánh giá!');
+      message.error('Vui lòng chọn đánh giá!');
       return;
     }
 
     if (!comments.trim()) {
-      alert('Vui lòng nhập nhận xét!');
+      message.error('Vui lòng nhập nhận xét!');
       return;
     }
 
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      MainApiRequest.post<RatingPayload>(`/ratings`, {
+        phoneCustomer: userInfo?.phone,
+        productId: productId,
+        description: comments,
+        star: rating,
+        orderId: reservationCode
+      })
       console.log('Feedback data:', { reservationCode, rating, comments });
 
-      alert('Gửi phản hồi thành công!');
+      message.success('Gửi phản hồi thành công!');
       navigate(ROUTES.HISTORY_ORDERS);
     } catch (error) {
       console.error('Failed to submit feedback:', error);
-      alert('Gửi phản hồi thất bại, vui lòng thử lại!');
+      message.error('Gửi phản hồi thất bại, vui lòng thử lại!');
     } finally {
       setLoading(false);
     }

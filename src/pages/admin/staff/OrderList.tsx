@@ -202,7 +202,7 @@ export const OrderList = () => {
             width: 140,
             align: "center",
             sorter: (a, b) => a.serviceType.localeCompare(b.serviceType),
-            render: (text) => <Tag color="blue">{text}</Tag>,
+            render: (text) => <Tag color="blue">{text.toLowerCase() === 'take away' ? 'Mang đi' : 'Tại cửa hàng'}</Tag>,
           },
           {
             title: "Tổng tiền",

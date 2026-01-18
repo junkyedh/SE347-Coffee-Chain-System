@@ -34,6 +34,7 @@ interface OrderDetail {
   mood?: string;
   quantity: number;
   price: number;
+  feedback: boolean
 }
 
 interface ProductDetail {
@@ -163,6 +164,7 @@ const HistoryOrder: React.FC = () => {
             size: string;
             mood?: string;
             quantity: number;
+            feedback: boolean
           }[];
         }>(`/order/customer/${encodeURIComponent(phone)}/${orderId}`);
         const rawDetails = res.data.order_details;
@@ -171,6 +173,7 @@ const HistoryOrder: React.FC = () => {
           rawDetails.map(async (d) => {
             const { data: p } = await MainApiRequest.get<ProductDetail>(`/product/${d.productId}`);
             const sz = p.sizes.find((s) => s.sizeName === d.size) || { sizeName: d.size, price: 0 };
+
             return {
               productId: p.id,
               name: p.name,
@@ -179,9 +182,11 @@ const HistoryOrder: React.FC = () => {
               mood: d.mood,
               quantity: d.quantity,
               price: sz.price,
+              feedback: d.feedback
             } as OrderDetail;
           })
         );
+        
         setDetails((prev) => ({ ...prev, [orderId]: enriched }));
       } catch (err) {
         console.error(err);
@@ -301,9 +306,8 @@ const HistoryOrder: React.FC = () => {
                           {order.paymentMethod === 'vnpay' ? 'VNPay' : 'Tiền mặt (COD)'}
                         </span>
                         <span
-                          className={`payment-status ${
-                            order.paymentStatus === 'Đã thanh toán' ? 'paid' : 'unpaid'
-                          }`}
+                          className={`payment-status ${order.paymentStatus === 'Đã thanh toán' ? 'paid' : 'unpaid'
+                            }`}
                         >
                           {order.paymentStatus || 'Chưa thanh toán'}
                         </span>
@@ -389,9 +393,10 @@ const HistoryOrder: React.FC = () => {
                                 variant="primary"
                                 size="sm"
                                 icon={<FaStar />}
-                                onClick={() => navigate(createFeedbackUrl(order.id))}
+                                onClick={() => navigate(createFeedbackUrl(order.id, item.productId))}
+                                disabled={item.feedback}
                               >
-                                Đánh giá
+                                {!item.feedback ? "Đánh giá" : "Đã đánh giá"}
                               </Button>
                             )}
                           </div>
