@@ -148,6 +148,7 @@ export const ManagerOrderList = () => {
             dataIndex: 'serviceType',
             key: 'serviceType',
             sorter: (a, b) => a.serviceType.localeCompare(b.serviceType),
+            render: (text) => <div>{text.toLowerCase() === 'take away' ? 'Mang đi' : 'Tại cửa hàng'}</div>,
           },
           {
             title: 'Phương thức TT',

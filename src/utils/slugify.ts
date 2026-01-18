@@ -47,8 +47,8 @@ export const createOrderTrackingUrl = (id: string | number): string => {
 /**
  * Format: /danh-gia/dh{orderId}-review
  */
-export const createFeedbackUrl = (orderId: string | number): string => {
-  return `/danh-gia/dh${orderId}-review`;
+export const createFeedbackUrl = (orderId: string | number, productId: string | number): string => {
+  return `/danh-gia/dh${orderId}-review?productId=${productId}`;
 };
 
 /**
@@ -56,4 +56,11 @@ export const createFeedbackUrl = (orderId: string | number): string => {
 export const extractOrderIdFromSlug = (slug: string): string => {
   const match = slug.match(/^dh(\d+)-/);
   return match ? match[1] : slug.split('-')[0].replace('dh', '');
+};
+
+export const extractProductIdFromQuery = (
+  search: string,
+): string | null => {
+  const params = new URLSearchParams(search);
+  return params.get('productId');
 };

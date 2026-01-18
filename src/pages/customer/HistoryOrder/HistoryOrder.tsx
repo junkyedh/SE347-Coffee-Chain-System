@@ -35,6 +35,7 @@ interface OrderDetailRaw {
   size: string;
   mood?: string;
   quantity: number;
+  feedback: boolean
 }
 
 interface OrderSummary {
@@ -50,7 +51,6 @@ interface OrderSummary {
   order_details: OrderDetailRaw[];
 }
 
-// --- Status Config ---
 const statusMap: Record<string, { label: string; color: string; icon: React.ComponentType }> = {
   Nháp: { label: 'Nháp', color: 'gray', icon: Clock },
   'Chờ xác nhận': { label: 'Chờ xác nhận', color: 'orange', icon: Clock },
@@ -67,7 +67,7 @@ const HistoryOrder: React.FC = () => {
   const [filteredOrders, setFilteredOrders] = useState<OrderSummary[]>([]);
   // Thay vì lưu details riêng lẻ, ta lưu toàn bộ danh sách sản phẩm
   const [products, setProducts] = useState<Product[]>([]);
-  
+
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -151,7 +151,7 @@ const HistoryOrder: React.FC = () => {
 
         // Sắp xếp đơn mới nhất lên đầu
         fetchedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-        
+
         setOrders(fetchedOrders);
         setFilteredOrders(fetchedOrders);
       } catch (err) {
@@ -187,9 +187,9 @@ const HistoryOrder: React.FC = () => {
   const getRenderItem = (itemRaw: OrderDetailRaw) => {
     // Tìm sản phẩm trong Map
     const product = productMap.get(String(itemRaw.productId));
-    
+
     const { price, displaySize, isValid } = getProductDisplayInfo(product, itemRaw.size);
-    
+
     // Nếu chưa tải xong products hoặc không tìm thấy
     if (!isValid || !product) {
       return {
@@ -198,6 +198,7 @@ const HistoryOrder: React.FC = () => {
         image: product?.image || '/placeholder.svg',
         price: 0,
         displaySize: itemRaw.size,
+        feedback: false,
       };
     }
 
@@ -208,6 +209,7 @@ const HistoryOrder: React.FC = () => {
       size: displaySize,
       mood: itemRaw.mood,
       quantity: itemRaw.quantity,
+      feedback: itemRaw.feedback,
       price: price,
     };
   };
@@ -319,9 +321,8 @@ const HistoryOrder: React.FC = () => {
                             {order.serviceType === 'TAKE AWAY' ? 'Giao hàng' : 'Tại cửa hàng'}
                           </span>
                           <span
-                            className={`payment-status ${
-                              order.paymentStatus === 'Đã thanh toán' ? 'paid' : 'unpaid'
-                            }`}
+                            className={`payment-status ${order.paymentStatus === 'Đã thanh toán' ? 'paid' : 'unpaid'
+                              }`}
                           >
                             {order.paymentStatus || 'Chưa thanh toán'}
                           </span>
@@ -406,9 +407,10 @@ const HistoryOrder: React.FC = () => {
                                   variant="primary"
                                   size="sm"
                                   icon={<FaStar />}
-                                  onClick={() => navigate(createFeedbackUrl(order.id))}
+                                  onClick={() => navigate(createFeedbackUrl(order.id, item.productId))}
+                                  disabled={item.feedback}
                                 >
-                                  Đánh giá
+                                  {item.feedback ? "Đã đánh giá" : "Đánh giá"}
                                 </Button>
                               )}
                             </div>

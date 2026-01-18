@@ -52,7 +52,7 @@ export const AdminOrderList = () => {
     }
   }, [searchKeyword, fetchAdminOrderList]);
 
-    useEffect(() => {
+  useEffect(() => {
     fetchAdminOrderList();
   }, [fetchAdminOrderList]);
 
@@ -141,6 +141,7 @@ export const AdminOrderList = () => {
             dataIndex: 'serviceType',
             key: 'serviceType',
             sorter: (a, b) => a.serviceType.localeCompare(b.serviceType),
+            render: (text) => <div>{text.toLowerCase() === 'take away' ? 'Mang đi' : 'Tại cửa hàng'}</div>,
           },
           {
             title: 'Phương thức TT',
@@ -166,7 +167,7 @@ export const AdminOrderList = () => {
               let color = 'default';
               if (paymentStatus === 'Đã thanh toán') color = 'green';
               else if (paymentStatus === 'Chưa thanh toán') color = 'orange';
-              
+
               return (
                 <div className="d-flex align-items-center gap-2">
                   <Tag color={color}>{paymentStatus}</Tag>

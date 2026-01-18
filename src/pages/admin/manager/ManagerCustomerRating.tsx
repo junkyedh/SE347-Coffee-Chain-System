@@ -12,7 +12,7 @@ const ManagerCustomerRating = () => {
 
   const fetchRatingsList = async () => {
     try {
-      const res = await AdminApiRequest.get('/branch-ratings/list');
+      const res = await AdminApiRequest.get('/ratings/branch-ratings/list');
       setRatingsList(res.data);
       setAllRatings(res.data);
     } catch (error) {
