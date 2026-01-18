@@ -6,7 +6,7 @@ import { AdminApiRequest } from "@/services/AdminApiRequest";
 import { DownloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { Form, message, Modal, Space, Table, Upload } from "antd";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../adminPage.scss";
 
@@ -59,7 +59,7 @@ const AdminStaffList = () => {
     }
   };
 
-  const fetchStaffList = async () => {
+  const fetchStaffList = useCallback(async () => {
     try {
       const res = await AdminApiRequest.get("/staff/list");
       const staffWithBranch = res.data.map((staff: any) => ({
@@ -74,22 +74,21 @@ const AdminStaffList = () => {
       console.error("Error fetching staff list:", error);
       message.error("Lấy danh sách nhân viên không thành công.");
     }
-  };
+  }, [branchList]);
 
-  const fetchBranchList = async () => {
+  const fetchBranchList = useCallback(async () => {
     try {
       const res = await AdminApiRequest.get("/branch/list");
       setBranchList(res.data);
     } catch (error) {
       console.error("Error fetching branch list:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchBranchList();
     fetchStaffList();
-    console.log("Staff list fetched:", branchList);
-  }, []);
+  }, [fetchBranchList, fetchStaffList, branchList]);
 
   const handleSearchKeyword = () => {
     if (!searchKeyword.trim()) {
@@ -109,12 +108,6 @@ const AdminStaffList = () => {
   const handleImportExcel = (file: any) => {
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-      console.log("Imported Excel data:", jsonData);
       message.success(
         "Import thành công (chỉ hiển thị, không lưu vào hệ thống).",
       );

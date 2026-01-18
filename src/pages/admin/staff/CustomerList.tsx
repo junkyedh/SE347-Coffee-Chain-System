@@ -6,7 +6,7 @@ import { AdminApiRequest } from "@/services/AdminApiRequest";
 import { DownloadOutlined } from "@ant-design/icons";
 import { Form, message, Modal, Space, Table, Tag } from "antd";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../adminPage.scss";
 
@@ -17,7 +17,7 @@ const CustomerList = () => {
   const [editingCustomer, setEditingCustomer] = useState<any | null>(null);
   const [form] = Form.useForm();
 
-  const fetchCustomerList = async () => {
+  const fetchCustomerList = useCallback(async () => {
     try {
       const res = await AdminApiRequest.get("/customer/list");
       setCustomerList(res.data);
@@ -25,11 +25,11 @@ const CustomerList = () => {
       console.error("Error fetching customer list:", error);
       message.error("Failed to fetch customer list.");
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCustomerList();
-  }, []);
+  }, [fetchCustomerList]);
 
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();
@@ -55,7 +55,7 @@ const CustomerList = () => {
     if (!searchKeyword.trim()) {
       fetchCustomerList();
     }
-  }, [searchKeyword]);
+  }, [searchKeyword, fetchCustomerList]);
 
   const exportExcel = () => {
     const exportData = customerList.map((customer) => ({

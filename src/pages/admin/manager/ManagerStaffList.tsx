@@ -19,7 +19,7 @@ const ManagerStaffList = () => {
 
   const branchId = Number(localStorage.getItem("branchId")) || null;
 
-  const [typeStaffOptions, setTypeStaffOptions] = useState<
+  const [typeStaffOptions] = useState<
     { value: string; label: string }[]
   >([
     { value: "Quản lý", label: "Quản lý" },

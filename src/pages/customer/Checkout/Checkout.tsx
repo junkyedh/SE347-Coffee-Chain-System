@@ -4,10 +4,13 @@ import SEO from '@/components/common/SEO';
 import { useCart, type CartItem } from '@/hooks/cartContext';
 import { MainApiRequest } from '@/services/MainApiRequest';
 import { ROUTES } from '@/constants';
-import { CheckCircle, Clock, CreditCard, MapPin, Tag, Wallet } from 'lucide-react';
+import { CheckCircle, Clock, CreditCard, MapPin, Tag, Wallet, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Checkout.scss';
+import { message } from 'antd';
+import { getProductDisplayInfo } from '@/utils/productSize';
+import { calculateOrderTotal, Coupon } from '@/utils/priceCalculator';
 
 interface LocationStateItem {
   productId: number;
@@ -24,18 +27,6 @@ interface OrderItem {
   size: string;
   price: number;
   mood?: string;
-}
-
-interface Coupon {
-  code: string;
-  discount: number;
-  description: string;
-  promote: {
-    id: number;
-    name: string;
-    promoteType: 'Phần trăm' | 'Cố định';
-    discount: number;
-  };
 }
 
 interface Branch {
@@ -58,12 +49,15 @@ export const Checkout: React.FC = () => {
   const [note, setNote] = useState('');
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'vnpay'>('cash');
+  
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<number | null>(null);
-  const [membershipDiscount, setMembershipDiscount] = useState(0);
+  
+  const [membershipRank, setMembershipRank] = useState<string>(''); 
+  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -82,10 +76,13 @@ export const Checkout: React.FC = () => {
   useEffect(() => {
     const loadItems = async () => {
       try {
-        if (state?.initialItems && Array.isArray(state.initialItems) && state.initialItems.length > 0) {
+        if (
+          state?.initialItems &&
+          Array.isArray(state.initialItems) &&
+          state.initialItems.length > 0
+        ) {
           const mapped = await Promise.all(
             (state.initialItems as LocationStateItem[]).map(async (it) => {
-              // Fetch product details với đầy đủ thông tin
               const { data: product } = await MainApiRequest.get<{
                 id: string;
                 name: string;
@@ -93,27 +90,9 @@ export const Checkout: React.FC = () => {
                 category: string;
                 sizes: { sizeName: string; price: number }[];
               }>(`/product/${it.productId}`);
-              
-              const isCake = product.category === 'Bánh ngọt';
-              
-              let price = 0;
-              if (isCake) {
-                // Với bánh ngọt: whole = piece × 8
-                if (it.size === 'whole') {
-                  const piecePrice = product.sizes.find((s) => s.sizeName === 'piece')?.price || product.sizes[0]?.price || 0;
-                  price = piecePrice * 8;
-                } else if (it.size === 'piece') {
-                  price = product.sizes.find((s) => s.sizeName === 'piece')?.price || product.sizes[0]?.price || 0;
-                } else {
-                  const sz = product.sizes.find((s) => s.sizeName === it.size);
-                  price = sz?.price || product.sizes[0]?.price || 0;
-                }
-              } else {
-                // Với đồ uống và sản phẩm khác
-                const sz = product.sizes.find((s) => s.sizeName === it.size);
-                price = sz?.price || product.sizes[0]?.price || 0;
-              }
-                            
+
+              const { price } = getProductDisplayInfo(product as any, it.size);
+
               return {
                 productId: Number(product.id),
                 name: product.name,
@@ -146,10 +125,8 @@ export const Checkout: React.FC = () => {
     loadItems();
   }, [state, cart, fetchCart]);
 
-  // Load from cart if no state provided
   useEffect(() => {
     if (!state?.initialItems && cart.length > 0) {
-      console.log('[Checkout] Updating items from cart changes');
       setItems(
         cart.map((it) => ({
           productId: Number(it.productId),
@@ -197,6 +174,8 @@ export const Checkout: React.FC = () => {
             .catch(() => [])
         )
       );
+      if (lists.length === 0) return;
+      
       const common = lists.reduce((prev, curr) =>
         prev.filter((b) => curr.some((c) => c.id === b.id))
       );
@@ -206,7 +185,6 @@ export const Checkout: React.FC = () => {
     loadBranches();
   }, [items, selectedBranch]);
 
-  // Calculate membership discount
   useEffect(() => {
     const fetchMembershipRank = async () => {
       try {
@@ -214,86 +192,62 @@ export const Checkout: React.FC = () => {
           '/auth/callback'
         );
         const rank = res.data.data.rank;
-        // Lưu rank để tính toán giảm giá
-        setMembershipDiscount(rank as any);
+        setMembershipRank(rank || '');
       } catch (err) {
-        console.error('Failed to fetch membership rank:', err);
-        setMembershipDiscount(0);
+        setMembershipRank('');
       }
     };
     fetchMembershipRank();
   }, []);
 
-  const deliveryFee = deliveryMethod === 'delivery' ? 10000 : 0;
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  
-  console.log('[Checkout] Price calculation:', { 
-    itemsCount: items.length, 
-    subtotal, 
+  const deliveryFee = deliveryMethod === 'delivery' ? 10000 : 0;
+
+  const { 
+    finalTotal, 
+    couponDiscount, 
+    membershipDiscount, 
+    isMembershipSkipped,
+    totalDiscount
+  } = calculateOrderTotal({
+    subtotal,
     deliveryFee,
-    items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity }))
-  });
-  
-  // Tính toán theo thứ tự: subtotal + phí ship - mã giảm giá - giảm giá membership
-  const totalAfterDelivery = subtotal + deliveryFee;
-  
-  // Tính giảm giá từ voucher (có thể là % hoặc số tiền cố định)
-  let couponDiscount = 0;
-  if (appliedCoupon) {
-    const promote = appliedCoupon.promote;
-    if (promote.promoteType === 'Phần trăm') {
-      // Giảm theo phần trăm
-      couponDiscount = Math.floor(totalAfterDelivery * (promote.discount / 100));
-    } else {
-      // Giảm số tiền cố định
-      couponDiscount = promote.discount;
-    }
-    // Voucher không được giảm quá tổng tiền (tối thiểu phải còn 1,000đ)
-    couponDiscount = Math.min(couponDiscount, totalAfterDelivery - 1000);
-  }
-  
-  const totalAfterCoupon = totalAfterDelivery - couponDiscount;
-  
-  // Tính giảm giá membership dựa trên rank (chỉ áp dụng nếu không dùng coupon)
-  let membershipApplied = 0;
-  if (!appliedCoupon && membershipDiscount) {
-    const rank = membershipDiscount as any as string;
-    
-    if (rank === 'Kim cương') {
-      // Kim cương: giảm 10%
-      membershipApplied = Math.floor(totalAfterCoupon * 0.1);
-    } else if (rank === 'Vàng') {
-      // Vàng: giảm 7%, tối đa 10,000đ
-      membershipApplied = Math.min(Math.floor(totalAfterCoupon * 0.07), 10000);
-    } else if (rank === 'Bạc') {
-      // Bạc: giảm 5%, tối đa 10,000đ
-      membershipApplied = Math.min(Math.floor(totalAfterCoupon * 0.05), 10000);
-    } else if (rank === 'Đồng') {
-      // Đồng: giảm 3%, tối đa 10,000đ
-      membershipApplied = Math.min(Math.floor(totalAfterCoupon * 0.03), 10000);
-    }
-    // Thường: không giảm (membershipApplied = 0)
-  }
-  
-  // Đảm bảo finalTotal luôn >= 1000 VND
-  const finalTotal = Math.max(1000, totalAfterCoupon - membershipApplied);
-  
-  console.log('[Checkout] Final calculation:', { 
-    totalAfterDelivery,
-    couponDiscount,
-    totalAfterCoupon,
-    membershipRank: membershipDiscount,
-    membershipApplied,
-    finalTotal 
+    coupon: appliedCoupon,
+    membershipRank: membershipRank
   });
 
   const handleApplyCoupon = () => {
     const code = couponCode.trim().toUpperCase();
+    if (!code) return;
+
     const c = availableCoupons.find((x) => x.code.toUpperCase() === code);
+
     if (c) {
       setAppliedCoupon(c);
+      if (membershipRank) {
+        message.success('Áp dụng mã giảm giá thành công!');
+        message.info(
+          `Ưu đãi thành viên (${membershipRank}) sẽ không được áp dụng đồng thời với mã giảm giá.`
+        );
+      } else {
+        message.success('Áp dụng mã giảm giá thành công!');
+      }
     } else {
-      alert('Mã giảm giá không hợp lệ!');
+      message.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!');
+      setAppliedCoupon(null);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+
+    if (membershipRank) {
+      message.info(
+        `Đã hủy mã giảm giá. Ưu đãi thành viên (${membershipRank}) đã được áp dụng lại.`
+      );
+    } else {
+      message.success('Đã hủy mã giảm giá.');
     }
   };
 
@@ -310,23 +264,23 @@ export const Checkout: React.FC = () => {
       alert('Vui lòng nhập địa chỉ giao hàng.');
       return;
     }
-    
-    // Kiểm tra giỏ hàng không rỗng
+
     if (items.length === 0) {
       alert('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi đặt hàng.');
       return;
     }
-    
-    // Kiểm tra số tiền hợp lệ cho VNPay
+
     if (paymentMethod === 'vnpay' && finalTotal < 5000) {
-      alert('Số tiền thanh toán qua VNPay phải từ 5,000đ trở lên. Vui lòng thêm sản phẩm hoặc chọn phương thức thanh toán khác.');
+      alert(
+        'Số tiền thanh toán qua VNPay phải từ 5,000đ trở lên. Vui lòng thêm sản phẩm hoặc chọn phương thức thanh toán khác.'
+      );
       return;
     }
-    
+
     setLoading(true);
     try {
       const orderStatus = paymentMethod === 'vnpay' ? 'Nháp' : 'Chờ xác nhận';
-      
+
       const { data: o } = await MainApiRequest.post<{ id: number }>('/order', {
         phoneCustomer: phone,
         name,
@@ -339,14 +293,16 @@ export const Checkout: React.FC = () => {
       });
       const orderId = o.id;
 
+      // Cập nhật thông tin chi tiết đơn hàng
       await MainApiRequest.put(`/order/${orderId}`, {
         phoneCustomer: phone,
         serviceType: deliveryMethod === 'delivery' ? 'TAKE AWAY' : 'DINE IN',
         totalPrice: finalTotal,
         orderDate: new Date().toISOString(),
         status: orderStatus,
-        paymentMethod: paymentMethod, // 'cash' hoặc 'vnpay'
+        paymentMethod: paymentMethod,
         paymentStatus: 'Chưa thanh toán',
+        discount: totalDiscount
       });
 
       await Promise.all(
@@ -357,6 +313,7 @@ export const Checkout: React.FC = () => {
             size: it.size,
             mood: it.mood,
             quantity: it.quantity,
+            price: it.price
           });
         })
       );
@@ -369,18 +326,21 @@ export const Checkout: React.FC = () => {
         localStorage.setItem('guest_order_history', JSON.stringify(newHistory));
       }
 
-      // If VNPay payment method is selected, redirect to payment URL
+      const backendBaseUrl = String(MainApiRequest.defaults.baseURL || '').replace(/\/+$/, '');
+      const clientReturn =
+        process.env.REACT_APP_VNPAY_RETURN_URL?.trim() ||
+        `${(process.env.REACT_APP_BASE_URL || window.location.origin).replace(/\/+$/, '')}/vnpay-callback`;
+
       if (paymentMethod === 'vnpay') {
         try {
           const { data: paymentData } = await MainApiRequest.post('/payment/vnpay/create', {
             orderId,
             amount: finalTotal,
             orderInfo: `Thanh toan don hang ${orderId}`,
-            returnUrl: `${window.location.origin}/vnpay-callback`,
+            returnUrl: `${backendBaseUrl}/payment/vnpay/return?clientReturn=${encodeURIComponent(clientReturn)}`,
           });
-                    
+
           if (paymentData.paymentUrl) {
-            // Redirect to VNPay payment page
             window.location.href = paymentData.paymentUrl;
             return;
           } else {
@@ -415,8 +375,7 @@ export const Checkout: React.FC = () => {
     <>
       <SEO
         title="Thanh toán"
-        description="Thanh toán đơn hàng tại SE347 Coffee Chain. Hỗ trợ nhiều phương thức thanh toán: tiền mặt, thẻ, VNPay. Giao hàng nhanh chóng và tiện lợi."
-        keywords="thanh toán, checkout, đặt hàng, payment, giao hàng, VNPay, tiền mặt"
+        description="Thanh toán đơn hàng tại SE347 Coffee Chain."
       />
       <Breadcrumbs
         title="Thanh toán"
@@ -599,30 +558,79 @@ export const Checkout: React.FC = () => {
                   <Tag size={20} />
                   Mã giảm giá
                 </h2>
-                <div className="coupon-input">
-                  <input
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Nhập mã giảm giá"
-                  />
-                  <button className="primaryBtn" onClick={handleApplyCoupon}>
-                    Áp dụng
-                  </button>
-                </div>
+
+                {!appliedCoupon ? (
+                  <div className="coupon-input">
+                    <input
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      placeholder="Nhập mã giảm giá"
+                      onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                    />
+                    <button className="primaryBtn" onClick={handleApplyCoupon}>
+                      Áp dụng
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="applied-coupon-container"
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '10px',
+                      backgroundColor: '#f0fdf4',
+                      border: '1px solid #bbf7d0',
+                      borderRadius: '8px',
+                      marginTop: '10px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <CheckCircle className="coupon-icon" size={18} color="#16a34a" />
+                      <div>
+                        <div
+                          className="coupon-code"
+                          style={{ fontWeight: 'bold', color: '#16a34a' }}
+                        >
+                          {appliedCoupon.code}
+                        </div>
+                        <div className="coupon-desc" style={{ fontSize: '12px', color: '#666' }}>
+                          {appliedCoupon.promote.name}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleRemoveCoupon}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#ef4444',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '14px',
+                      }}
+                    >
+                      <X size={16} /> Bỏ chọn
+                    </button>
+                  </div>
+                )}
 
                 {appliedCoupon && (
-                  <div className="applied-coupon">
-                    <CheckCircle className="coupon-icon" />
-                    <div className="coupon-info">
-                      <div className="coupon-code">{appliedCoupon.code}</div>
-                      <div className="coupon-desc">{appliedCoupon.promote.name}</div>
-                    </div>
-                    <div className="coupon-discount">
-                      {appliedCoupon.promote.promoteType === 'Phần trăm' 
-                        ? `-${appliedCoupon.promote.discount}%` 
-                        : `-${Number(appliedCoupon.promote.discount || 0).toLocaleString('vi-VN')}₫`
-                      }
-                    </div>
+                  <div
+                    className="coupon-discount"
+                    style={{
+                      textAlign: 'right',
+                      marginTop: '5px',
+                      fontSize: '14px',
+                      color: '#16a34a',
+                    }}
+                  >
+                    Giảm:{' '}
+                    {appliedCoupon.promote.promoteType === 'Phần trăm'
+                      ? `-${appliedCoupon.promote.discount}%`
+                      : `-${Number(appliedCoupon.promote.discount || 0).toLocaleString('vi-VN')}₫`}
                   </div>
                 )}
               </div>
@@ -639,18 +647,34 @@ export const Checkout: React.FC = () => {
                     <span>Phí giao hàng</span>
                     <span>{Number(deliveryFee || 0).toLocaleString('vi-VN')}₫</span>
                   </div>
+                  
                   {couponDiscount > 0 && (
                     <div className="total-line discount">
                       <span>Giảm giá voucher</span>
                       <span>-{Number(couponDiscount || 0).toLocaleString('vi-VN')}₫</span>
                     </div>
                   )}
-                  {membershipApplied > 0 && (
-                    <div className="total-line discount">
-                      <span>Giảm giá thành viên ({membershipDiscount})</span>
-                      <span>-{Number(membershipApplied || 0).toLocaleString('vi-VN')}₫</span>
+
+                  {(membershipDiscount > 0 || (isMembershipSkipped && membershipRank)) && (
+                    <div
+                      className="total-line discount"
+                      style={{
+                        opacity: isMembershipSkipped ? 0.5 : 1,
+                        textDecoration: isMembershipSkipped ? 'line-through' : 'none',
+                      }}
+                    >
+                      <span>
+                        Giảm giá thành viên ({membershipRank})
+                        {isMembershipSkipped && (
+                          <span style={{ fontSize: '11px', display: 'block', textDecoration: 'none' }}>
+                            (Không áp dụng cùng voucher)
+                          </span>
+                        )}
+                      </span>
+                      <span>-{Number(membershipDiscount || 0).toLocaleString('vi-VN')}₫</span>
                     </div>
                   )}
+                  
                   <div className="total-line final">
                     <strong>Tổng cộng</strong>
                     <strong>{Number(finalTotal || 0).toLocaleString('vi-VN')}₫</strong>

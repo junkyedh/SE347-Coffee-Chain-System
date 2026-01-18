@@ -1,149 +1,176 @@
-import AdminButton from "@/components/admin/AdminButton/AdminButton";
-import SearchInput from "@/components/common/SearchInput/SearchInput";
-import StatusDropdown from "@/components/common/StatusDropdown/StatusDropdown";
-import { AdminApiRequest } from "@/services/AdminApiRequest";
-import { DownloadOutlined } from "@ant-design/icons";
-import { Form, Input, message, Table, Tag } from "antd";
-import moment from "moment";
-import { useEffect, useState } from "react";
-import * as XLSX from "xlsx";
-import "../adminPage.scss";
+import AdminButton from '@/components/admin/AdminButton/AdminButton';
+import SearchInput from '@/components/common/SearchInput/SearchInput';
+import StatusDropdown from '@/components/common/StatusDropdown/StatusDropdown';
+import { AdminApiRequest } from '@/services/AdminApiRequest';
+import { DownloadOutlined, UserOutlined } from '@ant-design/icons';
+import { Form, message, Select, Table, Tag } from 'antd';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
+import '../adminPage.scss';
 
 export const OrderList = () => {
   const [managerOrderList, setManagerOrderList] = useState<any[]>([]);
-  const [originalManagerOrderList, setOriginalManagerOrderList] = useState<
-    any[]
-  >([]);
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [staffInput, setStaffInput] = useState<{ [orderId: number]: string }>(
-    {},
-  );
+  const [originalManagerOrderList, setOriginalManagerOrderList] = useState<any[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  
+  // State lưu ID nhân viên đang chọn cho các đơn hàng chưa có người phụ trách
+  const [staffInput, setStaffInput] = useState<{ [orderId: number]: number }>({});
+  
+  // Danh sách nhân viên của chi nhánh để hiển thị Dropdown
+  const [branchStaffList, setBranchStaffList] = useState<any[]>([]);
 
   const fetchManagerOrderList = async () => {
-    const res = await AdminApiRequest.get("/branch-order/list");
-    setManagerOrderList(res.data);
-    setOriginalManagerOrderList(res.data);
+    try {
+      const res = await AdminApiRequest.get('/branch-order/list');
+      setManagerOrderList(res.data);
+      setOriginalManagerOrderList(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchBranchStaffList = async () => {
+    try {
+      const res = await AdminApiRequest.get('/staff/list'); 
+      setBranchStaffList(res.data);
+    } catch (error) {
+      console.error('Lỗi tải danh sách nhân viên:', error);
+    }
   };
 
   useEffect(() => {
     fetchManagerOrderList();
+    fetchBranchStaffList();
   }, []);
 
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();
     if (!keyword) {
-      fetchManagerOrderList();
+      setManagerOrderList(originalManagerOrderList);
       return;
     }
     const filtered = originalManagerOrderList.filter((order) => {
-      const id = String(order.id ?? "").toLowerCase();
-      const phoneCustomer = (order.phoneCustomer ?? "").toLowerCase();
-      const staffName = (order.staffName ?? "").toLowerCase();
-
-      return (
-        id.includes(keyword) ||
-        phoneCustomer.includes(keyword) ||
-        staffName.includes(keyword)
-      );
+      const id = String(order.id ?? '').toLowerCase();
+      const phoneCustomer = (order.phoneCustomer ?? '').toLowerCase();
+      // [FIX] Search cả trong object staff
+      const staffName = (order.staff?.name || order.staffName || '').toLowerCase();
+      
+      return id.includes(keyword) || phoneCustomer.includes(keyword) || staffName.includes(keyword);
     });
     setManagerOrderList(filtered);
   };
-
+  
   useEffect(() => {
-    if (!searchKeyword.trim()) {
-      fetchManagerOrderList();
-    }
-  }, [searchKeyword]);
+     if (!searchKeyword) setManagerOrderList(originalManagerOrderList);
+  }, [searchKeyword, originalManagerOrderList]);
 
   const handleExportManagerOrderList = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       managerOrderList.map((order) => ({
-        "Mã đơn": order.id,
-        "Số điện thoại": order.phoneCustomer,
-        "Loại phục vụ": order.serviceType,
-        "Tổng tiền": order.totalPrice,
-        "Ngày đặt": moment(order.orderDate).format("DD-MM-YYYY HH:mm:ss"),
-        "Nhân viên": order.staffName,
-        "Trạng thái": order.status,
-      })),
+        'Mã đơn': order.id,
+        'Số điện thoại': order.phoneCustomer,
+        'Loại phục vụ': order.serviceType,
+        'Phương thức thanh toán': order.paymentMethod || 'Tiền mặt',
+        'Trạng thái thanh toán': order.paymentStatus || 'Chưa thanh toán',
+        'Tổng tiền': order.totalPrice,
+        'Ngày đặt': moment(order.orderDate).format('DD-MM-YYYY HH:mm:ss'),
+        'Nhân viên': order.staff?.name || order.staffName || '',
+        'Trạng thái': statusMap[order.status]?.label || order.status,
+      }))
     );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Danh Sách Đơn Hàng");
-    XLSX.writeFile(workbook, "DanhSachDonHang.xlsx");
-    message.success("Xuất danh sách đơn hàng thành công.");
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Danh Sách Đơn Hàng');
+    XLSX.writeFile(workbook, 'DanhSachDonHang.xlsx');
   };
 
   const handleChangeStatus = async (id: number, newStatus: string) => {
-    // 1. Tìm đơn hàng hiện tại để lấy trạng thái cũ
     const currentOrder = managerOrderList.find((o) => o.id === id);
-    if (!currentOrder) return;
+    if (!currentOrder) {
+      message.error('Đơn hàng không tồn tại.');
+      return;
+    }
 
-    // 2. Lấy tên nhân viên (Ưu tiên lấy từ ô Input user đang nhập)
-    const staffNameInput = staffInput[id];
-    const staffName =
-      staffNameInput !== undefined
-        ? staffNameInput
-        : currentOrder.staffName || "";
+    const selectedStaffId = staffInput[id];
+    
+    // [FIX] Kiểm tra kỹ xem đơn hàng đã có nhân viên (dạng object hoặc id) chưa
+    const hasAssignedStaff = currentOrder.staff || currentOrder.staffID || currentOrder.staffName;
 
-    // 3. KIỂM TRA ĐIỀU KIỆN: Nếu đang là PENDING mà không có tên nhân viên
-    if (
-      currentOrder.status === "PENDING" &&
-      (!staffName || staffName.trim() === "")
-    ) {
-      message.warning(
-        "Đơn hàng 'Chờ xác nhận' bắt buộc phải nhập tên nhân viên xử lý!",
-      );
+    // Logic: Nếu chưa có nhân viên VÀ cũng chưa chọn nhân viên mới -> Báo lỗi
+    // (Áp dụng khi chuyển khỏi trạng thái Nháp/Chờ xác nhận)
+    if (!hasAssignedStaff && !selectedStaffId) {
+      message.warning('Vui lòng chọn nhân viên phụ trách trước khi xử lý đơn hàng!');
       return;
     }
 
     try {
-      await AdminApiRequest.put(`/branch-order/status/${id}`, {
+      const payload: any = {
         status: newStatus,
-        staffName: staffName,
-      });
-      message.success("Cập nhật trạng thái thành công.");
+      };
+      
+      // Chỉ gửi staffId nếu người dùng có chọn mới. 
+      // Nếu đã có staff cũ, backend sẽ tự giữ nguyên (dựa trên logic service đã sửa trước đó)
+      if (selectedStaffId) {
+        payload.staffId = selectedStaffId;
+      }
 
-      // Xóa input tạm
+      await AdminApiRequest.put(`/branch-order/status/${id}`, payload);
+
+      message.success('Cập nhật thành công.');
+      fetchManagerOrderList();
+
+      // Clear input sau khi thành công
       setStaffInput((prev) => {
         const newState = { ...prev };
         delete newState[id];
         return newState;
       });
-
-      fetchManagerOrderList();
-    } catch (error) {
-      message.error("Không thể cập nhật trạng thái.");
+    } catch (error: any) {
+      console.error(error);
+      message.error(error.response?.data?.message || 'Không thể cập nhật trạng thái.');
     }
   };
 
-  const handleCancelOrder = async (id: number) => {
-    const staffName =
-      staffInput[id] ||
-      managerOrderList.find((o) => o.id === id)?.staffName ||
-      "";
-
-    try {
-      await AdminApiRequest.put(`/branch-order/status/${id}`, {
-        status: "CANCELLED",
-        staffName,
-      });
-      message.success("Đơn hàng đã được hủy.");
-      fetchManagerOrderList();
-      setStaffInput((prev) => {
-        const newState = { ...prev };
-        delete newState[id];
-        return newState;
-      });
-    } catch (error) {
-      message.error("Không thể hủy đơn hàng.");
-    }
+  const handleUpdatePaymentStatus = async (orderId: number, newStatus: string) => {
+     try {
+        await AdminApiRequest.put(`/order/${orderId}`, { paymentStatus: newStatus });
+        message.success('Cập nhật trạng thái thanh toán thành công!');
+        fetchManagerOrderList();
+     } catch(e) { message.error('Lỗi cập nhật thanh toán'); }
   };
 
   const statusMap: Record<string, { label: string; color: string }> = {
-    PENDING: { label: "Chờ xác nhận", color: "orange" },
-    PREPARING: { label: "Đang chuẩn bị", color: "purple" },
-    COMPLETED: { label: "Hoàn thành", color: "green" },
-    CANCELLED: { label: "Đã hủy", color: "red" },
+    Nháp: { label: 'Nháp', color: 'default' },
+    'Chờ xác nhận': { label: 'Chờ xác nhận', color: 'orange' },
+    'Đã xác nhận': { label: 'Đã xác nhận', color: 'blue' },
+    'Đang chuẩn bị': { label: 'Đang chuẩn bị', color: 'purple' },
+    'Sẵn sàng': { label: 'Sẵn sàng', color: 'cyan' },
+    'Đang giao': { label: 'Đang giao', color: 'geekblue' },
+    'Hoàn thành': { label: 'Hoàn thành', color: 'green' },
+    'Đã hủy': { label: 'Đã hủy', color: 'red' },
+  };
+
+  const STATUS_FLOW = [
+    'Chờ xác nhận',
+    'Đã xác nhận',
+    'Đang chuẩn bị',
+    'Sẵn sàng',
+    'Đang giao',
+    'Hoàn thành',
+  ];
+
+  const getAllowedStatusMap = (currentStatus: string) => {
+    if (currentStatus === 'Hoàn thành' || currentStatus === 'Đã hủy') {
+      return { [currentStatus]: statusMap[currentStatus] };
+    }
+    const currentIndex = STATUS_FLOW.indexOf(currentStatus);
+    const allowedMap: Record<string, { label: string; color: string }> = {};
+    if (statusMap[currentStatus]) allowedMap[currentStatus] = statusMap[currentStatus];
+    STATUS_FLOW.forEach((status, index) => {
+      if (index > currentIndex) allowedMap[status] = statusMap[status];
+    });
+    allowedMap['Đã hủy'] = statusMap['Đã hủy'];
+    return allowedMap;
   };
 
   return (
@@ -154,7 +181,7 @@ export const OrderList = () => {
           <div className="flex-grow-1 d-flex justify-content-center">
             <Form layout="inline" className="search-form d-flex">
               <SearchInput
-                placeholder="Tìm kiếm theo SĐT hoặc mã đơn"
+                placeholder="Tìm kiếm..."
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 onSearch={handleSearchKeyword}
@@ -178,108 +205,120 @@ export const OrderList = () => {
         className="custom-table"
         dataSource={managerOrderList}
         rowKey="id"
-        // --- THÊM DÒNG NÀY ĐỂ KÍCH HOẠT CUỘN NGANG ---
-        scroll={{ x: "max-content" }}
         columns={[
-          {
-            title: "Mã đơn",
-            dataIndex: "id",
-            key: "id",
-            width: 80, // Cố định chiều rộng cột nhỏ
-            align: "center",
-            sorter: (a, b) => a.id - b.id,
+          { title: 'Mã đơn', dataIndex: 'id', key: 'id', width: 80, sorter: (a, b) => a.id - b.id },
+          { title: 'SĐT', dataIndex: 'phoneCustomer', key: 'phoneCustomer', width: 120 },
+          { 
+            title: 'Loại', 
+            dataIndex: 'serviceType', 
+            key: 'serviceType',
+            width: 100,
+            render: (text) => text === 'TAKE AWAY' ? 'Mang đi' : 'Tại chỗ'
           },
           {
-            title: "Số điện thoại",
-            dataIndex: "phoneCustomer",
-            key: "phoneCustomer",
-            width: 140, // Đủ rộng cho SĐT
+            title: 'Phương thức TT',
+            dataIndex: 'paymentMethod',
+            key: 'paymentMethod',
+            width: 130,
+            render: (method: string) => {
+              const isVNPay = (method || '').toLowerCase() === 'vnpay';
+              return <Tag color={isVNPay ? 'orange' : 'blue'}>{isVNPay ? 'VNPay' : 'Tiền mặt'}</Tag>;
+            },
           },
           {
-            title: "Loại phục vụ",
-            dataIndex: "serviceType",
-            key: "serviceType",
-            width: 140,
-            align: "center",
-            sorter: (a, b) => a.serviceType.localeCompare(b.serviceType),
-            render: (text) => <Tag color="blue">{text.toLowerCase() === 'take away' ? 'Mang đi' : 'Tại cửa hàng'}</Tag>,
+            title: 'Trạng thái TT',
+            dataIndex: 'paymentStatus',
+            key: 'paymentStatus',
+            width: 180,
+            render: (status: string, record: any) => {
+               const st = status || 'Chưa thanh toán';
+               return (
+                 <div className="d-flex align-items-center gap-2">
+                   <Tag color={st === 'Đã thanh toán' ? 'green' : 'orange'}>{st}</Tag>
+                   {st !== 'Đã thanh toán' && record.paymentMethod !== 'vnpay' && (
+                     <AdminButton variant="primary" size="sm" onClick={() => handleUpdatePaymentStatus(record.id, 'Đã thanh toán')}>Xác nhận</AdminButton>
+                   )}
+                 </div>
+               )
+            },
           },
-          {
-            title: "Tổng tiền",
-            dataIndex: "totalPrice",
-            key: "totalPrice",
+          { title: 'Tổng tiền', dataIndex: 'totalPrice', key: 'totalPrice', width: 120, render: (v) => v?.toLocaleString() + 'đ' },
+          { 
+            title: 'Ngày đặt', 
+            dataIndex: 'orderDate', 
+            key: 'orderDate',
             width: 150,
-            sorter: (a, b) => a.totalPrice - b.totalPrice,
-            render: (price) =>
-              new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }).format(price),
+            render: (date) => moment(date).format('DD/MM/YYYY HH:mm'),
+            sorter: (a, b) => moment(a.orderDate).unix() - moment(b.orderDate).unix(),
           },
           {
-            title: "Ngày đặt",
-            dataIndex: "orderDate",
-            key: "orderDate",
-            width: 180, // Đủ rộng cho ngày giờ
-            render: (date: string) =>
-              moment(date).format("DD-MM-YYYY HH:mm:ss"),
-            sorter: (a, b) =>
-              moment(a.orderDate).unix() - moment(b.orderDate).unix(),
-          },
-          {
-            title: "Nhân viên",
-            dataIndex: "staffName",
-            key: "staffName",
-            width: 180, // Đủ rộng cho ô Input
-            render: (staffName: string, record: any) => (
-              <Input
-                value={staffInput[record.id] ?? staffName ?? ""}
-                placeholder="Tên nhân viên"
-                size="small"
-                // style={{ width: 120 }} // Bỏ width cứng này đi để nó theo width của cột
-                onChange={(e) =>
-                  setStaffInput((prev) => ({
-                    ...prev,
-                    [record.id]: e.target.value,
-                  }))
-                }
-              />
-            ),
-          },
-          {
-            title: "Trạng thái",
-            dataIndex: "status",
-            key: "status",
-            width: 150,
-            align: "center",
-            render: (status: string) => {
-              const map = statusMap[status];
-              return map ? (
-                <Tag color={map.color}>{map.label}</Tag>
-              ) : (
-                <Tag>{status}</Tag>
+            title: 'Nhân viên',
+            key: 'staff', // Key chung cho cột
+            width: 200,
+            render: (_: any, record: any) => {
+              // [FIX LOGIC HIỂN THỊ]
+              // Ưu tiên lấy tên từ object staff (do TypeORM relations trả về)
+              // Sau đó mới check staffName (trường hợp flat data)
+              const assignedName = record.staff?.name || record.staffName;
+
+              if (assignedName) {
+                // Nếu ĐÃ CÓ người phụ trách -> Hiển thị tên (Text/Tag), không hiện Select nữa
+                return (
+                  <div className="d-flex align-items-center gap-2">
+                    <UserOutlined style={{ color: '#1890ff' }} />
+                    <span style={{ fontWeight: 500, color: '#262626' }}>{assignedName}</span>
+                  </div>
+                );
+              }
+
+              // Nếu CHƯA CÓ người phụ trách -> Hiển thị Dropdown để chọn
+              return (
+                <Select
+                  placeholder="Chọn nhân viên"
+                  size="small"
+                  style={{ width: '100%' }}
+                  value={staffInput[record.id]}
+                  onChange={(value) =>
+                    setStaffInput((prev) => ({
+                      ...prev,
+                      [record.id]: value, // value là ID nhân viên
+                    }))
+                  }
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  options={branchStaffList.map((staff) => ({
+                    value: staff.id,
+                    label: staff.name, 
+                  }))}
+                />
               );
             },
-            sorter: (a, b) => {
-              const labelA = statusMap[a.status]?.label || a.status;
-              const labelB = statusMap[b.status]?.label || b.status;
-              return labelA.localeCompare(labelB);
-            },
           },
           {
-            title: "Hành động",
-            key: "action",
-            width: 200, // Cột hành động cần rộng
-            align: "center",
-            render: (_: any, record: any) => (
-              <StatusDropdown
-                value={record.status}
-                onChange={(newStatus) =>
-                  handleChangeStatus(record.id, newStatus)
-                }
-                statusMap={statusMap}
-              ></StatusDropdown>
-            ),
+            title: 'Trạng thái',
+            dataIndex: 'status',
+            key: 'status',
+            width: 140,
+            render: (status) => <Tag color={statusMap[status]?.color}>{statusMap[status]?.label || status}</Tag>,
+            sorter: (a, b) => (statusMap[a.status]?.label || '').localeCompare(statusMap[b.status]?.label || ''),
+          },
+          {
+            title: 'Hành động',
+            key: 'action',
+            fixed: 'right',
+            width: 140,
+            render: (_: any, record: any) => {
+              const allowedMap = getAllowedStatusMap(record.status);
+              return (
+                <StatusDropdown
+                  value={record.status}
+                  onChange={(newStatus) => handleChangeStatus(record.id, newStatus)}
+                  statusMap={allowedMap}
+                />
+              );
+            },
           },
         ]}
       />

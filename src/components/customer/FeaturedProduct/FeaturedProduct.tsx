@@ -37,7 +37,6 @@ const FeaturedList: React.FC<FeaturedListProps> = ({
   const handleShowMore = () => {
     navigate(ROUTES.MENU);
   };
-  console.log('Popular products:', popularProducts);
   return (
     <section className="featured-list">
       <h2 className="featured-title text-center mb-4">{title}</h2>
