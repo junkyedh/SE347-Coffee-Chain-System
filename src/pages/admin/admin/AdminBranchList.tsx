@@ -1,13 +1,13 @@
-import AdminButton from '@/components/admin/AdminButton/AdminButton';
-import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
-import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
-import SearchInput from '@/components/common/SearchInput/SearchInput';
-import { useToast } from '@/components/common/Toast/Toast';
-import { AdminApiRequest } from '@/services/AdminApiRequest';
-import { Form, message, Modal, Space, Table } from 'antd';
-import moment from 'moment';
-import { useEffect, useState } from 'react';
-import '../adminPage.scss';
+import AdminButton from "@/components/admin/AdminButton/AdminButton";
+import AdminPopConfirm from "@/components/admin/PopConfirm/AdminPopConfirm";
+import FloatingLabelInput from "@/components/common/FloatingInput/FloatingLabelInput";
+import SearchInput from "@/components/common/SearchInput/SearchInput";
+import { useToast } from "@/components/common/Toast/Toast";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
+import { Form, message, Modal, Space, Table, Tooltip } from "antd";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import "../adminPage.scss";
 
 const AdminBranchList = () => {
   const [branchForm] = Form.useForm();
@@ -15,16 +15,15 @@ const AdminBranchList = () => {
   const [openCreateBranchModal, setOpenCreateBranchModal] = useState(false);
   const [editBranch, setEditBranch] = useState<any>(null);
   const [managerList, setManagerList] = useState<any[]>([]);
-
   const { success } = useToast();
 
   const fetchAdminBranchList = async () => {
     try {
-      const res = await AdminApiRequest.get('/branch/list');
+      const res = await AdminApiRequest.get("/branch/list");
       setAdminBranchList(res.data);
     } catch (error) {
-      console.error('Error fetching branch list:', error);
-      message.error('Tải chi nhánh thất bại.');
+      console.error("Error fetching branch list:", error);
+      message.error("Tải chi nhánh thất bại.");
     }
   };
 
@@ -51,7 +50,7 @@ const AdminBranchList = () => {
       if (data.createAt) {
         data.createAt = data.createAt.toISOString();
       } else {
-        message.error('Ngày tạo là trường bắt buộc!');
+        message.error("Ngày tạo là trường bắt buộc!");
         return;
       }
 
@@ -59,10 +58,10 @@ const AdminBranchList = () => {
         const { id, ...rest } = data;
         await AdminApiRequest.put(`/branch/${editBranch.id}`, rest);
       } else {
-        await AdminApiRequest.post('/branch', data);
-        const createdBranch = await AdminApiRequest.get('/branch/list');
-        const newBranchId = createdBranch?.data?.[createdBranch.data.length - 1]?.id;
-
+        await AdminApiRequest.post("/branch", data);
+        const createdBranch = await AdminApiRequest.get("/branch/list");
+        const newBranchId =
+          createdBranch?.data?.[createdBranch.data.length - 1]?.id;
         await AdminApiRequest.put(`/staff/staffbranch/${data.managerId}`, {
           branchId: newBranchId,
         });
@@ -71,12 +70,12 @@ const AdminBranchList = () => {
       fetchAdminBranchList();
       setOpenCreateBranchModal(false);
       branchForm.resetFields();
-      message.success('Branch saved successfully!');
-      success('Chi nhánh đã được lưu thành công!');
+      message.success("Branch saved successfully!");
+      success("Chi nhánh đã được lưu thành công!");
       setEditBranch(null);
     } catch (error) {
-      console.error('Error saving branch:', error);
-      message.error('Lưu thất bại, thử lại sau.');
+      console.error("Error saving branch:", error);
+      message.error("Lưu thất bại, thử lại sau.");
     }
   };
 
@@ -99,14 +98,14 @@ const AdminBranchList = () => {
     try {
       await AdminApiRequest.delete(`/branch/${id}`);
       fetchAdminBranchList();
-      message.success('Xóa chi nhánh thành công!');
+      message.success("Xóa chi nhánh thành công!");
     } catch (error) {
-      console.error('Error deleting branch:', error);
-      message.error('Xóa chi nhánh thất bại, thử lại sau.');
+      console.error("Error deleting branch:", error);
+      message.error("Xóa chi nhánh thất bại, thử lại sau.");
     }
   };
 
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState("");
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();
     if (!keyword) {
@@ -114,8 +113,8 @@ const AdminBranchList = () => {
       return;
     }
     const filtered = adminBranchList.filter((branch) => {
-      const name = (branch.name || '').toLowerCase();
-      const address = (branch.address || '').toLowerCase();
+      const name = (branch.name || "").toLowerCase();
+      const address = (branch.address || "").toLowerCase();
       return name.includes(keyword) || address.includes(keyword);
     });
     setAdminBranchList(filtered);
@@ -129,11 +128,11 @@ const AdminBranchList = () => {
 
   const fetchManagerList = async () => {
     try {
-      const res = await AdminApiRequest.get('/staff/list?role=ADMIN_BRAND');
+      const res = await AdminApiRequest.get("/staff/list?role=ADMIN_BRAND");
       setManagerList(res.data);
     } catch (error) {
-      console.error('Error fetching manager list:', error);
-      message.error('Không thể lấy danh sách quản lý.');
+      console.error("Error fetching manager list:", error);
+      message.error("Không thể lấy danh sách quản lý.");
     }
   };
 
@@ -167,7 +166,7 @@ const AdminBranchList = () => {
 
       <Modal
         className="custom-modal"
-        title={editBranch ? 'Chỉnh sửa' : 'Thêm mới'}
+        title={editBranch ? "Chỉnh sửa" : "Thêm mới"}
         open={openCreateBranchModal}
         onCancel={onCancelCreateBranch}
         footer={null}
@@ -177,33 +176,33 @@ const AdminBranchList = () => {
             name="name"
             label="Tên chi nhánh"
             component="input"
-            rules={[{ required: true, message: 'Tên chi nhánh là bắt buộc' }]}
+            rules={[{ required: true, message: "Tên chi nhánh là bắt buộc" }]}
           />
           <FloatingLabelInput
             name="address"
             label="Địa chỉ"
             component="input"
             type="textarea"
-            rules={[{ required: true, message: 'Địa chỉ là bắt buộc' }]}
+            rules={[{ required: true, message: "Địa chỉ là bắt buộc" }]}
           />
           <FloatingLabelInput
             name="phone"
             label="Số điện thoại"
             component="input"
             type="number"
-            rules={[{ required: true, message: 'Số điện thoại là bắt buộc' }]}
+            rules={[{ required: true, message: "Số điện thoại là bắt buộc" }]}
           />
           <FloatingLabelInput
             name="createAt"
             label="Ngày tạo"
             component="date"
-            rules={[{ required: true, message: 'Ngày tạo là bắt buộc' }]}
+            rules={[{ required: true, message: "Ngày tạo là bắt buộc" }]}
           />
           <FloatingLabelInput
             name="managerId"
             label="Người quản lý"
             component="select"
-            rules={[{ required: true, message: 'Vui lòng chọn người quản lý' }]}
+            rules={[{ required: true, message: "Vui lòng chọn người quản lý" }]}
             options={managerList.map((manager) => ({
               label: `${manager.name} - ${manager.phone}`,
               value: manager.id,
@@ -211,7 +210,7 @@ const AdminBranchList = () => {
             componentProps={{
               showSearch: true,
               allowClear: true,
-              optionFilterProp: 'children',
+              optionFilterProp: "children",
               filterOption: (input: string, option: any) =>
                 option.label.toLowerCase().includes(input.toLowerCase()),
             }}
@@ -222,7 +221,7 @@ const AdminBranchList = () => {
               Hủy
             </AdminButton>
             <AdminButton variant="primary" onClick={onOKCreateBranch}>
-              {editBranch ? 'Lưu thay đổi' : 'Tạo mới'}
+              {editBranch ? "Lưu thay đổi" : "Tạo mới"}
             </AdminButton>
           </div>
         </Form>
@@ -232,34 +231,78 @@ const AdminBranchList = () => {
         className="custom-table"
         rowKey="id"
         dataSource={adminBranchList}
+        // --- KÍCH HOẠT CUỘN NGANG ---
+        scroll={{ x: "max-content" }}
         pagination={{
           pageSize: 8,
           showSizeChanger: true,
         }}
         columns={[
-          { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
           {
-            title: 'Tên chi nhánh',
-            dataIndex: 'name',
-            key: 'name',
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 70, // Cố định chiều rộng cột ID nhỏ
+            align: "center",
+            sorter: (a, b) => a.id - b.id,
+          },
+          {
+            title: "Tên chi nhánh",
+            dataIndex: "name",
+            key: "name",
+            width: 200, // Đủ rộng cho tên
+            fixed: "left", // Ghim cột tên bên trái khi cuộn
             sorter: (a, b) => a.name.localeCompare(b.name),
-          },
-          { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },
-          { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },
-          {
-            title: 'Ngày tạo',
-            dataIndex: 'createAt',
-            render: (value: string) => moment(value).format('YYYY-MM-DD HH:mm:ss'),
+            render: (text) => <span style={{ fontWeight: 600 }}>{text}</span>,
           },
           {
-            title: 'Người quản lý',
-            dataIndex: 'manager',
-            key: 'manager',
-            render: (manager: any) => manager?.name || '---',
+            title: "Số điện thoại",
+            dataIndex: "phone",
+            key: "phone",
+            width: 140,
           },
           {
-            title: 'Hành động',
-            key: 'actions',
+            title: "Địa chỉ",
+            dataIndex: "address",
+            key: "address",
+            width: 250, // Địa chỉ cần rộng hơn
+            render: (text) => (
+              <Tooltip title={text}>
+                <div
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    maxWidth: "250px",
+                  }}
+                >
+                  {text}
+                </div>
+              </Tooltip>
+            ),
+          },
+          {
+            title: "Ngày tạo",
+            dataIndex: "createAt",
+            width: 160,
+            align: "center",
+            render: (value: string) =>
+              moment(value).format("YYYY-MM-DD HH:mm:ss"),
+          },
+          {
+            title: "Người quản lý",
+            dataIndex: "manager",
+            key: "manager",
+            width: 180,
+            render: (manager: any) => (
+              <span style={{ fontWeight: 500 }}>{manager?.name || "---"}</span>
+            ),
+          },
+          {
+            title: "Hành động",
+            key: "actions",
+            width: 120, // Cố định chiều rộng cột hành động
+            align: "center",
             render: (text, record) => (
               <Space size="middle">
                 <AdminButton
