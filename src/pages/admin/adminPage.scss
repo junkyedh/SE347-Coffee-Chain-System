@@ -18,14 +18,16 @@
     );
     backdrop-filter: blur(20px);
     position: sticky;
+    top: 0; /* Quan trọng: Giữ header dính trên cùng */
     z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid rgba(get-color($primary2, "200"), 0.2);
-    box-shadow: 0 2px 8px rgba(get-color($primary, "default"), 0.1);
-    border-radius: 0rem 0rem 2rem 2rem;
-    padding: 2rem 2rem;
+    box-shadow: 0 4px 12px rgba(get-color($primary, "default"), 0.05);
+    border-radius: 0 0 1rem 1rem;
+    padding: 1.5rem 2rem;
+    transition: all 0.3s ease;
   }
 
   .header-custom {
@@ -50,56 +52,16 @@
       min-width: 200px;
     }
   }
-  .h3,
-  .h4 {
-    color: get-color($primary, "900");
-    font-weight: bold;
-    margin-top: 5px;
-  }
 
   .content-area {
-    backdrop-filter: blur(20px);
-    position: sticky;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 1.5rem;
-    box-shadow:
-      0 8px 32px rgba(get-color($primary, "default"), 0.08),
-      0 2px 8px rgba(get-color($primary2, "default"), 0.04);
-    border: 1px solid rgba(get-color($primary2, "200"), 0.2);
-    position: relative;
+    /* ... (giữ nguyên hoặc xóa nếu không dùng) ... */
   }
 
-  // Grid layouts
-  .grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-  }
-
-  .grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    @media (max-width: 1024px) {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-  }
-
+  /* --- STYLE BẢNG RESPONSIVE --- */
   .custom-table {
+    margin-top: 1.5rem;
+    /* Xóa overflow ở đây để tránh 2 thanh cuộn */
+
     .ant-table {
       z-index: 1;
       background: transparent;
@@ -118,29 +80,35 @@
         font-size: 0.95rem;
         border: none;
         text-align: center;
-        position: relative;
+        white-space: nowrap; /* Giữ tiêu đề trên 1 dòng */
+        padding: 1rem 0.5rem !important;
       }
 
       .ant-table-tbody {
         .ant-table-row {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.2s ease;
           border: none;
 
           &:nth-child(odd) {
             background: get-color($primary2, "50") !important;
           }
-
           &:nth-child(even) {
             background: get-color($primary2, "200") !important;
           }
 
           td {
-            padding: 1rem;
+            padding: 0.8rem 0.5rem !important;
             text-align: center;
             border: none;
             font-size: 0.9rem;
-            transition: all 0.3s ease;
+            white-space: nowrap; /* QUAN TRỌNG: Không cho xuống dòng để kích hoạt scroll ngang */
           }
+        }
+
+        /* Hiệu ứng hover vào hàng */
+        > tr:hover > td {
+          background: get-color($primary2, "600") !important;
+          color: #fff !important;
         }
       }
 
@@ -152,11 +120,9 @@
           &:hover {
             border-color: get-color($primary, "400");
           }
-
           &.ant-pagination-item-active {
             background: get-color($primary, "600");
             border-color: get-color($primary, "600");
-
             a {
               color: white;
             }
@@ -165,39 +131,71 @@
       }
     }
 
-    // --- CẤU HÌNH THANH CUỘN (SCROLLBAR) ---
-    .ant-table-body {
-      overflow-x: auto !important; // Cho phép cuộn ngang
-      overflow-y: auto !important; // Cho phép cuộn dọc
-      -webkit-overflow-scrolling: touch; // Cuộn mượt trên iPad/iPhone
+    /* --- CẤU HÌNH THANH CUỘN (SCROLLBAR) --- */
+    .ant-table-body,
+    .ant-table-content {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iPad */
 
-      // 1. Kích thước thanh cuộn
       &::-webkit-scrollbar {
-        height: 10px !important; // Chiều cao thanh ngang
-        width: 10px !important; // Chiều rộng thanh dọc
+        height: 10px; /* Độ cao thanh cuộn ngang */
+        width: 10px;
+        display: block; /* Ép hiển thị */
       }
-
-      // 2. Nền thanh cuộn (Track)
       &::-webkit-scrollbar-track {
         background: #f0f2f5;
         border-radius: 5px;
       }
-
-      // 3. Tay cầm kéo (Thumb)
       &::-webkit-scrollbar-thumb {
-        background: #c1c1c1; // Màu xám vừa phải
+        background: #c1c1c1;
         border-radius: 5px;
-        border: 2px solid #f0f2f5; // Tạo viền trắng cho thumb nổi bật
-
+        border: 2px solid #f0f2f5;
         &:hover {
-          background: #a8a8a8; // Đậm hơn khi hover
+          background: #a8a8a8;
         }
       }
     }
-    // Hỗ trợ Firefox
-    .ant-table-body {
-      scrollbar-width: thin;
-      scrollbar-color: #c1c1c1 #f0f2f5;
+  }
+
+  /* Modal Styles */
+  .custom-modal {
+    .ant-modal-content {
+      border-radius: 16px;
+      padding: 24px;
+      @media (max-width: 768px) {
+        padding: 16px;
+      }
+    }
+    .ant-modal-header {
+      border-radius: 16px 16px 0 0;
+      background-color: #f9fafb;
+      border-bottom: 1px solid #eaeaea;
+      padding: 16px 24px;
+    }
+    .ant-modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2f4156;
+    }
+    .ant-form-item {
+      margin-bottom: 16px;
+      label {
+        font-weight: 500;
+        color: #333;
+      }
+      .ant-input,
+      .ant-select-selector {
+        border-radius: 8px !important;
+        padding: 8px 12px;
+      }
+    }
+    .modal-footer-custom {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
+      border-top: 1px solid rgba(get-color($primary2, "200"), 0.3);
+      padding-top: 1rem;
     }
   }
 
@@ -205,127 +203,18 @@
     .sticky-header-wrapper {
       padding: 1rem;
       flex-direction: column;
-      align-items: stretch;
       gap: 1rem;
     }
-
     .header-custom {
       font-size: 1.5rem;
       text-align: center;
     }
-
     .header-actions {
       justify-content: center;
+      width: 100%;
     }
-
-    .content-area {
-      margin: 0 1rem 1rem;
-      padding: 1.5rem;
-    }
-  }
-}
-
-.custom-modal {
-  .ant-modal-content {
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    padding: 24px;
-
-    @media (max-width: 768px) {
-      padding: 16px;
-    }
-  }
-
-  .ant-modal-header {
-    border-radius: 16px 16px 0 0;
-    background-color: #f9fafb;
-    border-bottom: 1px solid #eaeaea;
-    padding: 16px 24px;
-  }
-
-  .ant-modal-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #2f4156;
-  }
-
-  .ant-form-item {
-    margin-bottom: 16px;
-
-    label {
-      font-weight: 500;
-      color: #333;
-    }
-
-    .input,
-    .textarea,
-    .ant-input,
-    .ant-select-selector,
-    .ant-picker {
-      border-radius: 8px !important;
-      padding: 8px 12px;
-      transition: border-color 0.3s;
-
-      &:focus,
-      &:hover {
-        border-color: #2f4156 !important;
-        box-shadow: 0 0 5px rgba(47, 65, 86, 0.2);
-      }
-    }
-  }
-
-  .ant-form-item-label {
-    padding: 0 !important;
-  }
-
-  .ant-modal-footer {
-    button {
-      width: 120px;
-      height: 40px;
-      font-size: 14px;
-    }
-  }
-  .modal-footer-custom {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 1rem;
-    border-top: 1px solid rgba(get-color($primary2, "200"), 0.3);
-  }
-}
-
-.custom-table .ant-table-tbody > tr:hover > td,
-.custom-table .ant-table-row:hover > td {
-  background: get-color($primary2, "600") !important;
-  color: get-color($primary, "foreground") !important;
-  box-shadow: 0 2px 8px rgba(get-color($primary, "default"), 0.1);
-  transform: translateY(-2px);
-  font-weight: 500;
-}
-
-.checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  background: get-color($primary, "100");
-  border: 1px solid #e0e7ef;
-  border-radius: 8px;
-  padding: 8px 16px;
-  margin-bottom: 8px;
-
-  .ant-form-item {
-    margin-bottom: 0;
-  }
-  .ant-checkbox-wrapper {
-    font-weight: 500;
-    color: get-color($secondary, "800");
-    transition: color 0.2s;
-    &:hover {
-      color: get-color($secondary, "700");
-    }
-    .ant-checkbox-checked .ant-checkbox-inner {
-      background-color: get-color($secondary, "600");
-      border-color: get-color($secondary, "500");
+    .search-form {
+      width: 100%;
     }
   }
 }
