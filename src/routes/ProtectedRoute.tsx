@@ -2,11 +2,16 @@ import { useSystemContext } from '@/hooks/useSystemContext';
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants';
+import { jwtDecode } from 'jwt-decode';
 
 type ProtectedRouteProps = {
   allowedRoles?: string[];
   redirectTo?: string;
   children: React.ReactNode;
+};
+
+type TokenPayload = {
+  role?: string;
 };
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
@@ -16,6 +21,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { isLoggedIn, role, isInitialized } = useSystemContext();
   const location = useLocation();
+
+  const tokenLS = localStorage.getItem('token') || '';
+  const roleLS = localStorage.getItem('role') || '';
+
+  const effectiveIsLoggedIn = isLoggedIn || !!tokenLS;
+
+  let effectiveRole = role || roleLS;
+  if (!effectiveRole && tokenLS) {
+    try {
+      const decoded = jwtDecode<TokenPayload>(tokenLS);
+      effectiveRole = decoded?.role || '';
+    } catch {
+      effectiveRole = '';
+    }
+  }
 
   if (!isInitialized) return null;
 
@@ -28,12 +48,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   const to = redirectTo ?? defaultRedirect;
 
-  if (!isLoggedIn) {
+  if (!effectiveIsLoggedIn) {
     return <Navigate to={to} replace state={{ from: location.pathname }} />;
   }
 
   if (allowedRoles && allowedRoles.length > 0) {
-    if (!role || !allowedRoles.includes(role)) {
+    if (!effectiveRole || !allowedRoles.includes(effectiveRole)) {
       return <Navigate to={to} replace />;
     }
   }

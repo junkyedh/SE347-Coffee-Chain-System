@@ -1,6 +1,5 @@
 import AdminButton from '@/components/admin/AdminButton/AdminButton';
 import SearchInput from '@/components/common/SearchInput/SearchInput';
-import { useToast } from '@/components/common/Toast/Toast';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { DownloadOutlined } from '@ant-design/icons';
 import { message, Table, Tag } from 'antd';
@@ -14,7 +13,6 @@ export const AdminOrderList = () => {
   const [originalAdminOrderList, setOriginalAdminOrderList] = useState<any[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
-  const toast = useToast();
 
   const fetchAdminOrderList = useCallback(async () => {
     try {
@@ -24,11 +22,10 @@ export const AdminOrderList = () => {
       setOriginalAdminOrderList(res.data);
     } catch (error) {
       console.error('Error fetching order list:', error);
-      toast.fetchError('đơn hàng');
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();

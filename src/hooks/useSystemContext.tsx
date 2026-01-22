@@ -1,13 +1,16 @@
-import React, { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { MainApiRequest } from '@/services/MainApiRequest';
-import { 
-  clearAuthStorage, 
-  getAccessToken, 
-  getRole, 
-  setAccessToken as storeAccessToken, 
-  setRole as storeRole 
-} from '@/services/authStorage';
+
+interface UserInfo {
+  id?: number;
+  phone: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  branchId?: string | number;
+  type?: 'staff' | 'customer';
+}
 
 interface ContextValue {
   isLoggedIn: boolean;
@@ -16,32 +19,21 @@ interface ContextValue {
   branchId?: string;
   isInitialized: boolean;
   userInfo: UserInfo | null;
-  setAuth: (token: string, role: string) => void;
-  refreshUserInfo: () => Promise<void>;
+  isLoadingUser: boolean;
+  setAuth: (token: string, role?: string) => void;
   logout: () => void;
+  refreshUserInfo: () => Promise<void>;
 }
 
-type TokenPayload = {
+const AppContext = createContext<ContextValue | undefined>(undefined);
+
+interface TokenPayload {
   id?: number;
   phone?: string;
   role?: string;
   branchId?: string;
   type?: 'staff' | 'customer';
-};
-
-export type UserInfo = {
-  id?: number;
-  phone?: string;
-  name?: string;
-  email?: string;
-  gender?: string;
-  address?: string;
-  rank?: string;
-  role?: string;
-  branchId?: string;
-};
-
-const AppContext = createContext<ContextValue | undefined>(undefined);
+}
 
 export const useSystemContext = () => {
   const ctx = useContext(AppContext);
@@ -56,129 +48,109 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  
-  // Ref to track ongoing auth requests and prevent spam
-  const authRequestRef = useRef<AbortController | null>(null);
-  const isRefreshingRef = useRef(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
 
-  const logout = useCallback(() => {
+  const fetchUserInfo = async (overrideToken?: string) => {
+    const currentToken = overrideToken ?? localStorage.getItem('token');
+    if (!currentToken) {
+      setUserInfo(null);
+      setIsLoadingUser(false);
+      return;
+    }
+
+    setIsLoadingUser(true);
+    try {
+      const response = await MainApiRequest.get('/auth/callback', {
+        headers: { Authorization: `Bearer ${currentToken}` },
+      });
+      const data = response.data?.data;
+      setUserInfo(data ?? null);
+    } catch (error) {
+      setUserInfo(null);
+    } finally {
+      setIsLoadingUser(false);
+    }
+  };
+
+  const refreshUserInfo = async () => {
+    await fetchUserInfo();
+  };
+
+  const setAuth = (newToken: string, newRole?: string) => {
+    if (newToken) localStorage.setItem('token', newToken);
+
+    let roleToUse = newRole ?? '';
+    try {
+      const decoded: TokenPayload = jwtDecode(newToken);
+      if (!roleToUse && decoded?.role) roleToUse = decoded.role;
+      setBranchId(decoded?.branchId);
+    } catch {
+      // ignore decode error
+    }
+
+    if (roleToUse) localStorage.setItem('role', roleToUse);
+
+    setToken(newToken);
+    setRole(roleToUse);
+    setIsLoggedIn(!!newToken);
+
+    // fetch user info
+    fetchUserInfo(newToken);
+  };
+
+  const logout = () => {
     setIsLoggedIn(false);
     setToken('');
     setRole('');
-    setBranchId(undefined);
     setUserInfo(null);
-    clearAuthStorage();
-  }, []);
-
-  const refreshUserInfo = useCallback(async () => {
-    const t = getAccessToken();
-    if (!t) {
-      logout();
-      return;
-    }
-
-    // Prevent concurrent refresh requests
-    if (isRefreshingRef.current) {
-      return;
-    }
-
-    // Cancel any pending request
-    if (authRequestRef.current) {
-      authRequestRef.current.abort();
-    }
-
-    // Create new AbortController for this request
-    authRequestRef.current = new AbortController();
-    isRefreshingRef.current = true;
-    
-    try {
-      const res = await MainApiRequest.get<{ msg: string; data: UserInfo }>('/auth/callback', {
-        signal: authRequestRef.current.signal,
-      });
-      setUserInfo(res.data.data ?? null);
-      setIsLoggedIn(true);
-    } catch (error: any) {
-      // Don't logout on abort - it's intentional
-      if (error.name === 'AbortError' || error.name === 'CanceledError') {
-        return;
-      }
-      // token invalid / expired
-      console.error('[Auth] Failed to refresh user info, logging out:', error);
-      logout();
-    } finally {
-      isRefreshingRef.current = false;
-      authRequestRef.current = null;
-    }
-  }, [logout]);
-
-  const setAuth = useCallback((newToken: string, newRole: string) => {
-    
-    // Store in localStorage first
-    storeAccessToken(newToken);
-    storeRole(newRole);
-    
-    // Update state
-    setToken(newToken);
-    setRole(newRole);
-    setIsLoggedIn(true);
-
-    try {
-      const decoded: TokenPayload = jwtDecode(newToken);
-      setBranchId(decoded.branchId);
-    } catch {
-      setBranchId(undefined);
-    }
-
-    // Fetch user info in next tick to avoid circular dependency
-    setTimeout(() => {
-      refreshUserInfo();
-    }, 0);
-  }, [refreshUserInfo]);
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('sessionId');
+  };
 
   useEffect(() => {
-    const t = getAccessToken();
-    const r = getRole();
+    const t = localStorage.getItem('token');
+    const r = localStorage.getItem('role') || '';
 
-    if (t && r) {
-      setToken(t);
-      setRole(r);
-      setIsLoggedIn(true);
-
+    if (t) {
       try {
         const decoded: TokenPayload = jwtDecode(t);
-        setBranchId(decoded.branchId);
-      } catch (err) {
-        console.error('[Auth] Failed to decode token:', err);
-        setBranchId(undefined);
-      }
+        const roleFromToken = decoded?.role ?? r;
 
-      refreshUserInfo()
-        .then(() => {})
-        .catch((err) => console.error('[Auth] Failed to refresh user info:', err))
-        .finally(() => {
-          setIsInitialized(true);
-        });
-      return;
+        setToken(t);
+        setRole(roleFromToken);
+        setBranchId(decoded?.branchId);
+        setIsLoggedIn(true);
+
+        if (roleFromToken) localStorage.setItem('role', roleFromToken);
+
+        fetchUserInfo(t);
+      } catch {
+        // token hỏng -> clear
+        logout();
+      }
     }
 
     setIsInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+  }, []);
 
-  const value = useMemo(
-    () => ({
-      isLoggedIn,
-      token,
-      role,
-      branchId,
-      isInitialized,
-      userInfo,
-      setAuth,
-      refreshUserInfo,
-      logout,
-    }),
-    [isLoggedIn, token, role, branchId, isInitialized, userInfo, setAuth, refreshUserInfo, logout]
+  return (
+    <AppContext.Provider
+      value={{
+        isLoggedIn,
+        token,
+        role,
+        branchId,
+        setAuth,
+        logout,
+        isInitialized,
+        userInfo,
+        isLoadingUser,
+        refreshUserInfo,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
   );
-
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

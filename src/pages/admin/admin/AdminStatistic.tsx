@@ -9,93 +9,127 @@ import Revenue30Days from '@/components/Statistic/Revenue30Days';
 import Top5Drinks from '@/components/Statistic/Top5Drinks';
 import TopBranchRevenue from '@/components/Statistic/TopBranchRevenue';
 import { MainApiRequest } from '@/services/MainApiRequest';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import '../Statistic.scss';
 
+type SystemReport = {
+  totalPayment?: number;
+  totalProduct?: number;
+  totalCustomer?: number;
+  totalStaff?: number;
+  totalTable?: number;
+  totalBranch?: number;
+
+  [key: string]: any;
+};
+
 const Statistic: React.FC = () => {
-  const [chartData, setChartData] = useState<any>({});
+  const [chartData, setChartData] = useState<SystemReport>({});
+  const [loading, setLoading] = useState(false);
+
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchData = useCallback(async () => {
-    const res = await MainApiRequest.get('/report/system');
-    setChartData(res.data);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
-    const totalProduct = document.getElementById('totalProduct');
-    const totalCustomer = document.getElementById('totalCustomer');
-    const totalStaff = document.getElementById('totalStaff');
-    const totalOrder = document.getElementById('totalOrder');
-    const totalTable = document.getElementById('totalTable');
-    const totalBranch = document.getElementById('totalBranch');
-
-    if (res.data.totalPayment && totalOrder) {
-      totalOrder.innerText = res.data.totalPayment.toLocaleString('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
+    setLoading(true);
+    try {
+      const res = await MainApiRequest.get('/report/system', {
+        signal: controller.signal,
       });
-    }
-    if (res.data.totalProduct && totalProduct) {
-      totalProduct.innerText = res.data.totalProduct;
-    }
-    if (res.data.totalCustomer && totalCustomer) {
-      totalCustomer.innerText = res.data.totalCustomer;
-    }
-    if (res.data.totalStaff && totalStaff) {
-      totalStaff.innerText = res.data.totalStaff;
-    }
-    if (res.data.totalTable && totalTable) {
-      totalTable.innerText = res.data.totalTable;
-    }
-    if (res.data.totalBranch && totalBranch) {
-      totalBranch.innerText = res.data.totalBranch;
+
+      setChartData(res.data ?? {});
+    } catch (err: any) {
+      if (err?.name === 'AbortError' || err?.name === 'CanceledError') return;
+
+      setChartData({});
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, chartData]);
+    return () => abortRef.current?.abort();
+  }, [fetchData]);
+
+  const summary = useMemo(() => {
+    const totalOrderText =
+      typeof chartData.totalPayment === 'number'
+        ? chartData.totalPayment.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          })
+        : 'N/A';
+
+    return {
+      totalOrderText,
+      totalProductText:
+        chartData.totalProduct != null ? String(chartData.totalProduct) : 'N/A',
+      totalCustomerText:
+        chartData.totalCustomer != null ? String(chartData.totalCustomer) : 'N/A',
+      totalStaffText:
+        chartData.totalStaff != null ? String(chartData.totalStaff) : 'N/A',
+      totalTableText:
+        chartData.totalTable != null ? String(chartData.totalTable) : 'N/A',
+      totalBranchText:
+        chartData.totalBranch != null ? String(chartData.totalBranch) : 'N/A',
+    };
+  }, [chartData]);
 
   return (
     <div className="container-fluid">
       <div className="header">
         <h2 className="h2 header-custom">THỐNG KÊ QUÁN CÀ PHÊ</h2>
       </div>
+
       <div className="container-fluid1">
         {/* Tổng quan thống kê */}
         <div className="stat-cards">
           <Card className="card">
             <Card.Body>
               <Card.Title>Tổng Doanh Thu</Card.Title>
-              <Card.Text id="totalOrder">N/A</Card.Text>
+              <Card.Text>
+                {loading ? 'Đang tải...' : summary.totalOrderText}
+              </Card.Text>
             </Card.Body>
           </Card>
+
           <Card className="card">
             <Card.Body>
               <Card.Title>Tổng Số Đồ Uống</Card.Title>
-              <Card.Text id="totalProduct">N/A</Card.Text>
+              <Card.Text>{loading ? 'Đang tải...' : summary.totalProductText}</Card.Text>
             </Card.Body>
           </Card>
+
           <Card className="card">
             <Card.Body>
               <Card.Title>Tổng Số Khách</Card.Title>
-              <Card.Text id="totalCustomer">N/A</Card.Text>
+              <Card.Text>{loading ? 'Đang tải...' : summary.totalCustomerText}</Card.Text>
             </Card.Body>
           </Card>
+
           <Card className="card">
             <Card.Body>
               <Card.Title>Tổng Số Nhân Viên</Card.Title>
-              <Card.Text id="totalStaff">N/A</Card.Text>
+              <Card.Text>{loading ? 'Đang tải...' : summary.totalStaffText}</Card.Text>
             </Card.Body>
           </Card>
+
           <Card className="card">
             <Card.Body>
               <Card.Title>Tổng Số Bàn</Card.Title>
-              <Card.Text id="totalTable">N/A</Card.Text>
+              <Card.Text>{loading ? 'Đang tải...' : summary.totalTableText}</Card.Text>
             </Card.Body>
           </Card>
+
           <Card className="card">
             <Card.Body>
               <Card.Title>Tổng Số Chi Nhánh</Card.Title>
-              <Card.Text id="totalBranch">N/A</Card.Text>
+              <Card.Text>{loading ? 'Đang tải...' : summary.totalBranchText}</Card.Text>
             </Card.Body>
           </Card>
         </div>
@@ -114,6 +148,7 @@ const Statistic: React.FC = () => {
           <Top5Drinks data={chartData} />
           <OrderType data={chartData} />
         </div>
+
         <div className="charts-row">
           <div className="chart-left">
             <OrdersChart14 data={chartData} />
@@ -124,6 +159,7 @@ const Statistic: React.FC = () => {
             <OrderRevenue30 data={chartData} />
           </div>
         </div>
+
         <div className="charts">
           <div className="chart-full-width">
             <TopBranchRevenue />
