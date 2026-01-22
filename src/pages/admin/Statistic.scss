@@ -1,21 +1,21 @@
-@import '../../styles/variables.scss';
+@import "../../styles/variables.scss";
 
 .container-fluid {
   padding: 0;
-  background: get-color($background, 'default');
+  background: get-color($background, "default");
   min-height: 100vh;
 
   .header {
     background: white;
     padding: 2rem 2.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 20px rgba(get-color($primary, 'default'), 0.08);
-    border-bottom: 1px solid get-color($neutral, '200');
+    box-shadow: 0 2px 20px rgba(get-color($primary, "default"), 0.08);
+    border-bottom: 1px solid get-color($neutral, "200");
 
     .header-custom {
       font-size: 2rem;
       font-weight: 700;
-      color: get-color($primary, '800');
+      color: get-color($primary, "800");
       margin: 0;
       text-align: left;
       letter-spacing: -0.025em;
@@ -32,23 +32,43 @@
     // Overview Cards
     .stat-cards {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 1rem;
       margin-bottom: 2rem;
       width: 100%;
       align-items: stretch;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+
+      &::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+
+        &:hover {
+          background: #555;
+        }
+      }
     }
 
     .stat-cards .card {
       background: #fff;
       border-radius: 1.2em;
       box-shadow: 0 2px 18px rgba(47, 65, 86, 0.1);
-      padding: 1em 0.5em 0.5em 0.25em;
+      padding: 0.7em 0.4em 0.4em 0.2em;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-width: 0;
+      min-width: 150px;
       min-height: 112px;
       border: none;
       transition: box-shadow 0.13s;
@@ -61,16 +81,17 @@
 
     .stat-cards .card-title,
     .stat-cards .card .card-title {
-      font-size: 1.05rem;
+      font-size: 0.7rem;
       font-weight: 600;
       color: #2f4156;
-      margin-bottom: 0.25em;
+      margin-bottom: 0.2em;
       letter-spacing: 0.01em;
+      line-height: 1.2;
     }
 
     .stat-cards .card-text,
     .stat-cards .card .card-text {
-      font-size: 2.02rem;
+      font-size: 1.4rem;
       font-weight: 800;
       color: #e45b4c;
       letter-spacing: 0.01em;
@@ -79,9 +100,19 @@
       text-align: center;
     }
 
+    @media (max-width: 1400px) {
+      .stat-cards {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
     @media (max-width: 1200px) {
       .stat-cards {
         grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 1024px) {
+      .stat-cards {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
     @media (max-width: 900px) {
@@ -89,17 +120,24 @@
         grid-template-columns: repeat(2, 1fr);
       }
     }
+    @media (max-width: 768px) {
+      .stat-cards {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.8rem;
+      }
+    }
     @media (max-width: 600px) {
       .stat-cards {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 0.8rem;
       }
       .stat-cards .card {
-        padding: 1.1em 0.7em 1.1em 0.7em;
+        padding: 0.6em 0.3em 0.3em 0.15em;
         min-height: 86px;
+        min-width: 140px;
       }
       .stat-cards .card-text {
-        font-size: 1.38rem;
+        font-size: 1.2rem;
       }
     }
 
@@ -111,8 +149,8 @@
         background: white;
         border-radius: 1.2em;
         padding: 2rem;
-        box-shadow: 0 4px 24px rgba(get-color($primary, 'default'), 0.08);
-        border: 1px solid get-color($neutral, '200');
+        box-shadow: 0 4px 24px rgba(get-color($primary, "default"), 0.08);
+        border: 1px solid get-color($neutral, "200");
         margin-bottom: 2.2rem;
         display: flex;
         flex-direction: column;
@@ -132,6 +170,26 @@
       gap: 0.5rem;
       margin-bottom: 2rem;
       align-items: stretch;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+
+      &::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+
+        &:hover {
+          background: #555;
+        }
+      }
 
       > * {
         min-width: 0;
@@ -145,11 +203,13 @@
       .donut-chart {
         background: #fff;
         border-radius: 1.2em;
-        box-shadow: 0 4px 24px rgba(get-color($primary, 'default'), 0.08);
-        border: 1px solid get-color($neutral, '200');
+        box-shadow: 0 4px 24px rgba(get-color($primary, "default"), 0.08);
+        border: 1px solid get-color($neutral, "200");
         padding: 1.5rem 1.2rem;
         margin: 0;
-        transition: box-shadow 0.15s, transform 0.14s;
+        transition:
+          box-shadow 0.15s,
+          transform 0.14s;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -157,12 +217,12 @@
 
         &:hover {
           transform: translateY(-3px) scale(1.015);
-          box-shadow: 0 10px 40px rgba(get-color($primary, 'default'), 0.11);
+          box-shadow: 0 10px 40px rgba(get-color($primary, "default"), 0.11);
         }
 
         h3,
         h4 {
-          color: get-color($primary, '800');
+          color: get-color($primary, "800");
           font-weight: 600;
           margin-bottom: 1.15rem;
           text-align: center;
@@ -170,9 +230,21 @@
         }
       }
 
+      @media (max-width: 1400px) {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.8rem;
+      }
       @media (max-width: 1200px) {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.8rem;
+      }
+      @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+      }
+      @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
       }
       @media (max-width: 800px) {
         grid-template-columns: 1fr;
@@ -193,19 +265,19 @@
 .recharts-wrapper {
   .recharts-cartesian-grid-horizontal line,
   .recharts-cartesian-grid-vertical line {
-    stroke: get-color($neutral, '300');
+    stroke: get-color($neutral, "300");
     stroke-opacity: 0.6;
   }
 
   .recharts-text {
-    fill: get-color($primary, '600');
+    fill: get-color($primary, "600");
     font-size: 0.875rem;
     font-weight: 500;
   }
 
   .recharts-legend-wrapper {
     .recharts-legend-item-text {
-      color: get-color($primary, '700') !important;
+      color: get-color($primary, "700") !important;
       font-weight: 500;
     }
   }
