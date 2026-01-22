@@ -9,18 +9,12 @@
     background: linear-gradient(90deg, get-color($primary, "50"), #fff 60%);
     border-radius: 18px;
     margin: 1.2rem 0 2rem;
-    padding: 1.2rem 2rem 1.2rem 1.2rem;
+    padding: 1.2rem 2rem;
     box-shadow: 0 2px 12px rgba(get-color($primary, "default"), 0.07);
-
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.1rem;
 
     .header-content {
       display: flex;
-      flex-wrap: wrap;
-      width: 100%;
+      flex-wrap: wrap; // QUAN TRỌNG: Cho phép xuống dòng khi hết chỗ
       justify-content: space-between;
       align-items: center;
       gap: 1.2rem;
@@ -29,6 +23,7 @@
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
+        min-width: 200px; // Đảm bảo tiêu đề không bị bóp quá nhỏ
 
         .title-icon {
           color: get-color($primary, "700");
@@ -54,22 +49,40 @@
 
       .header-actions {
         display: flex;
-        gap: 1.2rem;
         align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap; // Cho phép bộ lọc và nút xuống dòng trên mobile
 
         .filter-section {
           .filter-select {
-            min-width: 128px;
-            border-radius: 8px;
-            background: #fff;
-            font-size: 1rem;
-            box-shadow: 0 1px 6px rgba(get-color($primary, "default"), 0.07);
-            border: 1px solid get-color($neutral, "200");
+            min-width: 140px; // Độ rộng tối thiểu cho ô lọc
+            width: 100%; // Để nó co giãn trên mobile
+
+            // Ant Design override
+            .ant-select-selector {
+              border-radius: 8px !important;
+              height: 40px !important;
+              display: flex;
+              align-items: center;
+            }
           }
         }
+
         .action-buttons {
           display: flex;
           gap: 0.7rem;
+
+          .takeaway-btn,
+          .add-table-btn {
+            height: 40px; // Chiều cao cố định cho đẹp
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+          }
 
           .takeaway-btn {
             background: linear-gradient(
@@ -79,10 +92,8 @@
             );
             color: get-color($accent1, "700");
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            min-width: 108px;
-            transition: all 0.18s;
+            min-width: 100px;
+
             &:hover {
               background: linear-gradient(
                 135deg,
@@ -90,6 +101,7 @@
                 get-color($accent1, "600")
               );
               color: get-color($accent1, "900");
+              transform: translateY(-1px);
             }
           }
 
@@ -100,16 +112,15 @@
               get-color($primary, "800")
             );
             color: #fff;
-            font-weight: 700;
-            border-radius: 8px;
-            min-width: 108px;
-            box-shadow: 0 2px 10px rgba(get-color($primary, "600"), 0.07);
+            min-width: 120px;
+
             &:hover {
               background: linear-gradient(
                 135deg,
                 get-color($primary, "700"),
                 get-color($primary, "900")
               );
+              transform: translateY(-1px);
             }
           }
         }
@@ -117,10 +128,11 @@
     }
   }
 
-  // Table grid responsive layout
+  // Table grid layout
   .tables-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    // Mặc định: Tự động chia cột, tối thiểu 260px mỗi thẻ
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 2rem;
     margin-top: 1.2rem;
 
@@ -128,17 +140,13 @@
       background: #fff;
       border-radius: 1.25rem;
       box-shadow: 0 3px 18px rgba(get-color($primary, "default"), 0.1);
-      padding: 1.1rem 1.3rem 1.3rem 1.3rem;
+      padding: 1.1rem 1.3rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-width: 0;
       min-height: 210px;
       border: 1.5px solid transparent;
-      transition:
-        box-shadow 0.18s,
-        border-color 0.13s,
-        transform 0.16s;
+      transition: all 0.2s ease;
       cursor: pointer;
 
       &.available {
@@ -150,51 +158,43 @@
       &.occupied {
         border-color: get-color($accent1, "600");
       }
+
       &:hover {
         box-shadow: 0 8px 32px rgba(get-color($primary, "300"), 0.14);
-        transform: translateY(-2px) scale(1.015);
+        transform: translateY(-3px);
       }
 
+      // ... (Giữ nguyên style bên trong thẻ card như cũ của bạn) ...
       .table-card-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.5rem;
         margin-bottom: 0.6rem;
 
         .table-number {
           font-size: 1.1rem;
           font-weight: 600;
           color: get-color($primary, "900");
-          .table-label {
-            font-weight: 400;
-            color: get-color($neutral, "400");
-            margin-right: 0.1em;
-          }
           .table-id {
             font-weight: 700;
           }
         }
+
         .table-status {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          font-size: 1rem;
           .status-indicator {
-            display: inline-block;
-            min-width: 30px;
-            min-height: 30px;
-            background: get-color($neutral, "100");
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            color: #fff;
-            font-size: 1.2rem;
-            font-weight: 700;
+            background: get-color($neutral, "100");
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1rem;
           }
           .status-text {
-            font-size: 1rem;
             font-weight: 600;
             color: get-color($primary, "700");
           }
@@ -206,22 +206,14 @@
         .info-row {
           display: flex;
           align-items: center;
-          gap: 0.4rem;
-          font-size: 1rem;
-          font-weight: 500;
-          color: get-color($primary, "700");
-          margin-bottom: 0.18em;
-
+          gap: 0.5rem;
+          margin-bottom: 4px;
+          color: get-color($primary, "800");
           .info-icon {
-            color: get-color($primary, "600");
-          }
-          .info-label {
-            font-weight: 400;
-            color: get-color($neutral, "400");
+            color: get-color($primary, "500");
           }
           .info-value {
             font-weight: 600;
-            color: get-color($primary, "900");
           }
         }
       }
@@ -229,87 +221,64 @@
       .table-actions {
         margin-top: auto;
         display: flex;
-        flex-direction: row;
-        align-items: center;
         justify-content: space-between;
-        gap: 0.4rem;
+        align-items: center;
 
-        .primary-actions {
-          display: flex;
-          gap: 0.8rem;
-          .action-btn {
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            min-width: 100px;
-            transition: background 0.13s;
-            &.primary {
-              background: linear-gradient(
-                135deg,
-                get-color($primary, "100"),
-                get-color($primary, "400")
-              );
-              color: get-color($primary, "700");
-              &:hover {
-                background: linear-gradient(
-                  135deg,
-                  get-color($primary, "400"),
-                  get-color($primary, "700")
-                );
-                color: #fff;
-              }
+        .primary-actions .action-btn {
+          border-radius: 6px;
+          font-weight: 600;
+          padding: 6px 12px;
+          border: none;
+          cursor: pointer;
+          &.primary {
+            background: get-color($primary, "100");
+            color: get-color($primary, "800");
+            &:hover {
+              background: get-color($primary, "200");
             }
-            &.success {
-              background: linear-gradient(
-                135deg,
-                get-color($accent1, "200"),
-                get-color($accent1, "700")
-              );
-              color: #fff;
-              &:hover {
-                background: linear-gradient(
-                  135deg,
-                  get-color($accent1, "500"),
-                  get-color($accent1, "900")
-                );
-              }
+          }
+          &.info {
+            background: #e0f2fe;
+            color: #0369a1;
+            &:hover {
+              background: #bae6fd;
             }
-            &.warning {
-              background: linear-gradient(135deg, #ffe28d, #ffd67e);
-              color: get-color($accent1, "700");
-              &:hover {
-                background: linear-gradient(135deg, #ffe4ae, #f9be6e);
-                color: #fff;
-              }
+          }
+          &.warning {
+            background: #fef3c7;
+            color: #b45309;
+            &:hover {
+              background: #fde68a;
             }
           }
         }
 
         .secondary-actions {
           display: flex;
-          gap: 0.55rem;
+          gap: 8px;
           .icon-btn {
-            width: 38px;
-            height: 38px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: get-color($neutral, "100");
-            color: get-color($primary, "500");
+            border: none;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition:
-              background 0.13s,
-              color 0.13s,
-              box-shadow 0.13s;
-            box-shadow: 0 1px 4px rgba(get-color($neutral, "400"), 0.06);
-
-            &.edit:hover {
-              background: get-color($primary, "100");
-              color: get-color($primary, "700");
+            transition: all 0.2s;
+            &.edit {
+              background: #f3f4f6;
+              color: #4b5563;
+              &:hover {
+                background: #e5e7eb;
+              }
             }
-            &.delete:hover {
-              background: get-color($accent1, "100");
-              color: get-color($accent1, "700");
+            &.delete {
+              background: #fee2e2;
+              color: #ef4444;
+              &:hover {
+                background: #fecaca;
+              }
             }
           }
         }
@@ -317,6 +286,7 @@
     }
   }
 
+  // Empty state
   .empty-state {
     grid-column: 1/-1;
     display: flex;
@@ -324,121 +294,87 @@
     align-items: center;
     margin-top: 3rem;
     .empty-icon {
-      font-size: 3.2rem;
-      color: get-color($neutral, "300");
-      margin-bottom: 1.3rem;
+      font-size: 3rem;
+      color: #ccc;
+      margin-bottom: 1rem;
     }
     h3 {
-      font-weight: 700;
-      color: get-color($primary, "700");
-    }
-    p {
-      color: get-color($neutral, "400");
-    }
-    .ant-btn {
-      margin-top: 1rem;
+      color: get-color($primary, "800");
     }
   }
 }
 
-// Modal styles
-.modern-modal {
-  .ant-modal-content {
-    border-radius: 16px;
-    padding: 2rem 1.5rem;
-    background: #fff;
-  }
-  .ant-modal-title {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: get-color($primary, "800");
-    letter-spacing: -0.01em;
-  }
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.2rem;
-    @media (max-width: 640px) {
-      grid-template-columns: 1fr;
-    }
-  }
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.8rem;
-    .cancel-btn {
-      background: get-color($neutral, "100");
-      color: get-color($primary, "600");
-      border-radius: 7px;
-      font-weight: 500;
-      &:hover {
-        background: get-color($neutral, "200");
-      }
-    }
-    .submit-btn {
-      background: linear-gradient(
-        135deg,
-        get-color($primary, "600"),
-        get-color($primary, "800")
-      );
-      color: #fff;
-      border-radius: 7px;
-      font-weight: 700;
-      &:hover {
-        background: linear-gradient(
-          135deg,
-          get-color($primary, "700"),
-          get-color($primary, "900")
-        );
-      }
-    }
-  }
-}
+// ===============================================
+// RESPONSIVE ADJUSTMENTS (PHẦN BẠN CẦN)
+// ===============================================
 
-// Responsive adjustments
-@media (max-width: 1100px) {
-  .modern-table-container .tables-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.4rem;
-  }
-  .modern-table-container .table-header {
-    padding: 1.2rem 1.1rem;
-  }
-}
-
-@media (max-width: 800px) {
+// 1. Tablet & Nửa màn hình Laptop (Dưới 950px)
+@media (max-width: 950px) {
   .modern-table-container {
-    padding: 0 0.2rem 1.5rem;
-    .tables-grid {
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 0.7rem;
+    padding: 0 1rem 1rem;
+
+    .table-header {
+      padding: 1rem;
+
+      .header-content {
+        // Cho Title nằm trên, Actions rớt xuống dưới
+        flex-direction: column;
+        align-items: flex-start; // Căn trái hết
+        gap: 1rem;
+
+        .header-actions {
+          width: 100%; // Chiếm hết chiều ngang
+          justify-content: space-between; // Dàn đều sang 2 bên
+        }
+      }
     }
-    .table-header .header-content {
-      flex-direction: column;
-      gap: 0.6rem;
-      .title-section {
-        .page-title {
-          font-size: 1.2rem;
-        }
-        .subtitle {
-          font-size: 0.92rem;
-        }
+
+    // Grid 1 cột như yêu cầu trước
+    .tables-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1rem;
+    }
+
+    // Thẻ Card ngang
+    .table-card {
+      min-height: auto;
+      .table-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
       }
     }
   }
 }
 
+// 2. Mobile (Dưới 600px)
 @media (max-width: 600px) {
-  .modern-table-container .tables-grid {
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
-  }
-  .modern-table-container .table-header {
-    padding: 1.1rem 0.5rem;
-    .header-content {
-      flex-direction: column;
-      align-items: flex-start;
+  .modern-table-container .table-header .header-content .header-actions {
+    flex-direction: column; // Xếp dọc: Filter trên, Nút dưới
+    align-items: stretch; // Giãn full width
+
+    .filter-section {
+      width: 100%;
+      .filter-select {
+        width: 100% !important;
+      } // Select full width
     }
+
+    .action-buttons {
+      width: 100%;
+      display: flex;
+      gap: 0.8rem;
+
+      // Chia đều 2 nút "Mang đi" và "Tạo bàn"
+      .takeaway-btn,
+      .add-table-btn {
+        flex: 1;
+      }
+    }
+  }
+
+  // Trên mobile, thông tin trong thẻ quay về 1 cột cho dễ đọc
+  .modern-table-container .tables-grid .table-card .table-info {
+    grid-template-columns: 1fr;
   }
 }
