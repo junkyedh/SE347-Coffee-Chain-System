@@ -94,22 +94,6 @@ export const ManagerOrderList = () => {
     }
   };
 
-  // const handleUpdatePaymentStatus = async (
-  //   orderId: number,
-  //   newStatus: string,
-  // ) => {
-  //   try {
-  //     await AdminApiRequest.put(`/order/${orderId}`, {
-  //       paymentStatus: newStatus,
-  //     });
-  //     message.success("Cập nhật trạng thái thanh toán thành công!");
-  //     fetchManagerOrderList();
-  //   } catch (error) {
-  //     console.error("Error updating payment status:", error);
-  //     message.error("Không thể cập nhật trạng thái thanh toán.");
-  //   }
-  // };
-
   return (
     <div className="container-fluid">
       <div className="sticky-header-wrapper">
