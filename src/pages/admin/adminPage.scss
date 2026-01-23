@@ -56,7 +56,6 @@
   /* --- STYLE BẢNG RESPONSIVE --- */
   .custom-table {
     margin-top: 1.5rem;
-    /* Xóa overflow ở đây để tránh 2 thanh cuộn */
 
     .ant-table {
       z-index: 1;
@@ -76,7 +75,7 @@
         font-size: 0.95rem;
         border: none;
         text-align: center;
-        white-space: nowrap; /* Giữ tiêu đề trên 1 dòng */
+        white-space: nowrap;
         padding: 1rem 0.5rem !important;
       }
 
@@ -97,11 +96,10 @@
             text-align: center;
             border: none;
             font-size: 0.9rem;
-            white-space: nowrap; /* QUAN TRỌNG: Không cho xuống dòng để kích hoạt scroll ngang */
+            white-space: nowrap;
           }
         }
 
-        /* Hiệu ứng hover vào hàng */
         > tr:hover > td {
           background: get-color($primary2, "600") !important;
           color: #fff !important;
@@ -127,16 +125,15 @@
       }
     }
 
-    /* --- CẤU HÌNH THANH CUỘN (SCROLLBAR) --- */
     .ant-table-body,
     .ant-table-content {
       overflow-x: auto !important;
-      -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iPad */
+      -webkit-overflow-scrolling: touch;
 
       &::-webkit-scrollbar {
-        height: 10px; /* Độ cao thanh cuộn ngang */
+        height: 10px;
         width: 10px;
-        display: block; /* Ép hiển thị */
+        display: block;
       }
       &::-webkit-scrollbar-track {
         background: #f0f2f5;
