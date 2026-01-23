@@ -18,14 +18,19 @@
     );
     backdrop-filter: blur(20px);
     position: sticky;
-    top: 0; /* Quan trọng: Giữ header dính trên cùng */
+    top: 0;
     z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid rgba(get-color($primary2, "200"), 0.2);
     box-shadow: 0 4px 12px rgba(get-color($primary, "default"), 0.05);
-    border-radius: 0 0 1rem 1rem;
+
+    /* --- SỬA DÒNG NÀY --- */
+    /* Cũ: border-radius: 0 0 1rem 1rem; (Chỉ bo dưới) */
+    /* Mới: Bo cong đều cả 4 góc */
+    border-radius: 1rem;
+
     padding: 1.5rem 2rem;
     transition: all 0.3s ease;
   }
@@ -192,22 +197,89 @@
     }
   }
 
+  /* --- RESPONSIVE CHO TABLET & MOBILE (Thay thế đoạn cũ) --- */
+  /* --- RESPONSIVE CHO TABLET & MOBILE --- */
   @media (max-width: 768px) {
+    /* 1. Khung bao ngoài */
     .sticky-header-wrapper {
-      padding: 1rem;
-      flex-direction: column;
-      gap: 1rem;
+      padding: 0.5rem 0.75rem !important;
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+      align-items: stretch !important;
     }
+
+    /* 2. Tiêu đề */
     .header-custom {
-      font-size: 1.5rem;
+      font-size: 1.25rem !important;
       text-align: center;
+      margin-bottom: 0 !important;
+      line-height: 1.2;
     }
+
+    /* 3. Khu vực Search + Nút: Nằm ngang */
     .header-actions {
-      justify-content: center;
       width: 100%;
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      justify-content: space-between;
+      gap: 8px !important; /* Khoảng cách giữa Search và Nút */
     }
+
+    /* 4. Ô tìm kiếm: Tự co giãn thông minh */
+    /* 4. Ô tìm kiếm: Tự co giãn thông minh */
     .search-form {
-      width: 100%;
+      flex: 1 1 auto !important; /* Quan trọng: Cho phép co (shrink) và giãn (grow) */
+      min-width: 100px !important; /* Cho phép thu nhỏ xuống tận 100px để nhường chỗ */
+      width: auto !important;
+      max-width: 100%;
+
+      /* Chỉnh input cao đúng 32px và padding nhỏ lại */
+      .ant-input-affix-wrapper,
+      .ant-input {
+        height: 32px !important;
+        font-size: 0.85rem !important;
+        padding: 0 4px !important; /* Giảm padding 2 bên để tiết kiệm từng pixel */
+        display: flex;
+        align-items: center;
+      }
+
+      /* Ẩn bớt icon kính lúp nếu quá chật (để dành chỗ cho text) */
+      .ant-input-prefix {
+        margin-right: 2px !important;
+      }
+    }
+
+    /* 5. CÁC NÚT BẤM (QUAN TRỌNG) */
+    .header-actions .d-flex {
+      display: flex;
+      gap: 6px !important; /* Khoảng cách giữa các nút con */
+      flex-shrink: 0;
+    }
+
+    .header-actions .ant-btn {
+      /* Ép cứng kích thước để 3 nút bằng nhau chằn chặn */
+      height: 32px !important;
+      width: 32px !important; /* Chiều rộng bằng chiều cao -> Hình vuông */
+      min-width: 32px !important;
+      padding: 0 !important; /* Bỏ padding để icon căn giữa */
+
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px !important; /* Bo góc nhẹ */
+
+      /* Chỉnh icon bên trong nút */
+      span {
+        font-size: 0.9rem !important;
+        margin: 0 !important;
+      }
+
+      /* Ẩn chữ nếu có, chỉ hiện icon để đảm bảo nút vuông đẹp trên mobile */
+      span:not(.anticon) {
+        display: none !important;
+      }
     }
   }
 
