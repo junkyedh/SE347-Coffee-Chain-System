@@ -217,4 +217,33 @@
       width: 100%;
     }
   }
+
+  /* Thêm đoạn này vào adminPage.scss */
+
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Đẩy tiêu đề sang trái, nút sang phải */
+    margin: 2rem 0 1rem 0; /* Canh lề trên dưới cho thoáng */
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* (Tùy chọn) Thêm gạch chân mờ cho đẹp */
+
+    h4 {
+      /* Fix lỗi font chữ: Ép dùng font hệ thống không chân */
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+        Arial, sans-serif !important;
+      font-size: 1.3rem;
+      font-weight: 700; /* In đậm */
+      color: get-color($primary, "800"); /* Lấy màu xanh đậm của theme */
+      margin: 0; /* Xóa margin mặc định để căn giữa đẹp hơn */
+      text-transform: uppercase; /* (Tùy chọn) Viết hoa tiêu đề cho sang */
+      letter-spacing: 0.5px;
+    }
+
+    .action-btn-wrapper {
+      /* Đảm bảo nút không bị méo */
+      flex-shrink: 0;
+    }
+  }
 }
