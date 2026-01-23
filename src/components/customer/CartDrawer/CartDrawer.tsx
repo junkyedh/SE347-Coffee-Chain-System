@@ -18,16 +18,24 @@ import { createProductUrl } from '@/utils/slugify';
 import './CartDrawer.scss';
 import { Button } from '@/components/common/Button/Button';
 import { Badge } from '@/components/common/Badge/Badge';
+import { useSystemContext } from '@/hooks/useSystemContext';
+import LoginPromptModal from '@/components/common/LoginPromptModal/LoginPromptModal';
 
 const CartDrawer: React.FC = () => {
   const { cart, totalItems, totalPrice, updateItem, removeItem, clearCart } = useCart();
+  const { isLoggedIn } = useSystemContext();
   const [show, setShow] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const navigate = useNavigate();
 
   const open = () => setShow(true);
   const close = () => setShow(false);
 
   const handleCheckout = () => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
     close();
     navigate(ROUTES.CHECKOUT, {
       state: {
@@ -367,6 +375,8 @@ const CartDrawer: React.FC = () => {
           )}
         </Offcanvas.Body>
       </Offcanvas>
+      
+      <LoginPromptModal isOpen={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
     </>
   );
 };

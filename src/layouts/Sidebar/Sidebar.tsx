@@ -75,7 +75,7 @@ const Sidebar: React.FC = () => {
         roles: ["ADMIN_SYSTEM"],
       },
       {
-        title: "Khuyễn mãi",
+        title: "Khuyến mãi",
         link: ROUTES.ADMIN.PROMOTIONS,
         icon: "fa-solid fa-ticket",
         roles: ["ADMIN_SYSTEM"],

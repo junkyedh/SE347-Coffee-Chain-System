@@ -12,6 +12,7 @@ import {
   UploadProps,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import '../adminPage.scss';
 import imgDefault from '@/assets/cup10.jpg';
@@ -62,12 +63,18 @@ const ManagerProductList = () => {
   }, [selectedCategory, products]);
 
   const fetchManagerProductList = async () => {
-    const res = await AdminApiRequest.get('/product-branch/list');
-    setManagerProductList(res.data);
+    try {
+      const res = await AdminApiRequest.get('/product-branch/list');
+      setManagerProductList(res.data);
+    } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
+      console.error('Error fetching product list:', error);
+    }
   };
 
   useEffect(() => {
     fetchManagerProductList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleUpload = async (options: UploadRequestOption) => {

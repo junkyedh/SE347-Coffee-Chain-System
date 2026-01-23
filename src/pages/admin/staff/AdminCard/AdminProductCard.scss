@@ -241,46 +241,46 @@
         margin-left: 4px;
         font-weight: 500;
       }
-      .add-btn,
-      .ant-btn-primary {
-        height: 32px;
-        padding: 0 16px;
-        font-size: 12px;
+      .add-to-cart-btn {
+        height: 32px !important;
+        min-width: 32px !important;
+        padding: 0 12px !important;
+        font-size: 13px;
         font-weight: 600;
         border-radius: 10px;
         background: linear-gradient(
           135deg,
-          get-color($accent1, '500') 0%,
-          get-color($accent1, '600') 100%
-        );
-        border: none;
-        color: #fff;
+          get-color($primary2, '500') 0%,
+          get-color($primary2, '600') 100%
+        ) !important;
+        border: none !important;
+        color: #fff !important;
         letter-spacing: 0.3px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 6px rgba(get-color($accent1, '500'), 0.18);
+        box-shadow: 0 2px 8px rgba(get-color($primary2, '500'), 0.3) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
 
         &:hover:not(:disabled) {
           background: linear-gradient(
             135deg,
-            get-color($accent1, '600') 0%,
-            get-color($accent1, '700') 100%
-          );
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(get-color($accent1, '500'), 0.25);
+            get-color($primary2, '600') 0%,
+            get-color($primary2, '700') 100%
+          ) !important;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 14px rgba(get-color($primary2, '600'), 0.4) !important;
+          color: #fff !important;
         }
 
         &:disabled,
         &[disabled] {
-          background: linear-gradient(
-            145deg,
-            get-color($neutral, '200') 0%,
-            get-color($neutral, '300') 100%
-          );
-          color: get-color($neutral, '600');
+          background: get-color($neutral, '300') !important;
+          color: get-color($neutral, '500') !important;
           cursor: not-allowed;
-          border: 1.5px dashed get-color($neutral, '400');
-          opacity: 0.85;
-          box-shadow: none;
+          opacity: 0.6;
+          box-shadow: none !important;
+          transform: none;
         }
       }
     }

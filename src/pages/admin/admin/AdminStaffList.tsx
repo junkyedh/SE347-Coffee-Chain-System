@@ -5,8 +5,9 @@ import SearchInput from "@/components/common/SearchInput/SearchInput";
 import { AdminApiRequest } from "@/services/AdminApiRequest";
 import { DownloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { Form, message, Modal, Space, Table, Upload } from "antd";
+import axios from "axios";
 import moment from "moment";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../adminPage.scss";
 
@@ -59,7 +60,7 @@ const AdminStaffList = () => {
     }
   };
 
-  const fetchStaffList = useCallback(async () => {
+  const fetchStaffList = async () => {
     try {
       const res = await AdminApiRequest.get("/staff/list");
       const staffWithBranch = res.data.map((staff: any) => ({
@@ -71,24 +72,30 @@ const AdminStaffList = () => {
       }));
       setStaffList(staffWithBranch);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error("Error fetching staff list:", error);
       message.error("Lấy danh sách nhân viên không thành công.");
     }
-  }, [branchList]);
+  };
 
-  const fetchBranchList = useCallback(async () => {
+  const fetchBranchList = async () => {
     try {
       const res = await AdminApiRequest.get("/branch/list");
       setBranchList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error("Error fetching branch list:", error);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    fetchBranchList();
-    fetchStaffList();
-  }, [fetchBranchList, fetchStaffList, branchList]);
+    const loadData = async () => {
+      await fetchBranchList();
+      await fetchStaffList();
+    };
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearchKeyword = () => {
     if (!searchKeyword.trim()) {

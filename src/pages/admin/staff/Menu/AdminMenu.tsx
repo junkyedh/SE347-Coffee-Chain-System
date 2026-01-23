@@ -3,6 +3,7 @@ import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { ROUTES } from '@/constants';
 import { DeleteOutlined, ShoppingCartOutlined, UserAddOutlined } from '@ant-design/icons';
 import { AutoComplete, Button, Form, Input, message, Modal, Pagination } from 'antd';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AdminProductCard from '../AdminCard/AdminProductCard';
@@ -10,6 +11,7 @@ import './AdminMenu.scss';
 import { printInvoice } from '@/utils/invoicePrinter';
 import { getProductDisplayInfo } from '@/utils/productSize';
 import { calculateOrderTotal, Coupon } from '@/utils/priceCalculator';
+import { useSystemContext } from '@/hooks/useSystemContext';
 
 const categories = ['All', 'Cà phê', 'Trà trái cây', 'Trà sữa', 'Nước ép', 'Bánh ngọt'];
 
@@ -24,9 +26,21 @@ const AdminMenu = () => {
     [key: string]: { size: string; mood: string; quantity: number; price: number };
   }>({});
   
-  const [selectedSizes, setSelectedSizes] = useState<{ [key: number]: string }>({});
-  const [selectedMoods, setSelectedMoods] = useState<{ [key: number]: string }>({});
+  const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
+  const [selectedMoods, setSelectedMoods] = useState<{ [key: string]: string }>({});
   const [currentProductId, setCurrentProductId] = useState<number | null>(null);
+
+  // Debug log khi state thay đổi
+  useEffect(() => {
+    console.log('🔵 selectedSizes changed:', selectedSizes);
+  }, [selectedSizes]);
+
+  useEffect(() => {
+    console.log('🟠 selectedMoods changed:', selectedMoods);
+  }, [selectedMoods]);
+
+  // Tạo mã HĐ chỉ 1 lần khi component mount
+  const [orderId] = useState(() => Math.floor(Math.random() * 10000));
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -41,6 +55,8 @@ const AdminMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { tableId, tableName, serviceType: initialServiceType } = location.state || {};
+  const { branchId } = useSystemContext();
+  const currentBranchId = Number(branchId) || 1;
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -69,6 +85,7 @@ const AdminMenu = () => {
       const res = await AdminApiRequest.get('/product/list');
       setMenuList(res.data.data || res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error('Error fetching menu list:', error);
       message.error('Failed to fetch menu list.');
     } finally {
@@ -78,6 +95,7 @@ const AdminMenu = () => {
 
   useEffect(() => {
     fetchMenuList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkMemberRank = async (phoneNumber: string) => {
@@ -118,7 +136,7 @@ const AdminMenu = () => {
   const handleAddToOrder = (id: number, size: string) => {
     const product = menuList.find((p) => p.id === id);
     if (product && size) {
-      const mood = product.hot || product.cold ? selectedMoods[id] : '';
+      const mood = product.hot || product.cold ? selectedMoods[id.toString()] : '';
       
       const { price, isValid } = getProductDisplayInfo(product, size);
 
@@ -138,18 +156,8 @@ const AdminMenu = () => {
         },
       }));
 
-      // Reset selection
-      setSelectedSizes((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
-      setSelectedMoods((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
-      setCurrentProductId(null);
+      // Giữ lại selection để dễ thêm tiếp món tương tự
+      message.success(`Đã thêm ${product.name} vào giỏ hàng`);
     }
   };
 
@@ -167,10 +175,13 @@ const AdminMenu = () => {
       const item = newOrder[key];
       if (item) {
         const newQuantity = item.quantity + delta;
+        // Không cho giảm xuống dưới 1
+        if (delta < 0 && item.quantity === 1) {
+          message.warning('Số lượng tối thiểu là 1. Dùng nút xóa để bỏ món.');
+          return prevOrder;
+        }
         if (newQuantity > 0) {
           newOrder[key] = { ...item, quantity: newQuantity };
-        } else {
-          delete newOrder[key];
         }
       }
       return newOrder;
@@ -183,30 +194,77 @@ const AdminMenu = () => {
         setAppliedCoupon(null);
         return;
       }
-      const response = await AdminApiRequest.get('/promote/coupon/list');
-      // Tìm coupon khớp mã và đang có hiệu lực
-      const coupon = response.data.find(
-        (c: Coupon) => 
-          c.code.toLowerCase() === couponCode.toLowerCase() && 
-          (c as any).status === 'Có hiệu lực' 
+
+      const code = couponCode.trim().toUpperCase();
+      const response = await AdminApiRequest.get<Coupon[] | Coupon>(
+        `/promote/coupon/check?code=${encodeURIComponent(code)}&branchId=${currentBranchId}`
       );
 
-      if (coupon) {
-        setAppliedCoupon(coupon);
-        if(customerRank) {
-            message.success('Áp dụng mã thành công!');
-            message.info(`Ưu đãi hạng ${customerRank} sẽ không được áp dụng cùng voucher.`);
-        } else {
-            message.success('Áp dụng mã giảm giá thành công!');
-        }
-      } else {
+      const couponData = Array.isArray(response.data) ? response.data[0] : response.data;
+
+      if (!couponData) {
         setAppliedCoupon(null);
-        message.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!');
+        message.error('Mã giảm giá không tồn tại.');
+        return;
       }
-    } catch (error) {
-      console.error(error);
+      
+      // Kiểm tra status
+      if (couponData.status?.toLowerCase() === 'hết hạn') {
+        setAppliedCoupon(null);
+        message.error('Chương trình khuyến mãi đã kết thúc.');
+        return;
+      }
+      
+      if (couponData.status?.toLowerCase() !== 'có hiệu lực') {
+        setAppliedCoupon(null);
+        message.error(`Mã giảm giá không khả dụng (${couponData.status}).`);
+        return;
+      }
+
+      // Nếu có customer rank, hiển modal xác nhận
+      if (customerRank) {
+        Modal.confirm({
+          title: 'Xác nhận áp dụng mã giảm giá',
+          content: (
+            <div>
+              <p style={{ marginBottom: '12px' }}>
+                Khách hàng hiện có ưu đãi hạng <strong>{customerRank}</strong>.
+              </p>
+              <p style={{ color: '#f59e0b', marginBottom: '12px' }}>
+                ⚠️ Khi áp dụng mã <strong>{couponData.code}</strong>, 
+                ưu đãi hạng sẽ <strong>không được áp dụng đồng thời</strong>.
+              </p>
+              <p>Bạn có chắc chắn muốn sử dụng mã giảm giá này không?</p>
+            </div>
+          ),
+          okText: 'Xác nhận',
+          cancelText: 'Hủy',
+          onOk: () => {
+            setAppliedCoupon(couponData);
+            message.success(`Áp dụng mã giảm giá "${couponData.code}" thành công!`);
+          },
+        });
+      } else {
+        setAppliedCoupon(couponData);
+        message.success(`Áp dụng mã giảm giá "${couponData.code}" thành công!`);
+      }
+    } catch (error: any) {
       setAppliedCoupon(null);
-      message.error('Lỗi khi kiểm tra mã giảm giá!');
+      const status = error?.response?.status;
+      const rawMsg = error?.response?.data?.message;
+      
+      let errorMessage = 'Lỗi khi kiểm tra mã giảm giá!';
+      
+      if (status === 404) {
+        errorMessage = 'Mã giảm giá không tồn tại hoặc không áp dụng cho chi nhánh này.';
+      } else if (status === 400 && rawMsg) {
+        // Xử lý message từ backend (có thể là array hoặc string)
+        errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg;
+      } else if (rawMsg) {
+        errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg;
+      }
+      
+      message.error(errorMessage);
     }
   };
 
@@ -252,7 +310,7 @@ const AdminMenu = () => {
         orderDate: new Date().toISOString(),
         status: 'Hoàn thành',
         tableID: tableId || null,
-        branchId: 1, 
+        branchId: currentBranchId, 
         paymentMethod: 'Tiền mặt',
         paymentStatus: 'Đã thanh toán',
         discount: totalDiscount
@@ -274,6 +332,18 @@ const AdminMenu = () => {
       });
 
       await Promise.all(orderDetailsPromises);
+
+      // Cập nhật trạng thái bàn nếu là Dine In
+      if (tableId && initialServiceType === 'Dine In') {
+        try {
+          await AdminApiRequest.put(`/table/${tableId}`, { 
+            status: 'Available' 
+          });
+        } catch (tableError) {
+          console.error('Error updating table status:', tableError);
+          // Không cần message.error ở đây vì đơn hàng đã thanh toán thành công
+        }
+      }
 
       message.success('Thanh toán thành công!');
       
@@ -348,14 +418,24 @@ const AdminMenu = () => {
             <AdminProductCard
               key={product.id}
               product={product}
-              selectedSize={selectedSizes[product.id]}
-              selectedMood={selectedMoods[product.id]}
-              onSelectSize={(size) =>
-                setSelectedSizes((prev) => ({ ...prev, [product.id]: size }))
-              }
-              onSelectMood={(mood) =>
-                setSelectedMoods((prev) => ({ ...prev, [product.id]: mood }))
-              }
+              selectedSize={selectedSizes[product.id.toString()]}
+              selectedMood={selectedMoods[product.id.toString()]}
+              onSelectSize={(size) => {
+                console.log('onSelectSize called:', { productId: product.id.toString(), size });
+                setSelectedSizes((prev) => {
+                  const updated = { ...prev, [product.id.toString()]: size };
+                  console.log('Updated selectedSizes:', updated);
+                  return updated;
+                });
+              }}
+              onSelectMood={(mood) => {
+                console.log('onSelectMood called:', { productId: product.id.toString(), mood });
+                setSelectedMoods((prev) => {
+                  const updated = { ...prev, [product.id.toString()]: mood };
+                  console.log('Updated selectedMoods:', updated);
+                  return updated;
+                });
+              }}
               onAddToOrder={(size) => handleAddToOrder(product.id, size)}
               isCurrentProduct={currentProductId === product.id}
               cartQuantity={Object.entries(order)
@@ -385,7 +465,7 @@ const AdminMenu = () => {
 
         <div className="order-info">
           <div className="info-row">
-            <span>Mã HĐ: {Math.floor(Math.random() * 1000)}</span>
+            <span>Mã HĐ: {orderId}</span>
             <span>Loại: {tableName || 'Mang đi'}</span>
           </div>
 
@@ -425,38 +505,59 @@ const AdminMenu = () => {
           <div className="items-scroll">
             {Object.entries(order).map(([key, item]) => {
               const [id] = key.split('-');
-              const product = menuList.find((p) => p.id === parseInt(id));
+              const product = menuList.find((p) => p.id.toString() === id);
+              
+              if (!product) {
+                console.warn('Product not found for id:', id);
+                return null;
+              }
+
               return (
                 <div key={key} className="order-item">
+                  <div className="item-image">
+                    <img 
+                      src={product.image || '/placeholder.svg'} 
+                      alt={product.name || 'Sản phẩm'}
+                    />
+                  </div>
                   <div className="item-main">
-                    <div className="item-name">{product?.name}</div>
+                    <div className="item-name">{product.name || 'Chưa có tên'}</div>
                     <div className="item-details">
-                      Size: {item.size}
-                      {item.mood && ` | ${item.mood === 'hot' ? 'Nóng' : 'Lạnh'}`}
+                      <span className="detail-badge">Size: {item.size}</span>
+                      {item.mood && (
+                        <span className="detail-badge mood">
+                          {item.mood === 'hot' ? '🔥 Nóng' : '🧊 Lạnh'}
+                        </span>
+                      )}
                     </div>
                     <div className="item-price">
                       {(item.price * item.quantity).toLocaleString()}₫
                     </div>
                   </div>
                   <div className="item-actions">
-                    <Button
-                      size="small"
-                      onClick={() => handleUpdateQuantity(key, -1)}
-                    >
-                      -
-                    </Button>
-                    <span className="quantity">{item.quantity}</span>
-                    <Button
-                      size="small"
-                      onClick={() => handleUpdateQuantity(key, 1)}
-                    >
-                      +
-                    </Button>
+                    <div className="quantity-controls">
+                      <Button
+                        size="small"
+                        onClick={() => handleUpdateQuantity(key, -1)}
+                        className="qty-btn"
+                      >
+                        -
+                      </Button>
+                      <span className="quantity">{item.quantity}</span>
+                      <Button
+                        size="small"
+                        onClick={() => handleUpdateQuantity(key, 1)}
+                        className="qty-btn"
+                      >
+                        +
+                      </Button>
+                    </div>
                     <Button
                       type="text"
                       danger
                       icon={<DeleteOutlined />}
                       onClick={() => handleRemoveItem(key)}
+                      className="delete-btn"
                     />
                   </div>
                 </div>

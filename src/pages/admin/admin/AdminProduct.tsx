@@ -21,6 +21,7 @@ import {
   Upload,
   UploadProps,
 } from "antd";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import "../adminPage.scss";
 
@@ -45,11 +46,17 @@ const AdminProductList = () => {
   );
 
   const fetchAdminProductList = async () => {
-    const res = await AdminApiRequest.get("/product/list");
-    setAdminProductList(res.data);
+    try {
+      const res = await AdminApiRequest.get("/product/list");
+      setAdminProductList(res.data);
+    } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
+      console.error('Error fetching product list:', error);
+    }
   };
   useEffect(() => {
     fetchAdminProductList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

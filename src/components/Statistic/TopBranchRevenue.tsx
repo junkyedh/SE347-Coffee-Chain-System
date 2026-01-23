@@ -1,4 +1,5 @@
 import { MainApiRequest } from '@/services/MainApiRequest';
+import axios from 'axios';
 import {
   BarElement,
   CategoryScale,
@@ -55,8 +56,7 @@ const TopBranchRevenue = () => {
             },
           ],
         });
-      } catch (error) {
-        console.error('Error fetching top branch revenue:', error);
+      } catch (error) {        if (axios.isCancel(error)) return;        console.error('Error fetching top branch revenue:', error);
       }
     };
 

@@ -1,11 +1,12 @@
-import { Form, Input, message, Modal, Space, Table, Tag } from "antd";
-import moment from "moment";
-import { useEffect, useState } from "react";
-import "../adminPage.scss";
-import { AdminApiRequest } from "@/services/AdminApiRequest";
-import FloatingLabelInput from "@/components/common/FloatingInput/FloatingLabelInput";
-import AdminButton from "@/components/admin/AdminButton/AdminButton";
-import AdminPopConfirm from "@/components/admin/PopConfirm/AdminPopConfirm";
+import { Form, Input, message, Modal, Space, Table, Tag } from 'antd';
+import axios from 'axios';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import '../adminPage.scss';
+import { AdminApiRequest } from '@/services/AdminApiRequest';
+import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
+import AdminButton from '@/components/admin/AdminButton/AdminButton';
+import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
 
 const ManagerPromotion = () => {
   const [promoteForm] = Form.useForm();
@@ -22,8 +23,9 @@ const ManagerPromotion = () => {
       const res = await AdminApiRequest.get("/promote/list");
       setManagerPromoteList(res.data);
     } catch (error) {
-      console.error("Error fetching promote list:", error);
-      message.error("Failed to fetch promote list.");
+      if (axios.isCancel(error)) return; // Ignore canceled requests
+      console.error('Error fetching promote list:', error);
+      message.error('Failed to fetch promote list.');
     }
   };
 
@@ -32,14 +34,16 @@ const ManagerPromotion = () => {
       const res = await AdminApiRequest.get("/promote/coupon/list");
       setManagerCouponList(res.data);
     } catch (error) {
-      console.error("Error fetching coupon list:", error);
-      message.error("Failed to fetch coupon list.");
+      if (axios.isCancel(error)) return; // Ignore canceled requests
+      console.error('Error fetching coupon list:', error);
+      message.error('Failed to fetch coupon list.');
     }
   };
 
   useEffect(() => {
     fetchManagerPromoteList();
     fetchManagerCouponList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Hàm random mã CouponCode

@@ -5,6 +5,7 @@ import SearchInput from "@/components/common/SearchInput/SearchInput";
 import { useToast } from "@/components/common/Toast/Toast";
 import { AdminApiRequest } from "@/services/AdminApiRequest";
 import { Form, message, Modal, Space, Table, Tooltip } from "antd";
+import axios from "axios";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import "../adminPage.scss";
@@ -22,6 +23,7 @@ const AdminBranchList = () => {
       const res = await AdminApiRequest.get("/branch/list");
       setAdminBranchList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error("Error fetching branch list:", error);
       message.error("Tải chi nhánh thất bại.");
     }
@@ -29,6 +31,7 @@ const AdminBranchList = () => {
 
   useEffect(() => {
     fetchAdminBranchList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onOpenCreateBranchModal = (record: any = null) => {

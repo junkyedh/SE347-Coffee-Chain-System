@@ -3,8 +3,9 @@ import SearchInput from '@/components/common/SearchInput/SearchInput';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { DownloadOutlined } from '@ant-design/icons';
 import { message, Table, Tag } from 'antd';
+import axios from 'axios';
 import moment from 'moment';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import '../adminPage.scss';
 
@@ -14,23 +15,24 @@ export const AdminOrderList = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const fetchAdminOrderList = useCallback(async () => {
+  const fetchAdminOrderList = async () => {
     try {
       setLoading(true);
       const res = await AdminApiRequest.get('/order/list');
       setAdminOrderList(res.data);
       setOriginalAdminOrderList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error('Error fetching order list:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();
     if (!keyword) {
-      fetchAdminOrderList();
+      setAdminOrderList(originalAdminOrderList);
       return;
     }
     const filtered = originalAdminOrderList.filter((order) => {
@@ -45,13 +47,15 @@ export const AdminOrderList = () => {
 
   useEffect(() => {
     if (!searchKeyword.trim()) {
-      fetchAdminOrderList();
+      setAdminOrderList(originalAdminOrderList);
     }
-  }, [searchKeyword, fetchAdminOrderList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchKeyword]);
 
   useEffect(() => {
     fetchAdminOrderList();
-  }, [fetchAdminOrderList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleExportAdminOrderList = () => {
     const worksheet = XLSX.utils.json_to_sheet(
@@ -73,6 +77,7 @@ export const AdminOrderList = () => {
     message.success('Xuất danh sách đơn hàng thành công.');
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpdatePaymentStatus = async (orderId: number, newStatus: string) => {
     try {
       await AdminApiRequest.put(`/order/${orderId}`, {
@@ -165,20 +170,7 @@ export const AdminOrderList = () => {
               if (paymentStatus === 'Đã thanh toán') color = 'green';
               else if (paymentStatus === 'Chưa thanh toán') color = 'orange';
 
-              return (
-                <div className="d-flex align-items-center gap-2">
-                  <Tag color={color}>{paymentStatus}</Tag>
-                  {paymentStatus === 'Chưa thanh toán' && record.paymentMethod === 'cash' && (
-                    <AdminButton
-                      variant="primary"
-                      size="sm"
-                      onClick={() => handleUpdatePaymentStatus(record.id, 'Đã thanh toán')}
-                    >
-                      Xác nhận
-                    </AdminButton>
-                  )}
-                </div>
-              );
+              return <Tag color={color}>{paymentStatus}</Tag>;
             },
           },
           {

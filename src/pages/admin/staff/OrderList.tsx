@@ -4,6 +4,7 @@ import StatusDropdown from '@/components/common/StatusDropdown/StatusDropdown';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { DownloadOutlined, UserOutlined } from '@ant-design/icons';
 import { Form, message, Select, Table, Tag } from 'antd';
+import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
@@ -26,6 +27,7 @@ export const OrderList = () => {
       setManagerOrderList(res.data);
       setOriginalManagerOrderList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error(error);
     }
   };
@@ -35,6 +37,7 @@ export const OrderList = () => {
       const res = await AdminApiRequest.get('/staff/list'); 
       setBranchStaffList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error('Lỗi tải danh sách nhân viên:', error);
     }
   };
@@ -42,6 +45,7 @@ export const OrderList = () => {
   useEffect(() => {
     fetchManagerOrderList();
     fetchBranchStaffList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearchKeyword = () => {
@@ -131,6 +135,7 @@ export const OrderList = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpdatePaymentStatus = async (orderId: number, newStatus: string) => {
      try {
         await AdminApiRequest.put(`/order/${orderId}`, { paymentStatus: newStatus });
@@ -229,17 +234,10 @@ export const OrderList = () => {
             title: 'Trạng thái TT',
             dataIndex: 'paymentStatus',
             key: 'paymentStatus',
-            width: 180,
+            width: 150,
             render: (status: string, record: any) => {
                const st = status || 'Chưa thanh toán';
-               return (
-                 <div className="d-flex align-items-center gap-2">
-                   <Tag color={st === 'Đã thanh toán' ? 'green' : 'orange'}>{st}</Tag>
-                   {st !== 'Đã thanh toán' && record.paymentMethod !== 'vnpay' && (
-                     <AdminButton variant="primary" size="sm" onClick={() => handleUpdatePaymentStatus(record.id, 'Đã thanh toán')}>Xác nhận</AdminButton>
-                   )}
-                 </div>
-               )
+               return <Tag color={st === 'Đã thanh toán' ? 'green' : 'orange'}>{st}</Tag>;
             },
           },
           { title: 'Tổng tiền', dataIndex: 'totalPrice', key: 'totalPrice', width: 120, render: (v) => v?.toLocaleString() + 'đ' },

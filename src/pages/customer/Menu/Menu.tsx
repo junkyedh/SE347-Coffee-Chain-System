@@ -15,9 +15,10 @@ import ViewToggle from '@/components/customer/ViewToggle/ViewToggle';
 import { ROUTES } from '@/constants';
 import { useCart } from '@/hooks/cartContext';
 import { useAuth } from '@/hooks/useAuth';
-import { MainApiRequest } from '@/services/MainApiRequest';
+import { UnifiedApiRequest } from '@/services/UnifiedApiRequest';
 import { createProductUrl } from '@/utils/slugify';
 import { message } from 'antd';
+import axios from 'axios';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './Menu.scss';
@@ -36,6 +37,7 @@ interface RawProduct {
   sizes: { sizeName: string; price: number }[];
   materials: { name: string }[];
   rating?: number;
+  totalRatings?: number;
   discount?: number;
 }
 
@@ -53,6 +55,7 @@ export interface Product {
   sizes: { sizeName: string; price: number }[];
   materials: { name: string }[];
   rating?: number;
+  totalRatings?: number;
   discount?: number;
 }
 
@@ -101,9 +104,10 @@ const Menu: React.FC = () => {
 
   const fetchBranchList = async () => {
     try {
-      const res = await MainApiRequest.get('/branch/list');
+      const res = await UnifiedApiRequest.get('/branch/list');
       setBranchList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return;
       console.error('Error fetching branch list:', error);
     }
   };
@@ -111,13 +115,14 @@ const Menu: React.FC = () => {
   // Fetch all products for category counts
   const fetchAllProducts = async () => {
     try {
-      const res = await MainApiRequest.get<RawProduct[]>('/product/list');
+      const res = await UnifiedApiRequest.get<RawProduct[]>('/product/list');
       const mapped: Product[] = res.data.map((p) => ({
         ...p,
         sizes: p.sizes.map((s) => ({ sizeName: s.sizeName, price: s.price })),
       }));
       setAllProducts(mapped);
     } catch (error) {
+      if (axios.isCancel(error)) return;
       console.error('Error fetching all products:', error);
     }
   };
@@ -135,7 +140,7 @@ const Menu: React.FC = () => {
         params.append('category', selectedCategory);
       }
 
-      const res = await MainApiRequest.get<RawProduct[]>(`/product/filter?${params.toString()}`);
+      const res = await UnifiedApiRequest.get<RawProduct[]>(`/product/filter?${params.toString()}`);
 
       const mapped: Product[] = res.data.map((p) => ({
         ...p,
@@ -144,6 +149,10 @@ const Menu: React.FC = () => {
 
       setProducts(mapped);
     } catch (error) {
+      if (axios.isCancel(error)) {
+        setLoading(false);
+        return;
+      }
       console.error('Error fetching filtered products:', error);
       message.error('Không thể tải sản phẩm. Vui lòng thử lại sau.');
     } finally {

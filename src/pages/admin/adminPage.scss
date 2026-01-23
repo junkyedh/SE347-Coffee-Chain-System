@@ -91,9 +91,17 @@
 
           &:nth-child(odd) {
             background: get-color($primary2, "50") !important;
+
+            td {
+              background: get-color($primary2, "50") !important;
+            }
           }
           &:nth-child(even) {
             background: get-color($primary2, "200") !important;
+
+            td {
+              background: get-color($primary2, "200") !important;
+            }
           }
 
           td {
@@ -102,12 +110,23 @@
             border: none;
             font-size: 0.9rem;
             white-space: nowrap;
-          }
-        }
+            transition: all 0.2s ease;
 
-        > tr:hover > td {
-          background: get-color($primary2, "600") !important;
-          color: #fff !important;
+            /* Thêm gap giữa các buttons trong cell */
+            .d-flex {
+              gap: 0.5rem;
+            }
+          }
+
+          /* Hover với specificity cao hơn */
+          &:hover {
+            td {
+              background: get-color($primary, "600") !important;
+              color: #ffffff !important;
+              box-shadow: 0 2px 8px rgba(get-color($primary, "default"), 0.15);
+              font-weight: 500;
+            }
+          }
         }
       }
 

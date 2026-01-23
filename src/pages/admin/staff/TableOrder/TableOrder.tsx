@@ -11,6 +11,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Button, Card, Form, message, Modal, Select, Tooltip } from "antd";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./TableOrder.scss";
@@ -37,6 +38,7 @@ const AdminTableOrder = () => {
       setTableList(res.data);
       setFilteredTableList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       message.error("Lấy danh sách bàn thất bại!");
     } finally {
       setLoading(false);
@@ -45,6 +47,7 @@ const AdminTableOrder = () => {
 
   useEffect(() => {
     fetchTableList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFilterChange = (value: string | number) => {

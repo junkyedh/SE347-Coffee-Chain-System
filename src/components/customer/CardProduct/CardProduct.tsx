@@ -26,6 +26,7 @@ export interface Product {
   isPopular: boolean;
   isNew?: boolean;
   rating?: number;
+  totalRatings?: number;
   discount?: number;
 }
 
@@ -123,10 +124,13 @@ const CardProduct: React.FC<Props> = ({ product, onProductClick, onAddToCart }) 
       <div className="cardProductContent">
         <div className="cardProductHeader">
           <span className="cardProductCategory">{product.category}</span>
-          {product.rating != null && (
+          {product.rating != null && product.rating > 0 && (
             <div className="cardProductRating">
               <FaStar className="ratingIcon" />
               <span>{product.rating.toFixed(1)}</span>
+              {product.totalRatings && product.totalRatings > 0 && (
+                <span className="ratingCount">({product.totalRatings})</span>
+              )}
             </div>
           )}
         </div>

@@ -5,9 +5,10 @@ import SEO from '@/components/common/SEO';
 import ProductRating from '@/components/customer/RatingStar/ProductRating';
 import { useCart } from '@/hooks/cartContext';
 import { useAuth } from '@/hooks/useAuth';
-import { MainApiRequest } from '@/services/MainApiRequest';
+import { UnifiedApiRequest } from '@/services/UnifiedApiRequest';
 import { yellow } from '@mui/material/colors';
 import { message } from 'antd';
+import axios from 'axios';
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaMinus, FaPlus, FaStar } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -79,7 +80,7 @@ const DetailProduct: React.FC = () => {
     
     const productId = extractIdFromSlug(slug);
     
-    MainApiRequest.get(`/product/${productId}`)
+    UnifiedApiRequest.get(`/product/${productId}`)
       .then((res) => {
         const p: Product = res.data;
         setProduct(p);
@@ -87,11 +88,16 @@ const DetailProduct: React.FC = () => {
         if (p.hot) setSelectedTemp('hot');
         else if (p.cold) setSelectedTemp('cold');
       })
-      .catch(console.error);
+      .catch((err) => {
+        if (!axios.isCancel(err)) {
+          console.error(err);
+        }
+      });
 
-    MainApiRequest.get<RatingData>(`/ratings/product/${productId}`)
+    UnifiedApiRequest.get<RatingData>(`/ratings/product/${productId}`)
       .then((res) => setRatingData(res.data))
       .catch((err) => {
+        if (axios.isCancel(err)) return;
         console.error('Failed to fetch ratings:', err);
         setRatingData(null);
       });
@@ -156,9 +162,10 @@ const DetailProduct: React.FC = () => {
         needsTemp ? selectedTemp : undefined
       );
       message.success('Đã thêm vào giỏ hàng!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Thêm vào giỏ hàng thất bại:', error);
-      message.error('Thêm vào giỏ hàng thất bại. Vui lòng thử lại sau.');
+      const errorMsg = error?.response?.data?.message || error?.message || 'Thêm vào giỏ hàng thất bại. Vui lòng thử lại sau.';
+      message.error(errorMsg);
     }
   };
 
@@ -224,34 +231,38 @@ const DetailProduct: React.FC = () => {
                   />
                   <ul className="star-breakdown">
                     {(['5', '4', '3', '2', '1'] as Array<'5' | '4' | '3' | '2' | '1'>).map(
-                      (star) => (
-                        <li key={star}>
-                          <span className="star-label">
-                            {star}
-                            <span
-                              style={{
-                                marginLeft: 4,
-                                fontSize: 16,
-                                justifyContent: 'flex-start',
-                                top: -2,
-                              }}
-                            >
-                              <FaStar style={{ color: yellow[700] }} />
+                      (star) => {
+                        const percentage = ratingData.totalRatings > 0 
+                          ? (ratingData.starCounts[star] / ratingData.totalRatings) * 100 
+                          : 0;
+                        
+                        return (
+                          <li key={star}>
+                            <span className="star-label">
+                              {star}
+                              <span
+                                style={{
+                                  marginLeft: 4,
+                                  fontSize: 16,
+                                  justifyContent: 'flex-start',
+                                  top: -2,
+                                }}
+                              >
+                                <FaStar style={{ color: yellow[700] }} />
+                              </span>
                             </span>
-                          </span>
-                          <div className="bar">
-                            <div
-                              className="fill"
-                              style={{
-                                width: `${
-                                  (ratingData.starCounts[star] / ratingData.totalRatings) * 100
-                                }%`,
-                              }}
-                            />
-                          </div>
-                          <span className="count">{ratingData.starCounts[star]}</span>
-                        </li>
-                      )
+                            <div className="bar">
+                              <div
+                                className={`fill ${ratingData.totalRatings === 0 ? 'no-ratings' : ''}`}
+                                style={{
+                                  width: `${percentage}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="count">{ratingData.starCounts[star]}</span>
+                          </li>
+                        );
+                      }
                     )}
                   </ul>
                 </>
