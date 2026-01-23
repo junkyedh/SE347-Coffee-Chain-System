@@ -76,7 +76,7 @@ const AdminMaterialList = () => {
           : "Đang tạo nguyên liệu mới...",
         {
           key: loadingKey,
-        }
+        },
       );
       if (editingMaterial) {
         const { id, ...rest } = data;
@@ -156,16 +156,14 @@ const AdminMaterialList = () => {
         <h2 className="h2 header-custom">QUẢN LÝ NGUYÊN LIỆU</h2>
         {/* Tìm kiếm và Import + Export */}
         <div className="header-actions">
-          <div className="flex-grow-1 d-flex justify-content-center">
-            <Form layout="inline" className="search-form d-flex">
-              <SearchInput
-                placeholder="Tìm kiếm theo tên, loại bảo quản hoặc ID"
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                onSearch={handleSearchKeyword}
-                allowClear
-              />
-            </Form>
+          <div className="search-form">
+            <SearchInput
+              placeholder="Tìm kiếm theo tên, loại bảo quản hoặc ID"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onSearch={handleSearchKeyword}
+              allowClear
+            />
           </div>
           <div className="d-flex">
             <AdminButton
