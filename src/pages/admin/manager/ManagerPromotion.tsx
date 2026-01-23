@@ -431,8 +431,9 @@ const ManagerPromotion = () => {
           {
             title: "Hành động",
             key: "action",
+            align: "center",
             render: (_: any, record: any) => (
-              <div className="d-flex align-items-center gap-2">
+              <div className="d-flex align-items-center justify-content-center gap-2">
                 <Space size="middle">
                   <AdminButton
                     variant="secondary"
@@ -500,8 +501,9 @@ const ManagerPromotion = () => {
           {
             title: "Hành động",
             key: "action",
+            align: "center",
             render: (_: any, record: any) => (
-              <div className="d-flex align-items-center gap-2">
+              <div className="d-flex align-items-center gap-2 justify-content-center">
                 <Space size="middle">
                   <AdminButton
                     variant="secondary"
