@@ -1,11 +1,11 @@
-import AdminButton from '@/components/admin/AdminButton/AdminButton';
-import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
-import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
-import { AdminApiRequest } from '@/services/AdminApiRequest';
-import { Form, Input, message, Modal, Space, Table, Tag } from 'antd';
-import moment from 'moment';
-import { useEffect, useState } from 'react';
-import '../adminPage.scss';
+import AdminButton from "@/components/admin/AdminButton/AdminButton";
+import AdminPopConfirm from "@/components/admin/PopConfirm/AdminPopConfirm";
+import FloatingLabelInput from "@/components/common/FloatingInput/FloatingLabelInput";
+import { AdminApiRequest } from "@/services/AdminApiRequest";
+import { Form, Input, message, Modal, Space, Table, Tag } from "antd";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import "../adminPage.scss";
 
 const AdminPromotion = () => {
   const [promoteForm] = Form.useForm();
@@ -19,21 +19,21 @@ const AdminPromotion = () => {
 
   const fetchAdminPromoteList = async () => {
     try {
-      const res = await AdminApiRequest.get('/promote/list');
+      const res = await AdminApiRequest.get("/promote/list");
       setAdminPromoteList(res.data);
     } catch (error) {
-      console.error('Error fetching promote list:', error);
-      message.error('Lấy danh sách mã khuyến mãi thất bại.');
+      console.error("Error fetching promote list:", error);
+      message.error("Lấy danh sách mã khuyến mãi thất bại.");
     }
   };
 
   const fetchAdminCouponList = async () => {
     try {
-      const res = await AdminApiRequest.get('/promote/coupon/list');
+      const res = await AdminApiRequest.get("/promote/coupon/list");
       setAdminCouponList(res.data);
     } catch (error) {
-      console.error('Error fetching coupon list:', error);
-      message.error('Lấy danh sách Coupon thất bại.');
+      console.error("Error fetching coupon list:", error);
+      message.error("Lấy danh sách Coupon thất bại.");
     }
   };
 
@@ -45,22 +45,22 @@ const AdminPromotion = () => {
   // Hàm random mã CouponCode
   const generateRandomCode = () => {
     const codes = [
-      'TET',
-      'FLASH',
-      'SCHOOL',
-      'STUDENT',
-      'QK',
-      'XMAS',
-      'WOMEN',
-      'LOVE',
-      'CHILD',
-      'TEACH',
-      'SALE',
-      'BLACK',
-      'HALLO',
-      'MID',
-      'APRIL',
-      'LABOR',
+      "TET",
+      "FLASH",
+      "SCHOOL",
+      "STUDENT",
+      "QK",
+      "XMAS",
+      "WOMEN",
+      "LOVE",
+      "CHILD",
+      "TEACH",
+      "SALE",
+      "BLACK",
+      "HALLO",
+      "MID",
+      "APRIL",
+      "LABOR",
     ];
 
     const filteredCodes = codes.filter((code) => code.length <= 6);
@@ -71,10 +71,10 @@ const AdminPromotion = () => {
 
   const mappingColor = (status: string) => {
     switch (status) {
-      case 'Có hiệu lực':
-        return 'green';
-      case 'Hết hạn':
-        return 'red';
+      case "Có hiệu lực":
+        return "green";
+      case "Hết hạn":
+        return "red";
     }
   };
 
@@ -98,13 +98,13 @@ const AdminPromotion = () => {
       if (data.startAt) {
         data.startAt = data.startAt.toISOString();
       } else {
-        message.error('Ngày bắt đầu là bắt buộc!');
+        message.error("Ngày bắt đầu là bắt buộc!");
         return;
       }
       if (data.endAt) {
         data.endAt = data.endAt.toISOString();
       } else {
-        message.error('Ngày kết thúc là bắt buộc!');
+        message.error("Ngày kết thúc là bắt buộc!");
         return;
       }
 
@@ -112,17 +112,17 @@ const AdminPromotion = () => {
         const { id, ...rest } = data;
         await AdminApiRequest.put(`/promote/${editPromote.id}`, rest);
       } else {
-        await AdminApiRequest.post('/promote', data);
+        await AdminApiRequest.post("/promote", data);
       }
 
       fetchAdminPromoteList();
       setOpenCreatePromoteModal(false);
       promoteForm.resetFields();
-      message.success('Lưu mã khuyến mãi thành công!');
+      message.success("Lưu mã khuyến mãi thành công!");
       setEditPromote(null);
     } catch (error) {
-      console.error('Error saving promote:', error);
-      message.error('Lưu mã khuyến mãi thất bại, thử  lại sau.');
+      console.error("Error saving promote:", error);
+      message.error("Lưu mã khuyến mãi thất bại, thử  lại sau.");
     }
   };
 
@@ -145,10 +145,10 @@ const AdminPromotion = () => {
     try {
       await AdminApiRequest.delete(`/promote/${id}`);
       fetchAdminPromoteList();
-      message.success('Xóa mã khuyến mãi thành công!');
+      message.success("Xóa mã khuyến mãi thành công!");
     } catch (error) {
-      console.error('Error deleting promote:', error);
-      message.error('Xóa mã khuyễn mãi thất bại, thử lại sau.');
+      console.error("Error deleting promote:", error);
+      message.error("Xóa mã khuyễn mãi thất bại, thử lại sau.");
     }
   };
 
@@ -167,24 +167,24 @@ const AdminPromotion = () => {
       const now = moment();
       const promote = adminPromoteList.find((p) => p.id === data.promoteId);
       if (promote && moment(promote.endAt).isBefore(now)) {
-        data.status = 'Hết hạn';
+        data.status = "Hết hạn";
       } else {
-        data.status = 'Có hiệu lực';
+        data.status = "Có hiệu lực";
       }
       if (editCoupon) {
         const { id, ...rest } = data;
         await AdminApiRequest.put(`/promote/coupon/${editCoupon.id}`, rest);
       } else {
-        await AdminApiRequest.post('/promote/coupon', data);
+        await AdminApiRequest.post("/promote/coupon", data);
       }
       fetchAdminCouponList();
       setOpenCreateCouponModal(false);
       couponForm.resetFields();
-      message.success('Lưu Coupon thành công!');
+      message.success("Lưu Coupon thành công!");
       setEditCoupon(null);
     } catch (error) {
-      console.error('Error saving coupon:', error);
-      message.error('Lưu Coupon thất bại, thử lại sau.');
+      console.error("Error saving coupon:", error);
+      message.error("Lưu Coupon thất bại, thử lại sau.");
     }
   };
 
@@ -204,10 +204,10 @@ const AdminPromotion = () => {
     try {
       await AdminApiRequest.delete(`/promote/coupon/${id}`);
       fetchAdminCouponList();
-      message.success('Xóa Coupon thành công!');
+      message.success("Xóa Coupon thành công!");
     } catch (error) {
-      console.error('Error deleting coupon:', error);
-      message.error('Xóa Coupon thất bại, thử lại sau.');
+      console.error("Error deleting coupon:", error);
+      message.error("Xóa Coupon thất bại, thử lại sau.");
     }
   };
 
@@ -219,7 +219,7 @@ const AdminPromotion = () => {
       {/* Modal for creating or editing promote */}
       <Modal
         className="custom-modal promote-modal"
-        title={editPromote ? 'Chỉnh sửa' : 'Thêm mới'}
+        title={editPromote ? "Chỉnh sửa" : "Thêm mới"}
         open={openCreatePromoteModal}
         onCancel={onCancelCreatePromote}
         footer={null}
@@ -230,16 +230,20 @@ const AdminPromotion = () => {
               name="name"
               label="Tên khuyến mãi"
               component="input"
-              rules={[{ required: true, message: 'Tên khuyến mãi là bắt buộc' }]}
+              rules={[
+                { required: true, message: "Tên khuyến mãi là bắt buộc" },
+              ]}
             />
             <FloatingLabelInput
               name="promoteType"
               label="Loại khuyến mãi"
               component="select"
-              rules={[{ required: true, message: 'Loại khuyến mãi là bắt buộc' }]}
+              rules={[
+                { required: true, message: "Loại khuyến mãi là bắt buộc" },
+              ]}
               options={[
-                { value: 'Phần trăm', label: 'Phần trăm' },
-                { value: 'Cố định', label: 'Cố định' },
+                { value: "Phần trăm", label: "Phần trăm" },
+                { value: "Cố định", label: "Cố định" },
               ]}
             />
           </div>
@@ -249,14 +253,14 @@ const AdminPromotion = () => {
               label="Mô tả"
               component="input"
               type="textarea"
-              rules={[{ required: true, message: 'Mô tả là bắt buộc' }]}
+              rules={[{ required: true, message: "Mô tả là bắt buộc" }]}
             />
             <FloatingLabelInput
               name="discount"
               label="Giảm giá"
               component="input"
               type="number"
-              rules={[{ required: true, message: 'Giảm giá là bắt buộc' }]}
+              rules={[{ required: true, message: "Giảm giá là bắt buộc" }]}
             />
           </div>
           <div className="grid-2">
@@ -264,21 +268,29 @@ const AdminPromotion = () => {
               name="startAt"
               label="Ngày bắt đầu"
               component="date"
-              rules={[{ required: true, message: 'Ngày bắt đầu là bắt buộc' }]}
+              rules={[{ required: true, message: "Ngày bắt đầu là bắt buộc" }]}
             />
             <FloatingLabelInput
               name="endAt"
               label="Ngày kết thúc"
               component="date"
-              rules={[{ required: true, message: 'Ngày kết thúc là bắt buộc' }]}
+              rules={[{ required: true, message: "Ngày kết thúc là bắt buộc" }]}
             />
           </div>
           <div className="modal-footer-custom d-flex justify-content-end align-items-center gap-3">
-            <AdminButton variant="secondary" size="sm" onClick={onCancelCreatePromote}>
+            <AdminButton
+              variant="secondary"
+              size="sm"
+              onClick={onCancelCreatePromote}
+            >
               Hủy
             </AdminButton>
-            <AdminButton variant="primary" size="sm" onClick={onOKCreatePromote}>
-              {editPromote ? 'Lưu thay đổi' : 'Tạo mới'}
+            <AdminButton
+              variant="primary"
+              size="sm"
+              onClick={onOKCreatePromote}
+            >
+              {editPromote ? "Lưu thay đổi" : "Tạo mới"}
             </AdminButton>
           </div>
         </Form>
@@ -287,7 +299,7 @@ const AdminPromotion = () => {
       {/* Modal for creating or editing coupon */}
       <Modal
         className="custom-modal coupon-modal"
-        title={editCoupon ? 'Chỉnh sửa' : 'Thêm mới'}
+        title={editCoupon ? "Chỉnh sửa" : "Thêm mới"}
         open={openCreateCouponModal}
         onCancel={() => onCancelCreateCoupon()}
         footer={null}
@@ -297,7 +309,7 @@ const AdminPromotion = () => {
             name="promoteId"
             label="Chọn khuyến mãi"
             component="select"
-            rules={[{ required: true, message: 'Khuyến mãi là bắt buộc' }]}
+            rules={[{ required: true, message: "Khuyến mãi là bắt buộc" }]}
             options={adminPromoteList.map((promote) => ({
               value: promote.id,
               label: promote.name,
@@ -307,7 +319,7 @@ const AdminPromotion = () => {
             <Form.Item
               name="code"
               label="Mã Code"
-              rules={[{ required: true, message: 'Mã Code là bắt buộc' }]}
+              rules={[{ required: true, message: "Mã Code là bắt buộc" }]}
             >
               <Input
                 addonAfter={
@@ -327,26 +339,30 @@ const AdminPromotion = () => {
             </Form.Item>
           </div>
           <div className="modal-footer-custom d-flex justify-content-end align-items-center gap-3">
-            <AdminButton variant="secondary" size="sm" onClick={onCancelCreateCoupon}>
+            <AdminButton
+              variant="secondary"
+              size="sm"
+              onClick={onCancelCreateCoupon}
+            >
               Hủy
             </AdminButton>
             <AdminButton variant="primary" size="sm" onClick={onOKCreateCoupon}>
-              {editPromote ? 'Lưu thay đổi' : 'Tạo mới'}
+              {editPromote ? "Lưu thay đổi" : "Tạo mới"}
             </AdminButton>
           </div>
         </Form>
       </Modal>
 
-      {/* Danh sách Khuyến mãi và Coupon */}
-      <div className="d-flex me-2 align-items-center">
-        <h4 className="h4 mt-3">Danh sách Khuyến mãi</h4>
-        <div className="d-flex">
+      {/* 1. Tiêu đề Danh sách Khuyến mãi (Đã sửa font và tách nút) */}
+      <div className="list-header">
+        <h4>Danh sách Khuyến mãi</h4>
+        <div className="action-btn-wrapper">
           <AdminButton
             variant="primary"
             size="sm"
             icon={<i className="fas fa-plus"></i>}
             onClick={() => onOpenCreatePromoteModal()}
-          ></AdminButton>
+          />
         </div>
       </div>
 
@@ -358,37 +374,40 @@ const AdminPromotion = () => {
           showSizeChanger: true,
         }}
         columns={[
-          { title: 'ID', dataIndex: 'id', key: 'id' },
-          { title: 'Tên khuyến mãi', dataIndex: 'name', key: 'name' },
-          { title: 'Mô tả', dataIndex: 'description', key: 'description' },
+          { title: "ID", dataIndex: "id", key: "id" },
+          { title: "Tên khuyến mãi", dataIndex: "name", key: "name" },
+          { title: "Mô tả", dataIndex: "description", key: "description" },
           {
-            title: 'Giảm giá',
-            dataIndex: 'discount',
-            key: 'discount',
+            title: "Giảm giá",
+            dataIndex: "discount",
+            key: "discount",
             render: (discount: number, record) => {
-              return record.promoteType === 'Phần trăm'
+              return record.promoteType === "Phần trăm"
                 ? `${Math.round(discount)}%`
-                : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                    Number(discount)
-                  );
+                : new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(Number(discount));
             },
           },
-          { title: 'Loại', dataIndex: 'promoteType', key: 'promoteType' },
+          { title: "Loại", dataIndex: "promoteType", key: "promoteType" },
           {
-            title: 'Ngày bắt đầu',
-            dataIndex: 'startAt',
-            key: 'startAt',
-            render: (startAt: string) => moment(startAt).format('YYYY-MM-DD HH:mm:ss'),
+            title: "Ngày bắt đầu",
+            dataIndex: "startAt",
+            key: "startAt",
+            render: (startAt: string) =>
+              moment(startAt).format("YYYY-MM-DD HH:mm:ss"),
           },
           {
-            title: 'Ngày kết thúc',
-            dataIndex: 'endAt',
-            key: 'endAt',
-            render: (endAt: string) => moment(endAt).format('YYYY-MM-DD HH:mm:ss'),
+            title: "Ngày kết thúc",
+            dataIndex: "endAt",
+            key: "endAt",
+            render: (endAt: string) =>
+              moment(endAt).format("YYYY-MM-DD HH:mm:ss"),
           },
           {
-            title: 'Hành động',
-            key: 'actions',
+            title: "Hành động",
+            key: "actions",
             render: (text, record) => (
               <Space size="middle">
                 <AdminButton
@@ -415,17 +434,19 @@ const AdminPromotion = () => {
         ]}
       />
 
-      <div className="d-flex me-2 align-items-center">
-        <h4 className="h4">Danh sách Coupon</h4>
-        <div className="d-flex">
+      {/* 2. Tiêu đề Danh sách Coupon (Đã sửa font và tách nút) */}
+      <div className="list-header">
+        <h4>Danh sách Coupon</h4>
+        <div className="action-btn-wrapper">
           <AdminButton
             variant="primary"
             size="sm"
             icon={<i className="fas fa-plus"></i>}
             onClick={() => onOpenCreateCouponModal()}
-          ></AdminButton>
+          />
         </div>
       </div>
+
       <Table
         className="custom-table"
         rowKey="id"
@@ -435,25 +456,25 @@ const AdminPromotion = () => {
           showSizeChanger: true,
         }}
         columns={[
-          { title: 'ID', dataIndex: 'id', key: 'id' },
+          { title: "ID", dataIndex: "id", key: "id" },
           {
-            title: 'Tên khuyến mãi',
-            dataIndex: 'promote',
-            key: 'promote',
-            render: (promote) => promote?.name || 'N/A',
+            title: "Tên khuyến mãi",
+            dataIndex: "promote",
+            key: "promote",
+            render: (promote) => promote?.name || "N/A",
           },
           {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
+            title: "Trạng thái",
+            dataIndex: "status",
+            key: "status",
             render: (status: string) => {
               return <Tag color={mappingColor(status)}>{status}</Tag>;
             },
           },
-          { title: 'Mã Code', dataIndex: 'code', key: 'code' },
+          { title: "Mã Code", dataIndex: "code", key: "code" },
           {
-            title: 'Hành động',
-            key: 'actions',
+            title: "Hành động",
+            key: "actions",
             render: (text, record) => (
               <Space size="middle">
                 <AdminButton
