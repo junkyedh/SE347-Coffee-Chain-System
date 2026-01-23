@@ -193,21 +193,7 @@ export const ManagerOrderList = () => {
               return (
                 <div className="d-flex align-items-center gap-2">
                   <Tag color={color}>{paymentStatus}</Tag>
-                  {
-                    paymentStatus === "Chưa thanh toán"
-                    // &&
-                    //   record.paymentMethod === "cash" && (
-                    //     <AdminButton
-                    //       variant="primary"
-                    //       size="sm"
-                    //       onClick={() =>
-                    //         handleUpdatePaymentStatus(record.id, "Đã thanh toán")
-                    //       }
-                    //     >
-                    //       Xác nhận
-                    //     </AdminButton>
-                    //   )
-                  }
+                  {paymentStatus === "Chưa thanh toán"}
                 </div>
               );
             },
