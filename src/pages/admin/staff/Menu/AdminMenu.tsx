@@ -28,7 +28,7 @@ const AdminMenu = () => {
   
   const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
   const [selectedMoods, setSelectedMoods] = useState<{ [key: string]: string }>({});
-  const [currentProductId, setCurrentProductId] = useState<number | null>(null);
+  const [currentProductId] = useState<number | null>(null);
 
   // Debug log khi state thay đổi
   useEffect(() => {
@@ -308,7 +308,7 @@ const AdminMenu = () => {
         serviceType: initialServiceType === 'Dine In' ? 'DINE IN' : 'TAKE AWAY',
         totalPrice: finalTotal,
         orderDate: new Date().toISOString(),
-        status: 'Hoàn thành',
+        status: 'Đã xác nhận',
         tableID: tableId || null,
         branchId: currentBranchId, 
         paymentMethod: 'Tiền mặt',
@@ -337,17 +337,17 @@ const AdminMenu = () => {
       if (tableId && initialServiceType === 'Dine In') {
         try {
           await AdminApiRequest.put(`/table/${tableId}`, { 
-            status: 'Available' 
+            status: 'Occupied' 
           });
         } catch (tableError) {
           console.error('Error updating table status:', tableError);
-          // Không cần message.error ở đây vì đơn hàng đã thanh toán thành công
+          // Không cần message.error ở đây vì đơn hàng đã tạo thành công
         }
       }
 
       message.success('Thanh toán thành công!');
       
-      // In hóa đơn
+      // In hóa đơn ngay sau khi thanh toán
       printInvoice({
         orderId: orderId,
         serviceType: initialServiceType === 'Dine In' ? 'Tại chỗ' : 'Mang đi',
@@ -367,13 +367,15 @@ const AdminMenu = () => {
         }),
       });
 
-      // Reset trạng thái sau khi thanh toán thành công
+      // Reset trạng thái
       setOrder({});
       setPhone('');
       setName('');
       setCustomerRank('');
       setCouponCode('');
       setAppliedCoupon(null);
+      
+      // Chuyển về màn hình chọn bàn
       navigate(ROUTES.STAFF.ORDER_SELECT_TABLE);
       
     } catch (error) {

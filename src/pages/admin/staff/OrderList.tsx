@@ -34,7 +34,7 @@ export const OrderList = () => {
 
   const fetchBranchStaffList = async () => {
     try {
-      const res = await AdminApiRequest.get('/staff/list'); 
+      const res = await AdminApiRequest.get('/branch-staff/list'); 
       setBranchStaffList(res.data);
     } catch (error) {
       if (axios.isCancel(error)) return; // Ignore canceled requests
