@@ -9,6 +9,8 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import '../adminPage.scss';
+import { useSystemContext } from '@/hooks/useSystemContext';
+import { useLocation } from 'react-router-dom';
 
 export const OrderList = () => {
   const [managerOrderList, setManagerOrderList] = useState<any[]>([]);
@@ -20,6 +22,11 @@ export const OrderList = () => {
   
   // Danh sách nhân viên của chi nhánh để hiển thị Dropdown
   const [branchStaffList, setBranchStaffList] = useState<any[]>([]);
+  
+  const { branchId } = useSystemContext();
+  const currentBranchId = Number(branchId) || 1;
+  const location = useLocation();
+  const { highlightOrderId } = location.state || {};
 
   const fetchManagerOrderList = async () => {
     try {
@@ -34,8 +41,10 @@ export const OrderList = () => {
 
   const fetchBranchStaffList = async () => {
     try {
-      const res = await AdminApiRequest.get('/branch-staff/list'); 
-      setBranchStaffList(res.data);
+      const res = await AdminApiRequest.get('/staff/list'); 
+      // Filter theo branchId của staff hiện tại
+      const filteredStaff = res.data.filter((staff: any) => staff.branchId === currentBranchId);
+      setBranchStaffList(filteredStaff);
     } catch (error) {
       if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error('Lỗi tải danh sách nhân viên:', error);
@@ -48,6 +57,27 @@ export const OrderList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Tự động search theo order ID từ table navigation
+  useEffect(() => {
+    if (highlightOrderId && originalManagerOrderList.length > 0) {
+      const keyword = String(highlightOrderId).toLowerCase();
+      const filtered = originalManagerOrderList.filter((order) => {
+        const id = String(order.id ?? '').toLowerCase();
+        return id.includes(keyword);
+      });
+      setManagerOrderList(filtered);
+      setSearchKeyword(String(highlightOrderId));
+      
+      // Hiển thị thông báo
+      if (filtered.length > 0) {
+        message.success(`Đã tìm thấy đơn hàng #${highlightOrderId}`);
+      } else {
+        message.warning(`Không tìm thấy đơn hàng #${highlightOrderId}`);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightOrderId, originalManagerOrderList]);
+
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();
     if (!keyword) {
@@ -57,7 +87,6 @@ export const OrderList = () => {
     const filtered = originalManagerOrderList.filter((order) => {
       const id = String(order.id ?? '').toLowerCase();
       const phoneCustomer = (order.phoneCustomer ?? '').toLowerCase();
-      // [FIX] Search cả trong object staff
       const staffName = (order.staff?.name || order.staffName || '').toLowerCase();
       
       return id.includes(keyword) || phoneCustomer.includes(keyword) || staffName.includes(keyword);
@@ -97,10 +126,8 @@ export const OrderList = () => {
 
     const selectedStaffId = staffInput[id];
     
-    // [FIX] Kiểm tra kỹ xem đơn hàng đã có nhân viên (dạng object hoặc id) chưa
     const hasAssignedStaff = currentOrder.staff || currentOrder.staffID || currentOrder.staffName;
 
-    // Logic: Nếu chưa có nhân viên VÀ cũng chưa chọn nhân viên mới -> Báo lỗi
     // (Áp dụng khi chuyển khỏi trạng thái Nháp/Chờ xác nhận)
     if (!hasAssignedStaff && !selectedStaffId) {
       message.warning('Vui lòng chọn nhân viên phụ trách trước khi xử lý đơn hàng!');
@@ -165,16 +192,22 @@ export const OrderList = () => {
   ];
 
   const getAllowedStatusMap = (currentStatus: string) => {
+    // Nếu đã hoàn thành hoặc đã hủy, không cho phép thay đổi
     if (currentStatus === 'Hoàn thành' || currentStatus === 'Đã hủy') {
-      return { [currentStatus]: statusMap[currentStatus] };
+      return {};
     }
+    
     const currentIndex = STATUS_FLOW.indexOf(currentStatus);
     const allowedMap: Record<string, { label: string; color: string }> = {};
-    if (statusMap[currentStatus]) allowedMap[currentStatus] = statusMap[currentStatus];
+    
+    // Chỉ thêm các trạng thái tiếp theo, KHÔNG bao gồm trạng thái hiện tại
     STATUS_FLOW.forEach((status, index) => {
       if (index > currentIndex) allowedMap[status] = statusMap[status];
     });
+    
+    // Luôn cho phép hủy đơn (trừ khi đã hoàn thành/đã hủy)
     allowedMap['Đã hủy'] = statusMap['Đã hủy'];
+    
     return allowedMap;
   };
 
@@ -309,6 +342,13 @@ export const OrderList = () => {
             width: 140,
             render: (_: any, record: any) => {
               const allowedMap = getAllowedStatusMap(record.status);
+              const isFinalStatus = record.status === 'Hoàn thành' || record.status === 'Đã hủy';
+              
+              // Nếu đã hoàn thành hoặc đã hủy, hiển thị text thay vì dropdown
+              if (isFinalStatus) {
+                return <Tag color={statusMap[record.status]?.color}>{statusMap[record.status]?.label}</Tag>;
+              }
+              
               return (
                 <StatusDropdown
                   value={record.status}

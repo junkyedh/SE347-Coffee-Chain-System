@@ -109,26 +109,26 @@ const AdminTableOrder = () => {
       const res = await AdminApiRequest.get("branch-order/list");
       const activeOrders = res.data.filter(
         (order: any) =>
-          order.tableId === table.id &&
-          ["Chờ xác nhận", "Đang chuẩn bị", "Sẵn sàng", "Đang giao"].includes(
+          order.tableID === table.id &&
+          ["Chờ xác nhận", "Đã xác nhận", "Đang chuẩn bị", "Sẵn sàng"].includes(
             order.status,
           ),
       );
 
-      if (activeOrders) {
-        navigate(ROUTES.STAFF.ORDER_PLACE, {
+      if (activeOrders.length > 0) {
+        // Navigate đến trang danh sách đơn hàng với order ID để tự động tìm
+        navigate(ROUTES.STAFF.ORDER_LIST, {
           state: {
-            orderId: activeOrders[0].id,
-            isNewOrder: false,
+            highlightOrderId: activeOrders[0].id,
             tableId: table.id,
             tableName: `Bàn ${table.id}`,
-            serviceType: "Dine In",
           },
         });
       } else {
-        message.error("Không tìm thấy đơn hàng của bàn này.");
+        message.warning("Không tìm thấy đơn hàng đang hoạt động của bàn này.");
       }
     } catch (error) {
+      console.error("Error fetching active order:", error);
       message.error("Có lỗi xảy ra khi lấy đơn hàng.");
     } finally {
       setLoading(false);
