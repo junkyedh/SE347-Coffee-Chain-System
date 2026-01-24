@@ -251,6 +251,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(err.response.data?.message || 'Thông tin sản phẩm không hợp lệ');
       }
       
+      if (err.response?.status === 500) {
+        const serverMsg = err.response.data?.message;
+        throw new Error(serverMsg || 'Lỗi máy chủ, vui lòng thử lại sau');
+      }
+      
       if (!err.response && err.request) {
         throw new Error('Không thể kết nối đến máy chủ, vui lòng kiểm tra kết nối');
       }

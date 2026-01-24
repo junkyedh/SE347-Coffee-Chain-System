@@ -11,8 +11,7 @@ import './Checkout.scss';
 import { getProductDisplayInfo } from '@/utils/productSize';
 import { calculateOrderTotal, Coupon } from '@/utils/priceCalculator';
 import { useToast } from '@/components/common/Toast/Toast';
-import { Modal } from '@/components/common/Modal/Modal';
-import { Button } from '@/components/common/Button/Button';
+import { Modal } from 'antd';
 import { useSystemContext } from '@/hooks/useSystemContext';
 
 interface LocationStateItem {
@@ -64,9 +63,6 @@ export const Checkout: React.FC = () => {
   const [membershipRank, setMembershipRank] = useState<string>(''); 
   
   const [loading, setLoading] = useState(false);
-  
-  const [showMembershipWarningModal, setShowMembershipWarningModal] = useState(false);
-  const [pendingCoupon, setPendingCoupon] = useState<Coupon | null>(null);
   
   const toast = useToast();
 
@@ -268,14 +264,20 @@ export const Checkout: React.FC = () => {
 
     setIsCheckingCoupon(true);
     try {
-      // Backend trả về array, cần lấy phần tử đầu tiên
       const res = await MainApiRequest.get<Coupon[] | Coupon>(
         `/promote/coupon/check?code=${encodeURIComponent(code)}&branchId=${selectedBranch}`
       );
       
-      const couponData = Array.isArray(res.data) ? res.data[0] : res.data;
+      // Xử lý response: có thể là array hoặc object
+      let couponData: Coupon | null = null;
       
-      if (!couponData) {
+      if (Array.isArray(res.data)) {
+        couponData = res.data.length > 0 ? res.data[0] : null;
+      } else if (res.data && typeof res.data === 'object') {
+        couponData = res.data;
+      }
+      
+      if (!couponData || !couponData.code) {
         toast.error('Mã giảm giá không tồn tại.');
         setAppliedCoupon(null);
         return;
@@ -296,8 +298,38 @@ export const Checkout: React.FC = () => {
       
       // Nếu có membership rank, hiển thị modal thông báo
       if (membershipRank) {
-        setPendingCoupon(couponData);
-        setShowMembershipWarningModal(true);
+        Modal.confirm({
+          title: 'Xác nhận áp dụng mã giảm giá',
+          content: (
+            <div>
+              <p style={{ marginBottom: '12px' }}>
+                Bạn hiện đang có ưu đãi thành viên <strong style={{ color: '#059669' }}>{membershipRank}</strong>.
+              </p>
+              <div style={{ 
+                marginBottom: '12px', 
+                padding: '12px',
+                backgroundColor: '#fef3c7',
+                border: '1px solid #fbbf24',
+                borderRadius: '8px'
+              }}>
+                <p style={{ color: '#f59e0b', marginBottom: '8px' }}>
+                  ⚠️ Khi áp dụng mã <strong>{couponData.code}</strong>, 
+                  ưu đãi thành viên sẽ <strong>không được áp dụng đồng thời</strong>.
+                </p>
+              </div>
+              <p>Bạn có chắc chắn muốn sử dụng mã giảm giá này không?</p>
+            </div>
+          ),
+          okText: 'Xác nhận',
+          cancelText: 'Hủy',
+          onOk: () => {
+            setAppliedCoupon(couponData);
+            toast.success(`Áp dụng mã giảm giá "${couponData.code}" thành công!`);
+          },
+          onCancel: () => {
+            // Không làm gì khi hủy
+          },
+        });
       } else {
         // Áp dụng trực tiếp nếu không có member discount
         setAppliedCoupon(couponData);
@@ -311,32 +343,17 @@ export const Checkout: React.FC = () => {
       let errorMessage = 'Mã giảm giá không hợp lệ!';
       
       if (status === 404) {
-        errorMessage = 'Mã giảm giá không tồn tại.';
+        errorMessage = 'Mã giảm giá không tồn tại hoặc không áp dụng cho chi nhánh này.';
       } else if (status === 400 && rawMsg) {
-        // Backend trả về message như "Chương trình khuyến mãi đã kết thúc"
-        errorMessage = typeof rawMsg === 'string' ? rawMsg : (Array.isArray(rawMsg) ? rawMsg.join(', ') : 'Yêu cầu không hợp lệ.');
+        errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg;
       } else if (rawMsg) {
-        errorMessage = typeof rawMsg === 'string' ? rawMsg : (Array.isArray(rawMsg) ? rawMsg.join(', ') : errorMessage);
+        errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg;
       }
       
       toast.error(errorMessage);
     } finally {
       setIsCheckingCoupon(false);
     }
-  };
-  
-  const handleConfirmCouponWithMembership = () => {
-    if (pendingCoupon) {
-      setAppliedCoupon(pendingCoupon);
-      toast.success(`Áp dụng mã giảm giá "${pendingCoupon.code}" thành công!`);
-      setPendingCoupon(null);
-    }
-    setShowMembershipWarningModal(false);
-  };
-  
-  const handleCancelCouponApplication = () => {
-    setPendingCoupon(null);
-    setShowMembershipWarningModal(false);
   };
 
   const handleRemoveCoupon = () => {
@@ -832,35 +849,6 @@ export const Checkout: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      {/* Modal cảnh báo khi áp dụng coupon với membership discount */}
-      <Modal
-        isOpen={showMembershipWarningModal}
-        onClose={handleCancelCouponApplication}
-        title="Xác nhận áp dụng mã giảm giá"
-        size="sm"
-      >
-        <div style={{ padding: '20px 0' }}>
-          <p style={{ marginBottom: '16px', lineHeight: '1.6' }}>
-            Bạn hiện đang có ưu đãi thành viên <strong>{membershipRank}</strong>.
-          </p>
-          <p style={{ marginBottom: '16px', lineHeight: '1.6', color: '#f59e0b' }}>
-            ⚠️ Khi áp dụng mã giảm giá <strong>{pendingCoupon?.code}</strong>, 
-            ưu đãi thành viên sẽ <strong>không được áp dụng đồng thời</strong>.
-          </p>
-          <p style={{ lineHeight: '1.6' }}>
-            Bạn có chắc chắn muốn sử dụng mã giảm giá này không?
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-          <Button variant="outline" onClick={handleCancelCouponApplication}>
-            Hủy
-          </Button>
-          <Button variant="primary" onClick={handleConfirmCouponWithMembership}>
-            Xác nhận
-          </Button>
-        </div>
-      </Modal>
     </>
   );
 };

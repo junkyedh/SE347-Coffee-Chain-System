@@ -123,11 +123,8 @@ const ToastContainer: React.FC<{
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
-  
-  console.log('ToastProvider rendering, toasts count:', toasts.length);
 
   const removeToast = useCallback((id: string) => {
-    console.log('removeToast called for id:', id, 'Stack:', new Error().stack);
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 

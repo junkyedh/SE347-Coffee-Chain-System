@@ -63,8 +63,23 @@ const Modal: React.FC<ModalProps> = ({
   };
 
   return createPortal(
-    <div className={cn('modal-overlay', { 'modal-open': isOpen })} onClick={handleOverlayClick}>
-      <div className={cn('modal', `modal-${size}`, className)}>
+    <div 
+      className={cn('modal-overlay', { 'modal-open': isOpen })} 
+      onClick={handleOverlayClick}
+      style={{ 
+        position: 'fixed',
+        zIndex: 99999,
+        display: 'flex',
+        opacity: isOpen ? 1 : 0,
+        visibility: isOpen ? 'visible' : 'hidden'
+      }}
+    >
+      <div 
+        className={cn('modal', `modal-${size}`, className)}
+        style={{
+          transform: isOpen ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(20px)'
+        }}
+      >
         {(title || showCloseButton) && (
           <div className="modal-header">
             {title && <h2 className="modal-title">{title}</h2>}
