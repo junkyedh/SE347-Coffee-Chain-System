@@ -217,6 +217,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
       }
 
+      // Nếu giỏ hàng đã có sản phẩm từ chi nhánh khác → không cho thêm
+      const existingBranchId = getCartBranchId();
+      if (existingBranchId !== null && branchId !== undefined && existingBranchId !== branchId) {
+        throw new Error(
+          `Giỏ hàng đã có sản phẩm từ chi nhánh khác. Vui lòng xóa giỏ hàng hoặc chọn sản phẩm cùng chi nhánh.`
+        );
+      }
+
       const phoneCustomer = userInfo.phone;
       
       // Create abort controller for this specific request
