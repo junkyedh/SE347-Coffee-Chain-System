@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import '../adminPage.scss';
 import { useSystemContext } from '@/hooks/useSystemContext';
-import { useLocation } from 'react-router-dom';
 
 export const OrderList = () => {
   const [managerOrderList, setManagerOrderList] = useState<any[]>([]);
@@ -25,8 +24,6 @@ export const OrderList = () => {
   
   const { branchId } = useSystemContext();
   const currentBranchId = Number(branchId) || 1;
-  const location = useLocation();
-  const { highlightOrderId } = location.state || {};
 
   const fetchManagerOrderList = async () => {
     try {
@@ -56,27 +53,6 @@ export const OrderList = () => {
     fetchBranchStaffList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Tự động search theo order ID từ table navigation
-  useEffect(() => {
-    if (highlightOrderId && originalManagerOrderList.length > 0) {
-      const keyword = String(highlightOrderId).toLowerCase();
-      const filtered = originalManagerOrderList.filter((order) => {
-        const id = String(order.id ?? '').toLowerCase();
-        return id.includes(keyword);
-      });
-      setManagerOrderList(filtered);
-      setSearchKeyword(String(highlightOrderId));
-      
-      // Hiển thị thông báo
-      if (filtered.length > 0) {
-        message.success(`Đã tìm thấy đơn hàng #${highlightOrderId}`);
-      } else {
-        message.warning(`Không tìm thấy đơn hàng #${highlightOrderId}`);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [highlightOrderId, originalManagerOrderList]);
 
   const handleSearchKeyword = () => {
     const keyword = searchKeyword.trim().toLowerCase();

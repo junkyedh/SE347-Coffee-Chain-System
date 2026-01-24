@@ -104,35 +104,8 @@ const AdminTableOrder = () => {
   };
 
   const handleViewActiveOrder = async (table: any) => {
-    try {
-      setLoading(true);
-      const res = await AdminApiRequest.get("branch-order/list");
-      const activeOrders = res.data.filter(
-        (order: any) =>
-          order.tableID === table.id &&
-          ["Chờ xác nhận", "Đã xác nhận", "Đang chuẩn bị", "Sẵn sàng"].includes(
-            order.status,
-          ),
-      );
-
-      if (activeOrders.length > 0) {
-        // Navigate đến trang danh sách đơn hàng với order ID để tự động tìm
-        navigate(ROUTES.STAFF.ORDER_LIST, {
-          state: {
-            highlightOrderId: activeOrders[0].id,
-            tableId: table.id,
-            tableName: `Bàn ${table.id}`,
-          },
-        });
-      } else {
-        message.warning("Không tìm thấy đơn hàng đang hoạt động của bàn này.");
-      }
-    } catch (error) {
-      console.error("Error fetching active order:", error);
-      message.error("Có lỗi xảy ra khi lấy đơn hàng.");
-    } finally {
-      setLoading(false);
-    }
+    // Chỉ navigate đến trang danh sách đơn hàng, không filter
+    navigate(ROUTES.STAFF.ORDER_LIST);
   };
 
   const handleDeleteTable = (tableId: number) => {
