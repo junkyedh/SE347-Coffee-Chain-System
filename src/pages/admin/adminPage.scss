@@ -206,6 +206,53 @@
         padding: 8px 12px;
       }
     }
+
+    /* Layout grid cho form 2 cột */
+    .modal-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    /* Layout grid cho input nhỏ (Tên + Loại) */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+
+      @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Layout checkbox group */
+    .checkbox-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+
+      .ant-form-item {
+        margin-bottom: 0;
+      }
+    }
+
+    /* Layout form label cho sections */
+    .form-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: get-color($primary, "700");
+      margin-bottom: 8px;
+      display: block;
+    }
+
     .modal-footer-custom {
       display: flex;
       justify-content: flex-end;

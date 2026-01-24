@@ -436,30 +436,40 @@ const ManagerPromotion = () => {
             title: "Hành động",
             key: "action",
             align: "center",
-            render: (_: any, record: any) => (
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <Space size="middle">
-                  <AdminButton
-                    variant="secondary"
-                    size="sm"
-                    icon={<i className="fas fa-edit"></i>}
-                    onClick={() => onOpenEditPromote(record)}
-                  ></AdminButton>
-                  <AdminPopConfirm
-                    title="Bạn có chắc chắn muốn xóa khuyến mãi này?"
-                    onConfirm={() => onDeletePromote(record.id)}
-                    okText="Đồng ý"
-                    cancelText="Hủy"
-                  >
-                    <AdminButton
-                      variant="destructive"
-                      size="sm"
-                      icon={<i className="fas fa-trash-alt"></i>}
-                    ></AdminButton>
-                  </AdminPopConfirm>
-                </Space>
-              </div>
-            ),
+            render: (_: any, record: any) => {
+              // Manager chỉ edit/xóa được promote của chi nhánh mình (branchId !== null)
+              // Không được động vào promote chung (branchId === null)
+              const canEdit = record.branchId !== null;
+              
+              return (
+                <div className="d-flex align-items-center justify-content-center gap-2">
+                  {canEdit ? (
+                    <Space size="middle">
+                      <AdminButton
+                        variant="secondary"
+                        size="sm"
+                        icon={<i className="fas fa-edit"></i>}
+                        onClick={() => onOpenEditPromote(record)}
+                      ></AdminButton>
+                      <AdminPopConfirm
+                        title="Bạn có chắc chắn muốn xóa khuyến mãi này?"
+                        onConfirm={() => onDeletePromote(record.id)}
+                        okText="Đồng ý"
+                        cancelText="Hủy"
+                      >
+                        <AdminButton
+                          variant="destructive"
+                          size="sm"
+                          icon={<i className="fas fa-trash-alt"></i>}
+                        ></AdminButton>
+                      </AdminPopConfirm>
+                    </Space>
+                  ) : (
+                    <Tag color="blue">Khuyến mãi chung</Tag>
+                  )}
+                </div>
+              );
+            },
           },
         ]}
       />
@@ -506,30 +516,39 @@ const ManagerPromotion = () => {
             title: "Hành động",
             key: "action",
             align: "center",
-            render: (_: any, record: any) => (
-              <div className="d-flex align-items-center gap-2 justify-content-center">
-                <Space size="middle">
-                  <AdminButton
-                    variant="secondary"
-                    size="sm"
-                    icon={<i className="fas fa-edit"></i>}
-                    onClick={() => onOpenEditCoupon(record)}
-                  ></AdminButton>
-                  <AdminPopConfirm
-                    title="Bạn có chắc chắn muốn xóa coupon này?"
-                    onConfirm={() => onDeleteCoupon(record.id)}
-                    okText="Đồng ý"
-                    cancelText="Hủy"
-                  >
-                    <AdminButton
-                      variant="destructive"
-                      size="sm"
-                      icon={<i className="fas fa-trash-alt"></i>}
-                    ></AdminButton>
-                  </AdminPopConfirm>
-                </Space>
-              </div>
-            ),
+            render: (_: any, record: any) => {
+              // Manager chỉ edit/xóa được coupon của promote chi nhánh (promote.branchId !== null)
+              const canEdit = record.promote?.branchId !== null;
+              
+              return (
+                <div className="d-flex align-items-center gap-2 justify-content-center">
+                  {canEdit ? (
+                    <Space size="middle">
+                      <AdminButton
+                        variant="secondary"
+                        size="sm"
+                        icon={<i className="fas fa-edit"></i>}
+                        onClick={() => onOpenEditCoupon(record)}
+                      ></AdminButton>
+                      <AdminPopConfirm
+                        title="Bạn có chắc chắn muốn xóa coupon này?"
+                        onConfirm={() => onDeleteCoupon(record.id)}
+                        okText="Đồng ý"
+                        cancelText="Hủy"
+                      >
+                        <AdminButton
+                          variant="destructive"
+                          size="sm"
+                          icon={<i className="fas fa-trash-alt"></i>}
+                        ></AdminButton>
+                      </AdminPopConfirm>
+                    </Space>
+                  ) : (
+                    <Tag color="blue">Coupon chung</Tag>
+                  )}
+                </div>
+              );
+            },
           },
         ]}
       />
