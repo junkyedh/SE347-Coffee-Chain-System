@@ -115,6 +115,12 @@
       .ratingIcon {
         color: #fbbf24;
       }
+
+      .ratingCount {
+        color: get-color($neutral, '600');
+        font-size: 0.75rem;
+        margin-left: 2px;
+      }
     }
   }
 
