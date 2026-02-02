@@ -1,41 +1,47 @@
 @import '../../../styles/variables.scss';
 
 .modal-overlay {
-  position: fixed;
+  position: fixed !important;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 99999 !important;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
   padding: 20px;
+  will-change: opacity, visibility;
 
   &.modal-open {
-    opacity: 1;
-    visibility: visible;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto;
   }
 }
 
 .modal {
-  background: $white;
+  background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 24px 80px rgba(get-color($neutral, '900'), 0.2);
+  box-shadow: 0 24px 80px rgba(31, 43, 59, 0.2);
   max-height: 90vh;
   overflow: hidden;
   transform: scale(0.9) translateY(20px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  will-change: transform;
+  position: relative;
+  z-index: 100000;
 
   .modal-overlay.modal-open & {
-    transform: scale(1) translateY(0);
+    transform: scale(1) translateY(0) !important;
   }
 
   // Sizes
@@ -70,16 +76,16 @@
 
 .modal-header {
   padding: 24px 24px 0;
-  border-bottom: 1px solid get-color($neutral, '100');
+  border-bottom: 1px solid #e9eef1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
 
   .modal-title {
-    font-size: get-font-size($title-font-size, sm);
-    font-weight: get-font-weight($font-weight, semibold);
-    color: get-color($primary, '800');
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2f4156;
     margin: 0;
     flex: 1;
   }
@@ -101,23 +107,23 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: get-color($neutral, '100');
+    background: #e9eef1;
     border-radius: 3px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: get-color($neutral, '300');
+    background: #b3c5d2;
     border-radius: 3px;
 
     &:hover {
-      background: get-color($neutral, '400');
+      background: #8da9ba;
     }
   }
 }
 
 .modal-footer {
   padding: 0 24px 24px;
-  border-top: 1px solid get-color($neutral, '100');
+  border-top: 1px solid #e9eef1;
   display: flex;
   gap: 12px;
   justify-content: flex-end;

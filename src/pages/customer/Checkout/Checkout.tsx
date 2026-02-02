@@ -8,9 +8,11 @@ import { CheckCircle, Clock, CreditCard, MapPin, Tag, Wallet, X } from 'lucide-r
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Checkout.scss';
-import { message } from 'antd';
 import { getProductDisplayInfo } from '@/utils/productSize';
 import { calculateOrderTotal, Coupon } from '@/utils/priceCalculator';
+import { useToast } from '@/components/common/Toast/Toast';
+import { Modal } from 'antd';
+import { useSystemContext } from '@/hooks/useSystemContext';
 
 interface LocationStateItem {
   productId: number;
@@ -39,7 +41,8 @@ interface Branch {
 export const Checkout: React.FC = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { cart, fetchCart, removeCartItemsAfterOrder } = useCart();
+  const { cart, fetchCart, removeCartItemsAfterOrder, getCartBranchId } = useCart();
+  const { isLoggedIn } = useSystemContext();
 
   const [items, setItems] = useState<(OrderItem | CartItem)[]>([]);
   const [name, setName] = useState('');
@@ -52,26 +55,23 @@ export const Checkout: React.FC = () => {
   
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
-  const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>([]);
+  const [isCheckingCoupon, setIsCheckingCoupon] = useState(false);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<number | null>(null);
+  const [fixedBranch, setFixedBranch] = useState<Branch | null>(null); // Chi nhánh được cố định từ Menu
   
   const [membershipRank, setMembershipRank] = useState<string>(''); 
   
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  const toast = useToast();
 
   useEffect(() => {
-    MainApiRequest.get('/auth/callback')
-      .then(() => setIsLoggedIn(true))
-      .catch(() => setIsLoggedIn(false));
-  }, []);
-
-  useEffect(() => {
-    MainApiRequest.get<Coupon[]>('/promote/coupon/list')
-      .then((res) => setAvailableCoupons(res.data))
-      .catch((err) => console.error('Failed to fetch coupons:', err));
-  }, []);
+    if (!isLoggedIn) {
+      toast.error('Vui lòng đăng nhập để thanh toán');
+      navigate(ROUTES.LOGIN);
+    }
+  }, [isLoggedIn, navigate, toast]);
 
   useEffect(() => {
     const loadItems = async () => {
@@ -166,7 +166,26 @@ export const Checkout: React.FC = () => {
 
   useEffect(() => {
     if (!items.length) return;
+    
     const loadBranches = async () => {
+      // Kiểm tra xem có chi nhánh cố định từ giỏ hàng không
+      const cartBranchId = getCartBranchId();
+      
+      if (cartBranchId) {
+        // Nếu có chi nhánh từ giỏ hàng (từ Menu), lấy thông tin chi nhánh đó
+        try {
+          const res = await MainApiRequest.get<Branch>(`/branch/${cartBranchId}`);
+          setFixedBranch(res.data);
+          setSelectedBranch(cartBranchId);
+          setBranches([res.data]);
+          return;
+        } catch (error) {
+          console.error('Error loading fixed branch:', error);
+          toast.error('Không thể tải thông tin chi nhánh.');
+        }
+      }
+      
+      // Nếu không có chi nhánh cố định, load các chi nhánh có sản phẩm
       const lists = await Promise.all(
         items.map((it) =>
           MainApiRequest.get<Branch[]>(`/product/available-branches/${it.productId}`)
@@ -179,11 +198,17 @@ export const Checkout: React.FC = () => {
       const common = lists.reduce((prev, curr) =>
         prev.filter((b) => curr.some((c) => c.id === b.id))
       );
+      
+      if (common.length === 0) {
+        toast.warning('Không có chi nhánh nào có đủ tất cả sản phẩm trong giỏ hàng. Vui lòng kiểm tra lại.');
+      }
+      
       setBranches(common);
       if (common.length && selectedBranch === null) setSelectedBranch(common[0].id);
     };
     loadBranches();
-  }, [items, selectedBranch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, selectedBranch, getCartBranchId]);
 
   useEffect(() => {
     const fetchMembershipRank = async () => {
@@ -199,6 +224,14 @@ export const Checkout: React.FC = () => {
     };
     fetchMembershipRank();
   }, []);
+
+  // Reset coupon khi đổi chi nhánh để tránh áp coupon của chi nhánh cũ
+  useEffect(() => {
+    if (!appliedCoupon) return;
+    setAppliedCoupon(null);
+    setCouponCode('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBranch]);
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const deliveryFee = deliveryMethod === 'delivery' ? 10000 : 0;
@@ -216,25 +249,110 @@ export const Checkout: React.FC = () => {
     membershipRank: membershipRank
   });
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
-    if (!code) return;
 
-    const c = availableCoupons.find((x) => x.code.toUpperCase() === code);
+    if (!code) {
+      toast.warning('Vui lòng nhập mã giảm giá.');
+      return;
+    }
 
-    if (c) {
-      setAppliedCoupon(c);
-      if (membershipRank) {
-        message.success('Áp dụng mã giảm giá thành công!');
-        message.info(
-          `Ưu đãi thành viên (${membershipRank}) sẽ không được áp dụng đồng thời với mã giảm giá.`
-        );
-      } else {
-        message.success('Áp dụng mã giảm giá thành công!');
+    if (!selectedBranch) {
+      toast.warning('Vui lòng chọn chi nhánh trước khi áp dụng mã giảm giá.');
+      return;
+    }
+
+    setIsCheckingCoupon(true);
+    try {
+      const res = await MainApiRequest.get<Coupon[] | Coupon>(
+        `/promote/coupon/check?code=${encodeURIComponent(code)}&branchId=${selectedBranch}`
+      );
+      
+      // Xử lý response: có thể là array hoặc object
+      let couponData: Coupon | null = null;
+      
+      if (Array.isArray(res.data)) {
+        couponData = res.data.length > 0 ? res.data[0] : null;
+      } else if (res.data && typeof res.data === 'object') {
+        couponData = res.data;
       }
-    } else {
-      message.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!');
+      
+      if (!couponData || !couponData.code) {
+        toast.error('Mã giảm giá không tồn tại.');
+        setAppliedCoupon(null);
+        return;
+      }
+      
+      // Kiểm tra status của coupon
+      if (couponData.status?.toLowerCase() === 'hết hạn') {
+        toast.error('Chương trình khuyến mãi đã kết thúc.');
+        setAppliedCoupon(null);
+        return;
+      }
+      
+      if (couponData.status?.toLowerCase() !== 'có hiệu lực') {
+        toast.error(`Mã giảm giá không khả dụng (${couponData.status}).`);
+        setAppliedCoupon(null);
+        return;
+      }
+      
+      // Nếu có membership rank, hiển thị modal thông báo
+      if (membershipRank) {
+        Modal.confirm({
+          title: 'Xác nhận áp dụng mã giảm giá',
+          content: (
+            <div>
+              <p style={{ marginBottom: '12px' }}>
+                Bạn hiện đang có ưu đãi thành viên <strong style={{ color: '#059669' }}>{membershipRank}</strong>.
+              </p>
+              <div style={{ 
+                marginBottom: '12px', 
+                padding: '12px',
+                backgroundColor: '#fef3c7',
+                border: '1px solid #fbbf24',
+                borderRadius: '8px'
+              }}>
+                <p style={{ color: '#f59e0b', marginBottom: '8px' }}>
+                  ⚠️ Khi áp dụng mã <strong>{couponData.code}</strong>, 
+                  ưu đãi thành viên sẽ <strong>không được áp dụng đồng thời</strong>.
+                </p>
+              </div>
+              <p>Bạn có chắc chắn muốn sử dụng mã giảm giá này không?</p>
+            </div>
+          ),
+          okText: 'Xác nhận',
+          cancelText: 'Hủy',
+          onOk: () => {
+            setAppliedCoupon(couponData);
+            toast.success(`Áp dụng mã giảm giá "${couponData.code}" thành công!`);
+          },
+          onCancel: () => {
+            // Không làm gì khi hủy
+          },
+        });
+      } else {
+        // Áp dụng trực tiếp nếu không có member discount
+        setAppliedCoupon(couponData);
+        toast.success(`Áp dụng mã giảm giá "${couponData.code}" thành công!`);
+      }
+    } catch (err: any) {
       setAppliedCoupon(null);
+      const status = err?.response?.status;
+      const rawMsg = err?.response?.data?.message;
+      
+      let errorMessage = 'Mã giảm giá không hợp lệ!';
+      
+      if (status === 404) {
+        errorMessage = 'Mã giảm giá không tồn tại hoặc không áp dụng cho chi nhánh này.';
+      } else if (status === 400 && rawMsg) {
+        errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg;
+      } else if (rawMsg) {
+        errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg;
+      }
+      
+      toast.error(errorMessage);
+    } finally {
+      setIsCheckingCoupon(false);
     }
   };
 
@@ -243,11 +361,11 @@ export const Checkout: React.FC = () => {
     setCouponCode('');
 
     if (membershipRank) {
-      message.info(
+      toast.info(
         `Đã hủy mã giảm giá. Ưu đãi thành viên (${membershipRank}) đã được áp dụng lại.`
       );
     } else {
-      message.success('Đã hủy mã giảm giá.');
+      toast.success('Đã hủy mã giảm giá.');
     }
   };
 
@@ -326,8 +444,8 @@ export const Checkout: React.FC = () => {
         localStorage.setItem('guest_order_history', JSON.stringify(newHistory));
       }
 
-      const backendBaseUrl = String(MainApiRequest.defaults.baseURL || '').replace(/\/+$/, '');
-      const clientReturn =
+      // VNPay Return URL - trỏ trực tiếp về frontend
+      const vnpayReturnUrl =
         process.env.REACT_APP_VNPAY_RETURN_URL?.trim() ||
         `${(process.env.REACT_APP_BASE_URL || window.location.origin).replace(/\/+$/, '')}/vnpay-callback`;
 
@@ -337,7 +455,7 @@ export const Checkout: React.FC = () => {
             orderId,
             amount: finalTotal,
             orderInfo: `Thanh toan don hang ${orderId}`,
-            returnUrl: `${backendBaseUrl}/payment/vnpay/return?clientReturn=${encodeURIComponent(clientReturn)}`,
+            returnUrl: vnpayReturnUrl,
           });
 
           if (paymentData.paymentUrl) {
@@ -459,19 +577,48 @@ export const Checkout: React.FC = () => {
 
                 <div className="form-group">
                   <label>Chọn chi nhánh</label>
-                  <select
-                    value={selectedBranch ?? ''}
-                    onChange={(e) => setSelectedBranch(Number.parseInt(e.target.value, 10))}
-                  >
-                    <option value="" disabled>
-                      -- Chọn chi nhánh --
-                    </option>
-                    {branches.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name} - {b.address}
+                  {fixedBranch ? (
+                    <div style={{
+                      padding: '12px 16px',
+                      backgroundColor: '#f3f4f6',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <MapPin size={18} color="#6b7280" />
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#111827' }}>{fixedBranch.name}</div>
+                        <div style={{ fontSize: '14px', color: '#6b7280' }}>{fixedBranch.address}</div>
+                      </div>
+                      <div style={{
+                        marginLeft: 'auto',
+                        padding: '4px 8px',
+                        backgroundColor: '#dbeafe',
+                        color: '#1e40af',
+                        fontSize: '12px',
+                        borderRadius: '4px',
+                        fontWeight: 500
+                      }}>
+                        Đã chọn từ Menu
+                      </div>
+                    </div>
+                  ) : (
+                    <select
+                      value={selectedBranch ?? ''}
+                      onChange={(e) => setSelectedBranch(Number.parseInt(e.target.value, 10))}
+                    >
+                      <option value="" disabled>
+                        -- Chọn chi nhánh --
                       </option>
-                    ))}
-                  </select>
+                      {branches.map((b) => (
+                        <option key={b.id} value={b.id}>
+                          {b.name} - {b.address}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
 
@@ -566,9 +713,14 @@ export const Checkout: React.FC = () => {
                       onChange={(e) => setCouponCode(e.target.value)}
                       placeholder="Nhập mã giảm giá"
                       onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                      disabled={isCheckingCoupon}
                     />
-                    <button className="primaryBtn" onClick={handleApplyCoupon}>
-                      Áp dụng
+                    <button 
+                      className="primaryBtn" 
+                      onClick={handleApplyCoupon}
+                      disabled={isCheckingCoupon}
+                    >
+                      {isCheckingCoupon ? 'Đang kiểm tra...' : 'Áp dụng'}
                     </button>
                   </div>
                 ) : (
