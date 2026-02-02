@@ -13,15 +13,13 @@ validateEnvConfig();
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
-  <React.StrictMode>
-    <AppSystemProvider>
-      <CartProvider>
-        <BrowserRouter>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </BrowserRouter>
-      </CartProvider>
-    </AppSystemProvider>
-  </React.StrictMode>
+  <AppSystemProvider>
+    <CartProvider>
+      <BrowserRouter>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </BrowserRouter>
+    </CartProvider>
+  </AppSystemProvider>
 );

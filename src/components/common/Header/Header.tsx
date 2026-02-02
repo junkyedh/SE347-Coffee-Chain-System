@@ -12,7 +12,7 @@ import React from 'react';
 
 const Header: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const { token, logout, userInfo } = useSystemContext();
+  const { isLoggedIn, logout, userInfo, isLoadingUser } = useSystemContext();
   const navigate = useNavigate();
 
   const toggleMenu = () => setOpen(!open);
@@ -121,7 +121,7 @@ const Header: React.FC = () => {
               </Nav>
 
               <div className="offcanvas-user-section mt-4">
-                {userInfo ? (
+                {isLoggedIn && userInfo ? (
                   <div className="offcanvas-user-menu">
                     <div className="user-info-card">
                       <User className="user-avatar-icon" />
@@ -142,6 +142,10 @@ const Header: React.FC = () => {
                         </button>
                       ))}
                     </div>
+                  </div>
+                ) : isLoggedIn && isLoadingUser ? (
+                  <div className="text-center text-muted">
+                    Đang tải...
                   </div>
                 ) : (
                   <NavLink
@@ -166,7 +170,7 @@ const Header: React.FC = () => {
                 </NavLink>
               ))}
 
-              {userInfo ? (
+              {isLoggedIn && userInfo ? (
                 <NavDropdown
                   title={
                     <span className="user-dropdown-title">
@@ -190,6 +194,8 @@ const Header: React.FC = () => {
                     </React.Fragment>
                   ))}
                 </NavDropdown>
+              ) : isLoggedIn && isLoadingUser ? (
+                <span className="text-muted">Đang tải...</span>
               ) : (
                 <NavLink className="login-btn" to={ROUTES.LOGIN}>
                   <LogOut className="login-icon" />
@@ -197,7 +203,7 @@ const Header: React.FC = () => {
                 </NavLink>
               )}
             </Nav>
-            {token && <CartDrawer />}
+            {isLoggedIn && <CartDrawer />}
           </div>
         </Navbar>
       </Container>

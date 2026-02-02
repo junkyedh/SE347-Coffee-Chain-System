@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { MainApiRequest } from "@/services/MainApiRequest";
+import axios from "axios";
+import { UnifiedApiRequest } from "@/services/UnifiedApiRequest";
 import { Product } from "@/components/customer/CardProduct/CardProduct";
 
 const useProducts = () => {
@@ -7,10 +8,19 @@ const useProducts = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    let isMounted = true;
+    const abortController = new AbortController();
+
+    const fetchProducts = async (retryCount = 0) => {
+      if (!isMounted) return;
+      
       setIsLoading(true);
       try {
-        const res = await MainApiRequest.get("/product/list");
+        const res = await UnifiedApiRequest.get("/product/list", {
+          signal: abortController.signal
+        });
+
+        if (!isMounted) return;
 
         const rawProducts = res.data?.data || res.data;
         if (!Array.isArray(rawProducts)) {
@@ -37,19 +47,49 @@ const useProducts = () => {
             : [],
           description: item.description || "",
           isPopular: item.isPopular === true,
-          rating: item.rating || 0,
+          rating: item.rating,
+          totalRatings: item.totalRatings,
           discount: item.discount || 0,
         }));
 
-        setProducts(mappedProducts);
+        if (isMounted) {
+          setProducts(mappedProducts);
+        }
       } catch (error) {
-        console.error("Error fetching product list:", error);
+        if (!isMounted) return;
+        
+        // Handle canceled requests gracefully
+        if (axios.isCancel(error)) {
+          console.debug('Product fetch was canceled');
+          return;
+        }
+        
+        console.error("Failed to fetch product list", error);
+        
+        // Retry logic for network errors
+        const axiosError = error as any;
+        if (retryCount < 2 && !axiosError.response) {
+          console.log(`Retrying product fetch (${retryCount + 1}/2)`);
+          setTimeout(() => {
+            if (isMounted) {
+              fetchProducts(retryCount + 1);
+            }
+          }, 1000 * (retryCount + 1));
+          return;
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchProducts();
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, []);
 
   return { products, isLoading };

@@ -33,6 +33,8 @@ interface TokenPayload {
   role?: string;
   branchId?: string;
   type?: 'staff' | 'customer';
+  exp?: number;
+  iat?: number;
 }
 
 export const useSystemContext = () => {
@@ -65,8 +67,15 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
       });
       const data = response.data?.data;
       setUserInfo(data ?? null);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Fetch user info failed:', error);
       setUserInfo(null);
+      
+      // Nếu token hết hạn (401) hoặc không hợp lệ, logout ngay
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
+        console.warn('Token expired or invalid, logging out...');
+        logout();
+      }
     } finally {
       setIsLoadingUser(false);
     }
@@ -115,6 +124,15 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
     if (t) {
       try {
         const decoded: TokenPayload = jwtDecode(t);
+        
+        // Kiểm tra token có hết hạn không
+        if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+          console.warn('Token expired, logging out...');
+          logout();
+          setIsInitialized(true);
+          return;
+        }
+        
         const roleFromToken = decoded?.role ?? r;
 
         setToken(t);
@@ -125,7 +143,8 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
         if (roleFromToken) localStorage.setItem('role', roleFromToken);
 
         fetchUserInfo(t);
-      } catch {
+      } catch (error) {
+        console.error('Token decode error:', error);
         // token hỏng -> clear
         logout();
       }
