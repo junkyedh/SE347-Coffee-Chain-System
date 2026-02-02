@@ -4,6 +4,12 @@
 ## Giới Thiệu
 Cafe W Fen là nền tảng quản lý tập trung được thiết kế cho chuỗi cửa hàng cà phê. Hệ thống tối ưu hóa các hoạt động kinh doanh tại từng chi nhánh đồng thời cung cấp khả năng giám sát toàn diện cho toàn bộ chuỗi. Bao gồm quản lý sản phẩm, đơn hàng, kho, phân quyền người dùng, theo dõi doanh thu và thống kê lợi nhuận, đảm bảo tính chính xác, linh hoạt và khoa học.
 
+## 🎥 Video Demo
+
+[![Cafe W Fen - Demo Hệ Thống](https://img.youtube.com/vi/qu47eApz-_w/maxresdefault.jpg)](https://www.youtube.com/watch?v=qu47eApz-_w)
+
+**[▶️ Xem video demo đầy đủ](https://www.youtube.com/watch?v=qu47eApz-_w)**
+
 ## Tính Năng Chính
 
 ### 🏪 Quản Lý Đa Chi Nhánh
