@@ -91,9 +91,17 @@
 
           &:nth-child(odd) {
             background: get-color($primary2, "50") !important;
+
+            td {
+              background: get-color($primary2, "50") !important;
+            }
           }
           &:nth-child(even) {
             background: get-color($primary2, "200") !important;
+
+            td {
+              background: get-color($primary2, "200") !important;
+            }
           }
 
           td {
@@ -102,12 +110,23 @@
             border: none;
             font-size: 0.9rem;
             white-space: nowrap;
-          }
-        }
+            transition: all 0.2s ease;
 
-        > tr:hover > td {
-          background: get-color($primary2, "600") !important;
-          color: #fff !important;
+            /* Thêm gap giữa các buttons trong cell */
+            .d-flex {
+              gap: 0.5rem;
+            }
+          }
+
+          /* Hover với specificity cao hơn */
+          &:hover {
+            td {
+              background: get-color($primary, "600") !important;
+              color: #ffffff !important;
+              box-shadow: 0 2px 8px rgba(get-color($primary, "default"), 0.15);
+              font-weight: 500;
+            }
+          }
         }
       }
 
@@ -187,6 +206,53 @@
         padding: 8px 12px;
       }
     }
+
+    /* Layout grid cho form 2 cột */
+    .modal-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    /* Layout grid cho input nhỏ (Tên + Loại) */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+
+      @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Layout checkbox group */
+    .checkbox-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+
+      .ant-form-item {
+        margin-bottom: 0;
+      }
+    }
+
+    /* Layout form label cho sections */
+    .form-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: get-color($primary, "700");
+      margin-bottom: 8px;
+      display: block;
+    }
+
     .modal-footer-custom {
       display: flex;
       justify-content: flex-end;

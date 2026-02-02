@@ -1,4 +1,3 @@
-import AdminButton from '@/components/admin/AdminButton/AdminButton';
 import { Button, Tag } from 'antd';
 import React from 'react';
 import './AdminProductCard.scss';
@@ -35,7 +34,6 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
   onSelectSize,
   onSelectMood,
   onAddToOrder,
-  cartQuantity,
 }) => {
   const isCake = product.category === 'Bánh ngọt';
   const isCoffee = product.category === 'Cà phê';
@@ -74,7 +72,7 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
                       <Button
                         key={opt.value}
                         size="small"
-                        className={selectedSize === opt.value ? 'selected' : ''}
+                        className={`size-btn ${selectedSize === opt.value ? 'selected' : ''}`}
                         onClick={() => onSelectSize(opt.value)}
                       >
                         {opt.label} - {opt.price?.toLocaleString('vi-VN')}₫
@@ -84,7 +82,7 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
                       <Button
                         key={s.sizeName}
                         size="small"
-                        className={selectedSize === s.sizeName ? 'selected' : ''}
+                        className={`size-btn ${selectedSize === s.sizeName ? 'selected' : ''}`}
                         onClick={() => onSelectSize(s.sizeName)}
                       >
                         {s.sizeName}
@@ -100,7 +98,7 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
                   {product.hot && (
                     <Button
                       size="small"
-                      className={selectedMood === 'hot' ? 'selected' : ''}
+                      className={`mood-btn ${selectedMood === 'hot' ? 'selected' : ''}`}
                       onClick={() => onSelectMood('hot')}
                     >
                       Nóng
@@ -109,7 +107,7 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
                   {product.cold && (
                     <Button
                       size="small"
-                      className={selectedMood === 'cold' ? 'selected' : ''}
+                      className={`mood-btn ${selectedMood === 'cold' ? 'selected' : ''}`}
                       onClick={() => onSelectMood('cold')}
                     >
                       Đá
@@ -136,18 +134,14 @@ const AdminProductCard: React.FC<AdminProductCardProps> = ({
                   ₫
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <AdminButton
-                  variant="primary"
-                  size="sm"
-                  icon={<i className="fas fa-plus"></i>}
-                  disabled={!selectedSize || (isCoffee && !selectedMood)}
-                  onClick={() => onAddToOrder(selectedSize!)}
-                />
-                {cartQuantity && cartQuantity > 0 && (
-                  <span className="cart-quantity-label">Trong giỏ: {cartQuantity}</span>
-                )}
-              </div>
+              <Button
+                type="primary"
+                size="small"
+                icon={<i className="fas fa-plus" style={{ fontSize: '14px' }}></i>}
+                disabled={!selectedSize || (isCoffee && !selectedMood)}
+                onClick={() => onAddToOrder(selectedSize!)}
+                className="add-to-cart-btn"
+              />
             </div>
           </>
         ) : (
