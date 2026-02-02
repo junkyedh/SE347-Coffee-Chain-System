@@ -599,7 +599,6 @@ const AdminProductList = () => {
         className="custom-table"
         rowKey="id"
         dataSource={adminProductList}
-        // Kích hoạt thanh cuộn ngang và dọc
         scroll={{ x: "max-content", y: 600 }}
         pagination={{
           pageSize: 6,
@@ -610,7 +609,7 @@ const AdminProductList = () => {
             title: "ID",
             dataIndex: "id",
             key: "id",
-            width: 70, // Set độ rộng cố định
+            width: 70,
             align: "center",
             sorter: (a, b) => a.id - b.id,
           },
@@ -618,7 +617,7 @@ const AdminProductList = () => {
             title: "Hình ảnh",
             dataIndex: "image",
             key: "image",
-            width: 120, // Đủ rộng để chứa ảnh
+            width: 120,
             align: "center",
             render: (image: string) => (
               <img
@@ -638,7 +637,7 @@ const AdminProductList = () => {
             title: "Tên sản phẩm",
             dataIndex: "name",
             key: "name",
-            width: 200, // Tên dài sẽ không bị ép
+            width: 200,
             sorter: (a, b) => a.name.localeCompare(b.name),
             render: (text) => <span style={{ fontWeight: 600 }}>{text}</span>,
           },
@@ -654,7 +653,7 @@ const AdminProductList = () => {
           {
             title: "Giá",
             key: "price",
-            width: 180, // Quan trọng: Đủ rộng để hiển thị giá S/M/L
+            width: 180,
             sorter: (a: any, b: any) => {
               const priceA =
                 a.sizes?.find((s: ProductSize) => s.sizeName === "M")?.price ||
@@ -745,7 +744,7 @@ const AdminProductList = () => {
           {
             title: "Hành động",
             key: "action",
-            width: 180, // Cố định chiều rộng cột hành động
+            width: 180,
             align: "center",
             render: (_, record) => (
               <Space size="small">

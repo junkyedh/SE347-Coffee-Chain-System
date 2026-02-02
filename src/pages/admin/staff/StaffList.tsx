@@ -59,14 +59,13 @@ const StaffList = () => {
         className="custom-table"
         rowKey="id"
         dataSource={staffList}
-        // --- KÍCH HOẠT CUỘN NGANG ---
         scroll={{ x: "max-content" }}
         columns={[
           {
             title: "ID",
             dataIndex: "id",
             key: "id",
-            width: 70, // Cố định chiều rộng cột ID nhỏ
+            width: 70,
             align: "center",
             sorter: (a, b) => a.id - b.id,
           },
@@ -74,8 +73,8 @@ const StaffList = () => {
             title: "Tên nhân viên",
             dataIndex: "name",
             key: "name",
-            width: 180, // Đủ rộng cho họ tên dài
-            fixed: "left", // (Tùy chọn) Ghim cột Tên bên trái khi cuộn
+            width: 180,
+            fixed: "left",
             render: (text) => <span style={{ fontWeight: 600 }}>{text}</span>,
           },
           {
@@ -125,7 +124,7 @@ const StaffList = () => {
             title: "Địa chỉ",
             dataIndex: "address",
             key: "address",
-            width: 200, // Địa chỉ thường dài nên để rộng
+            width: 200,
             render: (text) => (
               <div
                 style={{

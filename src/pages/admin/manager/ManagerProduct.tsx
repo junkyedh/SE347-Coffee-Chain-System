@@ -176,7 +176,6 @@ const ManagerProductList = () => {
     }
   };
 
-  // Hàm mở modal edit sản phẩm
   const onOpenEditProduct = (record: any) => {
     setEditingProduct(record);
     const mappedMaterials =
@@ -213,7 +212,6 @@ const ManagerProductList = () => {
     setOpenCreateProductModal(true);
   };
 
-  // Hàm hủy bỏ việc tạo hoặc chỉnh sửa sản phẩm
   const onCancelCreateProduct = () => {
     setOpenCreateProductModal(false);
     setEditingProduct(null);
@@ -222,7 +220,6 @@ const ManagerProductList = () => {
     setImageUrl('');
   };
 
-  // Hàm cập nhật trạng thái sản phẩm
   const onToggleProductStatus = async (record: any) => {
     try {
       const updatedAvailable = !record.available;

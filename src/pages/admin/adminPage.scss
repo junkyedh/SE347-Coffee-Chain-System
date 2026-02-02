@@ -26,9 +26,6 @@
     border-bottom: 1px solid rgba(get-color($primary2, "200"), 0.2);
     box-shadow: 0 4px 12px rgba(get-color($primary, "default"), 0.05);
 
-    /* --- SỬA DÒNG NÀY --- */
-    /* Cũ: border-radius: 0 0 1rem 1rem; (Chỉ bo dưới) */
-    /* Mới: Bo cong đều cả 4 góc */
     border-radius: 1rem;
 
     padding: 1.5rem 2rem;
@@ -58,7 +55,6 @@
     }
   }
 
-  /* --- STYLE BẢNG RESPONSIVE --- */
   .custom-table {
     margin-top: 1.5rem;
 
@@ -112,13 +108,11 @@
             white-space: nowrap;
             transition: all 0.2s ease;
 
-            /* Thêm gap giữa các buttons trong cell */
             .d-flex {
               gap: 0.5rem;
             }
           }
 
-          /* Hover với specificity cao hơn */
           &:hover {
             td {
               background: get-color($primary, "600") !important;
@@ -263,10 +257,8 @@
     }
   }
 
-  /* --- RESPONSIVE CHO TABLET & MOBILE (Thay thế đoạn cũ) --- */
   /* --- RESPONSIVE CHO TABLET & MOBILE --- */
   @media (max-width: 768px) {
-    /* 1. Khung bao ngoài */
     .sticky-header-wrapper {
       padding: 0.5rem 0.75rem !important;
       flex-direction: column !important;
@@ -274,7 +266,6 @@
       align-items: stretch !important;
     }
 
-    /* 2. Tiêu đề */
     .header-custom {
       font-size: 1.25rem !important;
       text-align: center;
@@ -282,7 +273,6 @@
       line-height: 1.2;
     }
 
-    /* 3. Khu vực Search + Nút: Nằm ngang */
     .header-actions {
       width: 100%;
       display: flex !important;
@@ -290,90 +280,78 @@
       flex-wrap: nowrap !important;
       align-items: center !important;
       justify-content: space-between;
-      gap: 8px !important; /* Khoảng cách giữa Search và Nút */
+      gap: 8px !important;
     }
 
-    /* 4. Ô tìm kiếm: Tự co giãn thông minh */
-    /* 4. Ô tìm kiếm: Tự co giãn thông minh */
     .search-form {
-      flex: 1 1 auto !important; /* Quan trọng: Cho phép co (shrink) và giãn (grow) */
-      min-width: 100px !important; /* Cho phép thu nhỏ xuống tận 100px để nhường chỗ */
+      flex: 1 1 auto !important;
+      min-width: 100px !important;
       width: auto !important;
       max-width: 100%;
 
-      /* Chỉnh input cao đúng 32px và padding nhỏ lại */
       .ant-input-affix-wrapper,
       .ant-input {
         height: 32px !important;
         font-size: 0.85rem !important;
-        padding: 0 4px !important; /* Giảm padding 2 bên để tiết kiệm từng pixel */
+        padding: 0 4px !important;
         display: flex;
         align-items: center;
       }
 
-      /* Ẩn bớt icon kính lúp nếu quá chật (để dành chỗ cho text) */
       .ant-input-prefix {
         margin-right: 2px !important;
       }
     }
 
-    /* 5. CÁC NÚT BẤM (QUAN TRỌNG) */
     .header-actions .d-flex {
       display: flex;
-      gap: 6px !important; /* Khoảng cách giữa các nút con */
+      gap: 6px !important;
       flex-shrink: 0;
     }
 
     .header-actions .ant-btn {
-      /* Ép cứng kích thước để 3 nút bằng nhau chằn chặn */
       height: 32px !important;
-      width: 32px !important; /* Chiều rộng bằng chiều cao -> Hình vuông */
+      width: 32px !important;
       min-width: 32px !important;
-      padding: 0 !important; /* Bỏ padding để icon căn giữa */
+      padding: 0 !important;
 
       display: flex !important;
       align-items: center;
       justify-content: center;
-      border-radius: 6px !important; /* Bo góc nhẹ */
+      border-radius: 6px !important;
 
-      /* Chỉnh icon bên trong nút */
       span {
         font-size: 0.9rem !important;
         margin: 0 !important;
       }
 
-      /* Ẩn chữ nếu có, chỉ hiện icon để đảm bảo nút vuông đẹp trên mobile */
       span:not(.anticon) {
         display: none !important;
       }
     }
   }
 
-  /* Thêm đoạn này vào adminPage.scss */
-
   .list-header {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Đẩy tiêu đề sang trái, nút sang phải */
-    margin: 2rem 0 1rem 0; /* Canh lề trên dưới cho thoáng */
+    justify-content: space-between;
+    margin: 2rem 0 1rem 0;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* (Tùy chọn) Thêm gạch chân mờ cho đẹp */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
     h4 {
-      /* Fix lỗi font chữ: Ép dùng font hệ thống không chân */
       font-family:
         -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
         Arial, sans-serif !important;
       font-size: 1.3rem;
-      font-weight: 700; /* In đậm */
-      color: get-color($primary, "800"); /* Lấy màu xanh đậm của theme */
-      margin: 0; /* Xóa margin mặc định để căn giữa đẹp hơn */
-      text-transform: uppercase; /* (Tùy chọn) Viết hoa tiêu đề cho sang */
+      font-weight: 700;
+      color: get-color($primary, "800");
+      margin: 0;
+      text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .action-btn-wrapper {
-      /* Đảm bảo nút không bị méo */
       flex-shrink: 0;
     }
   }

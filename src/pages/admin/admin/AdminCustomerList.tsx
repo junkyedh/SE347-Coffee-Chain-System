@@ -25,7 +25,7 @@ const AdminCustomerList = () => {
       const res = await AdminApiRequest.get('/customer/list');
       setCustomerList(res.data);
     } catch (error) {
-      if (axios.isCancel(error)) return; // Ignore canceled requests
+      if (axios.isCancel(error)) return;
       console.error('Error fetching customer list:', error);
       message.error('Lấy danh sách khách hàng thất bại.');
     }

@@ -23,7 +23,7 @@ const AdminBranchList = () => {
       const res = await AdminApiRequest.get("/branch/list");
       setAdminBranchList(res.data);
     } catch (error) {
-      if (axios.isCancel(error)) return; // Ignore canceled requests
+      if (axios.isCancel(error)) return;
       console.error("Error fetching branch list:", error);
       message.error("Tải chi nhánh thất bại.");
     }
@@ -245,7 +245,7 @@ const AdminBranchList = () => {
             title: "ID",
             dataIndex: "id",
             key: "id",
-            width: 70, // Cố định chiều rộng cột ID nhỏ
+            width: 70,
             align: "center",
             sorter: (a, b) => a.id - b.id,
           },
@@ -253,8 +253,8 @@ const AdminBranchList = () => {
             title: "Tên chi nhánh",
             dataIndex: "name",
             key: "name",
-            width: 200, // Đủ rộng cho tên
-            fixed: "left", // Ghim cột tên bên trái khi cuộn
+            width: 200,
+            fixed: "left",
             sorter: (a, b) => a.name.localeCompare(b.name),
             render: (text) => <span style={{ fontWeight: 600 }}>{text}</span>,
           },
@@ -268,7 +268,7 @@ const AdminBranchList = () => {
             title: "Địa chỉ",
             dataIndex: "address",
             key: "address",
-            width: 250, // Địa chỉ cần rộng hơn
+            width: 250,
             render: (text) => (
               <Tooltip title={text}>
                 <div
@@ -304,7 +304,7 @@ const AdminBranchList = () => {
           {
             title: "Hành động",
             key: "actions",
-            width: 120, // Cố định chiều rộng cột hành động
+            width: 120,
             align: "center",
             render: (text, record) => (
               <Space size="middle">

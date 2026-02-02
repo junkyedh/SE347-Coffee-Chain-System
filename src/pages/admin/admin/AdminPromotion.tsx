@@ -353,7 +353,6 @@ const AdminPromotion = () => {
         </Form>
       </Modal>
 
-      {/* 1. Tiêu đề Danh sách Khuyến mãi (Đã sửa font và tách nút) */}
       <div className="list-header">
         <h4>Danh sách Khuyến mãi</h4>
         <div className="action-btn-wrapper">
@@ -434,7 +433,6 @@ const AdminPromotion = () => {
         ]}
       />
 
-      {/* 2. Tiêu đề Danh sách Coupon (Đã sửa font và tách nút) */}
       <div className="list-header">
         <h4>Danh sách Coupon</h4>
         <div className="action-btn-wrapper">

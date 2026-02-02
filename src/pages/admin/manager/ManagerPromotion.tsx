@@ -46,7 +46,6 @@ const ManagerPromotion = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Hàm random mã CouponCode
   const generateRandomCode = () => {
     const codes = [
       "TET",
@@ -215,12 +214,10 @@ const ManagerPromotion = () => {
     }
   };
 
-  // --- STYLE OBJECT DÙNG CHUNG ---
-  // Giúp tiêu đề đẹp, font không chân, và tách nút sang 2 bên
   const headerStyle: React.CSSProperties = {
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between", // Tách tiêu đề và nút
+    justifyContent: "space-between",
     marginTop: "2rem",
     marginBottom: "1rem",
     borderBottom: "1px solid rgba(0,0,0,0.05)",
@@ -232,7 +229,7 @@ const ManagerPromotion = () => {
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     fontSize: "1.3rem",
     fontWeight: 700,
-    color: "#2F4156", // Màu xanh đậm admin
+    color: "#2F4156",
     margin: 0,
     textTransform: "uppercase",
   };
@@ -380,7 +377,6 @@ const ManagerPromotion = () => {
         </Form>
       </Modal>
 
-      {/* --- PHẦN CHỈNH SỬA: DANH SÁCH KHUYẾN MÃI --- */}
       <div style={headerStyle}>
         <h4 style={titleStyle}>Danh sách Khuyến mãi</h4>
         <div className="d-flex">
@@ -474,7 +470,6 @@ const ManagerPromotion = () => {
         ]}
       />
 
-      {/* --- PHẦN CHỈNH SỬA: DANH SÁCH COUPON --- */}
       <div style={headerStyle}>
         <h4 style={titleStyle}>Danh sách Coupon</h4>
         <div className="d-flex">

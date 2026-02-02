@@ -14,7 +14,7 @@
 
     .header-content {
       display: flex;
-      flex-wrap: wrap; // QUAN TRỌNG: Cho phép xuống dòng khi hết chỗ
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 1.2rem;
@@ -23,7 +23,7 @@
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
-        min-width: 200px; // Đảm bảo tiêu đề không bị bóp quá nhỏ
+        min-width: 200px;
 
         .title-icon {
           color: get-color($primary, "700");
@@ -51,14 +51,13 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        flex-wrap: wrap; // Cho phép bộ lọc và nút xuống dòng trên mobile
+        flex-wrap: wrap;
 
         .filter-section {
           .filter-select {
-            min-width: 140px; // Độ rộng tối thiểu cho ô lọc
-            width: 100%; // Để nó co giãn trên mobile
+            min-width: 140px;
+            width: 100%;
 
-            // Ant Design override
             .ant-select-selector {
               border-radius: 8px !important;
               height: 40px !important;
@@ -74,7 +73,7 @@
 
           .takeaway-btn,
           .add-table-btn {
-            height: 40px; // Chiều cao cố định cho đẹp
+            height: 40px;
             border-radius: 8px;
             font-weight: 600;
             display: flex;
@@ -131,7 +130,6 @@
   // Table grid layout
   .tables-grid {
     display: grid;
-    // Mặc định: Tự động chia cột, tối thiểu 260px mỗi thẻ
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 2rem;
     margin-top: 1.2rem;
@@ -164,7 +162,6 @@
         transform: translateY(-3px);
       }
 
-      // ... (Giữ nguyên style bên trong thẻ card như cũ của bạn) ...
       .table-card-header {
         display: flex;
         align-items: center;
@@ -305,7 +302,7 @@
 }
 
 // ===============================================
-// RESPONSIVE ADJUSTMENTS (PHẦN BẠN CẦN)
+// RESPONSIVE ADJUSTMENTS
 // ===============================================
 
 // 1. Tablet & Nửa màn hình Laptop (Dưới 950px)
@@ -317,25 +314,22 @@
       padding: 1rem;
 
       .header-content {
-        // Cho Title nằm trên, Actions rớt xuống dưới
         flex-direction: column;
-        align-items: flex-start; // Căn trái hết
+        align-items: flex-start;
         gap: 1rem;
 
         .header-actions {
-          width: 100%; // Chiếm hết chiều ngang
-          justify-content: space-between; // Dàn đều sang 2 bên
+          width: 100%;
+          justify-content: space-between;
         }
       }
     }
 
-    // Grid 1 cột như yêu cầu trước
     .tables-grid {
       grid-template-columns: 1fr !important;
       gap: 1rem;
     }
 
-    // Thẻ Card ngang
     .table-card {
       min-height: auto;
       .table-info {
@@ -350,14 +344,14 @@
 // 2. Mobile (Dưới 600px)
 @media (max-width: 600px) {
   .modern-table-container .table-header .header-content .header-actions {
-    flex-direction: column; // Xếp dọc: Filter trên, Nút dưới
-    align-items: stretch; // Giãn full width
+    flex-direction: column;
+    align-items: stretch;
 
     .filter-section {
       width: 100%;
       .filter-select {
         width: 100% !important;
-      } // Select full width
+      }
     }
 
     .action-buttons {
@@ -365,7 +359,6 @@
       display: flex;
       gap: 0.8rem;
 
-      // Chia đều 2 nút "Mang đi" và "Tạo bàn"
       .takeaway-btn,
       .add-table-btn {
         flex: 1;
@@ -373,7 +366,6 @@
     }
   }
 
-  // Trên mobile, thông tin trong thẻ quay về 1 cột cho dễ đọc
   .modern-table-container .tables-grid .table-card .table-info {
     grid-template-columns: 1fr;
   }

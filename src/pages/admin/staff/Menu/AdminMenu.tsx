@@ -143,11 +143,10 @@ const AdminMenu = () => {
           size,
           mood,
           quantity: (prevOrder[key]?.quantity || 0) + 1,
-          price, // Giá này đã được nhân nếu là cả bánh
+          price,
         },
       }));
 
-      // Giữ lại selection để dễ thêm tiếp món tương tự
       message.success(`Đã thêm ${product.name} vào giỏ hàng`);
     }
   };
@@ -166,7 +165,6 @@ const AdminMenu = () => {
       const item = newOrder[key];
       if (item) {
         const newQuantity = item.quantity + delta;
-        // Không cho giảm xuống dưới 1
         if (delta < 0 && item.quantity === 1) {
           message.warning('Số lượng tối thiểu là 1. Dùng nút xóa để bỏ món.');
           return prevOrder;
@@ -212,7 +210,6 @@ const AdminMenu = () => {
         return;
       }
 
-      // Nếu có customer rank, hiển modal xác nhận
       if (customerRank) {
         Modal.confirm({
           title: 'Xác nhận áp dụng mã giảm giá',
@@ -249,7 +246,6 @@ const AdminMenu = () => {
       if (status === 404) {
         errorMessage = 'Mã giảm giá không tồn tại hoặc không áp dụng cho chi nhánh này.';
       } else if (status === 400 && rawMsg) {
-        // Xử lý message từ backend (có thể là array hoặc string)
         errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg;
       } else if (rawMsg) {
         errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg;
@@ -318,13 +314,12 @@ const AdminMenu = () => {
           quantity: item.quantity,
           size: item.size,
           mood: item.mood || null,
-          price: item.price // Gửi giá tại thời điểm mua
+          price: item.price
         });
       });
 
       await Promise.all(orderDetailsPromises);
 
-      // Cập nhật trạng thái bàn nếu là Dine In
       if (tableId && initialServiceType === 'Dine In') {
         try {
           await AdminApiRequest.put(`/table/${tableId}`, { 
@@ -332,7 +327,6 @@ const AdminMenu = () => {
           });
         } catch (tableError) {
           console.error('Error updating table status:', tableError);
-          // Không cần message.error ở đây vì đơn hàng đã tạo thành công
         }
       }
 
@@ -358,7 +352,6 @@ const AdminMenu = () => {
         }),
       });
 
-      // Reset trạng thái
       setOrder({});
       setPhone('');
       setName('');
@@ -366,7 +359,6 @@ const AdminMenu = () => {
       setCouponCode('');
       setAppliedCoupon(null);
       
-      // Chuyển về màn hình chọn bàn
       navigate(ROUTES.STAFF.ORDER_SELECT_TABLE);
       
     } catch (error) {
@@ -562,7 +554,7 @@ const AdminMenu = () => {
               placeholder="Nhập mã giảm giá"
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
-              disabled={!!appliedCoupon} // Disable nếu đã áp dụng
+              disabled={!!appliedCoupon}
             />
             {appliedCoupon ? (
               <Button danger onClick={() => {

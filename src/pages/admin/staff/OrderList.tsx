@@ -19,7 +19,6 @@ export const OrderList = () => {
   // State lưu ID nhân viên đang chọn cho các đơn hàng chưa có người phụ trách
   const [staffInput, setStaffInput] = useState<{ [orderId: number]: number }>({});
   
-  // Danh sách nhân viên của chi nhánh để hiển thị Dropdown
   const [branchStaffList, setBranchStaffList] = useState<any[]>([]);
   
   const { branchId } = useSystemContext();
@@ -104,7 +103,6 @@ export const OrderList = () => {
     
     const hasAssignedStaff = currentOrder.staff || currentOrder.staffID || currentOrder.staffName;
 
-    // (Áp dụng khi chuyển khỏi trạng thái Nháp/Chờ xác nhận)
     if (!hasAssignedStaff && !selectedStaffId) {
       message.warning('Vui lòng chọn nhân viên phụ trách trước khi xử lý đơn hàng!');
       return;
@@ -138,15 +136,6 @@ export const OrderList = () => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleUpdatePaymentStatus = async (orderId: number, newStatus: string) => {
-     try {
-        await AdminApiRequest.put(`/order/${orderId}`, { paymentStatus: newStatus });
-        message.success('Cập nhật trạng thái thanh toán thành công!');
-        fetchManagerOrderList();
-     } catch(e) { message.error('Lỗi cập nhật thanh toán'); }
-  };
-
   const statusMap: Record<string, { label: string; color: string }> = {
     Nháp: { label: 'Nháp', color: 'default' },
     'Chờ xác nhận': { label: 'Chờ xác nhận', color: 'orange' },
@@ -168,7 +157,6 @@ export const OrderList = () => {
   ];
 
   const getAllowedStatusMap = (currentStatus: string) => {
-    // Nếu đã hoàn thành hoặc đã hủy, không cho phép thay đổi
     if (currentStatus === 'Hoàn thành' || currentStatus === 'Đã hủy') {
       return {};
     }
@@ -260,16 +248,12 @@ export const OrderList = () => {
           },
           {
             title: 'Nhân viên',
-            key: 'staff', // Key chung cho cột
+            key: 'staff',
             width: 200,
             render: (_: any, record: any) => {
-              // [FIX LOGIC HIỂN THỊ]
-              // Ưu tiên lấy tên từ object staff (do TypeORM relations trả về)
-              // Sau đó mới check staffName (trường hợp flat data)
               const assignedName = record.staff?.name || record.staffName;
 
               if (assignedName) {
-                // Nếu ĐÃ CÓ người phụ trách -> Hiển thị tên (Text/Tag), không hiện Select nữa
                 return (
                   <div className="d-flex align-items-center gap-2">
                     <UserOutlined style={{ color: '#1890ff' }} />
@@ -278,7 +262,6 @@ export const OrderList = () => {
                 );
               }
 
-              // Nếu CHƯA CÓ người phụ trách -> Hiển thị Dropdown để chọn
               return (
                 <Select
                   placeholder="Chọn nhân viên"
@@ -288,7 +271,7 @@ export const OrderList = () => {
                   onChange={(value) =>
                     setStaffInput((prev) => ({
                       ...prev,
-                      [record.id]: value, // value là ID nhân viên
+                      [record.id]: value,
                     }))
                   }
                   showSearch
@@ -320,7 +303,6 @@ export const OrderList = () => {
               const allowedMap = getAllowedStatusMap(record.status);
               const isFinalStatus = record.status === 'Hoàn thành' || record.status === 'Đã hủy';
               
-              // Nếu đã hoàn thành hoặc đã hủy, hiển thị text thay vì dropdown
               if (isFinalStatus) {
                 return <Tag color={statusMap[record.status]?.color}>{statusMap[record.status]?.label}</Tag>;
               }

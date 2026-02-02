@@ -76,7 +76,6 @@ const StaffProfile = () => {
   useEffect(() => {
     if (!isInitialized) return;
 
-    // Nếu chưa có staffId (token/userInfo chưa kịp hydrate) -> đợi, KHÔNG gọi API
     if (!staffId) {
       setLoading(false);
       return;
