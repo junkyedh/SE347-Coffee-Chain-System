@@ -1,11 +1,12 @@
-import { Form, Input, message, Modal, Space, Table, Tag } from "antd";
-import moment from "moment";
-import { useEffect, useState } from "react";
-import "../adminPage.scss";
-import { AdminApiRequest } from "@/services/AdminApiRequest";
-import FloatingLabelInput from "@/components/common/FloatingInput/FloatingLabelInput";
-import AdminButton from "@/components/admin/AdminButton/AdminButton";
-import AdminPopConfirm from "@/components/admin/PopConfirm/AdminPopConfirm";
+import { Form, Input, message, Modal, Space, Table, Tag } from 'antd';
+import axios from 'axios';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import '../adminPage.scss';
+import { AdminApiRequest } from '@/services/AdminApiRequest';
+import FloatingLabelInput from '@/components/common/FloatingInput/FloatingLabelInput';
+import AdminButton from '@/components/admin/AdminButton/AdminButton';
+import AdminPopConfirm from '@/components/admin/PopConfirm/AdminPopConfirm';
 
 const ManagerPromotion = () => {
   const [promoteForm] = Form.useForm();
@@ -22,8 +23,9 @@ const ManagerPromotion = () => {
       const res = await AdminApiRequest.get("/promote/list");
       setManagerPromoteList(res.data);
     } catch (error) {
-      console.error("Error fetching promote list:", error);
-      message.error("Failed to fetch promote list.");
+      if (axios.isCancel(error)) return; // Ignore canceled requests
+      console.error('Error fetching promote list:', error);
+      message.error('Failed to fetch promote list.');
     }
   };
 
@@ -32,14 +34,16 @@ const ManagerPromotion = () => {
       const res = await AdminApiRequest.get("/promote/coupon/list");
       setManagerCouponList(res.data);
     } catch (error) {
-      console.error("Error fetching coupon list:", error);
-      message.error("Failed to fetch coupon list.");
+      if (axios.isCancel(error)) return; // Ignore canceled requests
+      console.error('Error fetching coupon list:', error);
+      message.error('Failed to fetch coupon list.');
     }
   };
 
   useEffect(() => {
     fetchManagerPromoteList();
     fetchManagerCouponList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Hàm random mã CouponCode
@@ -432,30 +436,40 @@ const ManagerPromotion = () => {
             title: "Hành động",
             key: "action",
             align: "center",
-            render: (_: any, record: any) => (
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <Space size="middle">
-                  <AdminButton
-                    variant="secondary"
-                    size="sm"
-                    icon={<i className="fas fa-edit"></i>}
-                    onClick={() => onOpenEditPromote(record)}
-                  ></AdminButton>
-                  <AdminPopConfirm
-                    title="Bạn có chắc chắn muốn xóa khuyến mãi này?"
-                    onConfirm={() => onDeletePromote(record.id)}
-                    okText="Đồng ý"
-                    cancelText="Hủy"
-                  >
-                    <AdminButton
-                      variant="destructive"
-                      size="sm"
-                      icon={<i className="fas fa-trash-alt"></i>}
-                    ></AdminButton>
-                  </AdminPopConfirm>
-                </Space>
-              </div>
-            ),
+            render: (_: any, record: any) => {
+              // Manager chỉ edit/xóa được promote của chi nhánh mình (branchId !== null)
+              // Không được động vào promote chung (branchId === null)
+              const canEdit = record.branchId !== null;
+              
+              return (
+                <div className="d-flex align-items-center justify-content-center gap-2">
+                  {canEdit ? (
+                    <Space size="middle">
+                      <AdminButton
+                        variant="secondary"
+                        size="sm"
+                        icon={<i className="fas fa-edit"></i>}
+                        onClick={() => onOpenEditPromote(record)}
+                      ></AdminButton>
+                      <AdminPopConfirm
+                        title="Bạn có chắc chắn muốn xóa khuyến mãi này?"
+                        onConfirm={() => onDeletePromote(record.id)}
+                        okText="Đồng ý"
+                        cancelText="Hủy"
+                      >
+                        <AdminButton
+                          variant="destructive"
+                          size="sm"
+                          icon={<i className="fas fa-trash-alt"></i>}
+                        ></AdminButton>
+                      </AdminPopConfirm>
+                    </Space>
+                  ) : (
+                    <Tag color="blue">Khuyến mãi chung</Tag>
+                  )}
+                </div>
+              );
+            },
           },
         ]}
       />
@@ -502,30 +516,39 @@ const ManagerPromotion = () => {
             title: "Hành động",
             key: "action",
             align: "center",
-            render: (_: any, record: any) => (
-              <div className="d-flex align-items-center gap-2 justify-content-center">
-                <Space size="middle">
-                  <AdminButton
-                    variant="secondary"
-                    size="sm"
-                    icon={<i className="fas fa-edit"></i>}
-                    onClick={() => onOpenEditCoupon(record)}
-                  ></AdminButton>
-                  <AdminPopConfirm
-                    title="Bạn có chắc chắn muốn xóa coupon này?"
-                    onConfirm={() => onDeleteCoupon(record.id)}
-                    okText="Đồng ý"
-                    cancelText="Hủy"
-                  >
-                    <AdminButton
-                      variant="destructive"
-                      size="sm"
-                      icon={<i className="fas fa-trash-alt"></i>}
-                    ></AdminButton>
-                  </AdminPopConfirm>
-                </Space>
-              </div>
-            ),
+            render: (_: any, record: any) => {
+              // Manager chỉ edit/xóa được coupon của promote chi nhánh (promote.branchId !== null)
+              const canEdit = record.promote?.branchId !== null;
+              
+              return (
+                <div className="d-flex align-items-center gap-2 justify-content-center">
+                  {canEdit ? (
+                    <Space size="middle">
+                      <AdminButton
+                        variant="secondary"
+                        size="sm"
+                        icon={<i className="fas fa-edit"></i>}
+                        onClick={() => onOpenEditCoupon(record)}
+                      ></AdminButton>
+                      <AdminPopConfirm
+                        title="Bạn có chắc chắn muốn xóa coupon này?"
+                        onConfirm={() => onDeleteCoupon(record.id)}
+                        okText="Đồng ý"
+                        cancelText="Hủy"
+                      >
+                        <AdminButton
+                          variant="destructive"
+                          size="sm"
+                          icon={<i className="fas fa-trash-alt"></i>}
+                        ></AdminButton>
+                      </AdminPopConfirm>
+                    </Space>
+                  ) : (
+                    <Tag color="blue">Coupon chung</Tag>
+                  )}
+                </div>
+              );
+            },
           },
         ]}
       />

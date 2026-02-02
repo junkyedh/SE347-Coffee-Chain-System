@@ -148,7 +148,7 @@ const AdminPromotion = () => {
       message.success("Xóa mã khuyến mãi thành công!");
     } catch (error) {
       console.error("Error deleting promote:", error);
-      message.error("Xóa mã khuyễn mãi thất bại, thử lại sau.");
+      message.error("Xóa mã khuyến mãi thất bại, thử lại sau.");
     }
   };
 
