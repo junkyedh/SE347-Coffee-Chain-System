@@ -145,7 +145,6 @@ export const AppSystemProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
         fetchUserInfo(t);
       } catch (error) {
         console.error('Token decode error:', error);
-        // token hỏng -> clear
         logout();
       }
     }

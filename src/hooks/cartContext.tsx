@@ -97,7 +97,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const phoneCustomer = userInfo.phone;
       
-      // Create abort controller for cart fetch
       const abortController = new AbortController();
       
       const res = await MainApiRequest.get<RawCartItem[]>(
@@ -173,16 +172,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           
           console.warn(`Failed to fetch product ${ci.productId}:`, productErr);
-          // Continue with other items rather than failing entire cart
         }
       }
 
       setCart(enrichedItems);
     } catch (err: any) {
-      // Handle different error types gracefully
       if (axios.isCancel(err)) {
         console.debug('Cart fetch was canceled');
-        return; // Keep existing cart on cancellation
+        return;
       }
       
       if (err.response?.status === 401) {
