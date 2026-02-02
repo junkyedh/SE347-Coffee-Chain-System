@@ -1,5 +1,6 @@
 import { Form, message, Modal, Space, Table } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
+import axios from "axios";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
@@ -39,12 +40,14 @@ const ManagerStaffList = () => {
       const res = await AdminApiRequest.get("/branch-staff/list");
       setStaffList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       message.error("Không thể tải danh sách nhân viên.");
     }
   };
 
   useEffect(() => {
     fetchStaffList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const exportExcel = () => {

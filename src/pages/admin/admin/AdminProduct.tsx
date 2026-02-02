@@ -21,6 +21,7 @@ import {
   Upload,
   UploadProps,
 } from "antd";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import "../adminPage.scss";
 
@@ -45,11 +46,17 @@ const AdminProductList = () => {
   );
 
   const fetchAdminProductList = async () => {
-    const res = await AdminApiRequest.get("/product/list");
-    setAdminProductList(res.data);
+    try {
+      const res = await AdminApiRequest.get("/product/list");
+      setAdminProductList(res.data);
+    } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
+      console.error('Error fetching product list:', error);
+    }
   };
   useEffect(() => {
     fetchAdminProductList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -340,8 +347,9 @@ const AdminProductList = () => {
               gap: "24px",
             }}
           >
-            <div>
-              <Form.Item name="image">
+            {/* ===== CỘT TRÁI: Thông tin cơ bản ===== */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <Form.Item name="image" style={{ marginBottom: '16px' }}>
                 <div
                   style={{
                     display: "flex",
@@ -369,7 +377,7 @@ const AdminProductList = () => {
                 {progress > 0 && <Progress percent={progress} />}
               </Form.Item>
 
-              <div className="grid-2">
+              <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <FloatingLabelInput
                   label="Tên sản phẩm"
                   name="name"
@@ -404,33 +412,74 @@ const AdminProductList = () => {
                 type="text"
               />
 
-              <div className="checkbox-group">
-                <Form.Item name="hot" valuePropName="checked">
-                  <Checkbox>Hot</Checkbox>
+              <div 
+                className="checkbox-group" 
+                style={{ 
+                  display: 'flex', 
+                  gap: '12px', 
+                  marginTop: '12px',
+                  flexWrap: 'wrap',
+                  alignItems: 'center'
+                }}
+              >
+                <Form.Item name="hot" valuePropName="checked" style={{ marginBottom: 0 }}>
+                  <Checkbox>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <i className="fas fa-fire" style={{ color: '#ff4d4f' }}></i>
+                      Nóng
+                    </span>
+                  </Checkbox>
                 </Form.Item>
-                <Form.Item name="cold" valuePropName="checked">
-                  <Checkbox>Cold</Checkbox>
+                <Form.Item name="cold" valuePropName="checked" style={{ marginBottom: 0 }}>
+                  <Checkbox>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <i className="fas fa-snowflake" style={{ color: '#1890ff' }}></i>
+                      Đá
+                    </span>
+                  </Checkbox>
                 </Form.Item>
-              </div>
-
-              <div className="checkbox-group">
-                <Form.Item name="isPopular" valuePropName="checked">
-                  <Checkbox>Phổ biến</Checkbox>
+                <Form.Item name="isPopular" valuePropName="checked" style={{ marginBottom: 0 }}>
+                  <Checkbox>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <i className="fas fa-star" style={{ color: '#faad14' }}></i>
+                      Phổ biến
+                    </span>
+                  </Checkbox>
                 </Form.Item>
-                <Form.Item name="isNew" valuePropName="checked">
-                  <Checkbox>Mới</Checkbox>
+                <Form.Item name="isNew" valuePropName="checked" style={{ marginBottom: 0 }}>
+                  <Checkbox>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <i className="fas fa-sparkles" style={{ color: '#52c41a' }}></i>
+                      Mới
+                    </span>
+                  </Checkbox>
                 </Form.Item>
                 <Form.Item
                   name="available"
                   valuePropName="checked"
                   initialValue={true}
+                  style={{ marginBottom: 0 }}
                 >
-                  <Checkbox>Đang bán</Checkbox>
+                  <Checkbox>
+                    <span 
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        fontWeight: 600,
+                        color: '#52c41a'
+                      }}
+                    >
+                      <i className="fas fa-check-circle" style={{ color: '#52c41a' }}></i>
+                      Đang bán
+                    </span>
+                  </Checkbox>
                 </Form.Item>
               </div>
             </div>
 
-            <div>
+            {/* ===== CỘT PHẢI: Giá & Nguyên liệu ===== */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               <Form.List
                 name="sizes"
                 initialValue={[{ sizeName: "M", price: null }]}
@@ -539,7 +588,7 @@ const AdminProductList = () => {
             >
               Hủy
             </AdminButton>
-            <AdminButton variant="primary" size="sm" disabled={progress > 0}>
+            <AdminButton variant="primary" size="sm" type="submit" disabled={progress > 0}>
               {editingProduct ? "Lưu thay đổi" : "Tạo mới"}
             </AdminButton>
           </div>

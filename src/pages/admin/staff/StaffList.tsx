@@ -1,26 +1,29 @@
 import SearchInput from "@/components/common/SearchInput/SearchInput";
 import { MainApiRequest } from "@/services/MainApiRequest";
 import { message, Table, Tag } from "antd";
+import axios from "axios";
 import moment from "moment";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../adminPage.scss";
 
 const StaffList = () => {
   const [staffList, setStaffList] = useState<any[]>([]);
 
-  const fetchStaffList = useCallback(async () => {
+  const fetchStaffList = async () => {
     try {
       const res = await MainApiRequest.get("/staff/list");
       setStaffList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error("Error fetching staff list:", error);
       message.error("Lấy danh sách nhân viên không thành công. Please try again.");
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchStaffList();
-  }, [fetchStaffList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [searchKeyword, setSearchKeyword] = useState("");
 

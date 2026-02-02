@@ -1,5 +1,6 @@
 import { Form, message, Modal, Space, Table, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
@@ -21,12 +22,14 @@ const ManagerTableList = () => {
       const res = await AdminApiRequest.get('/table/list');
       setTableList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       message.error('Không thể tải danh sách bàn.');
     }
   };
 
   useEffect(() => {
     fetchTableList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const openFormModal = (record: any = null) => {

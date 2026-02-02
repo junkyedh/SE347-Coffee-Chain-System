@@ -6,7 +6,8 @@ import { useToast } from "@/components/common/Toast/Toast";
 import { AdminApiRequest } from "@/services/AdminApiRequest";
 import { DownloadOutlined } from "@ant-design/icons";
 import { Form, Modal, Space, Table, message } from "antd";
-import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../adminPage.scss";
 
@@ -19,22 +20,24 @@ const AdminMaterialList = () => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
-  const fetchMaterialList = useCallback(async () => {
+  const fetchMaterialList = async () => {
     try {
       setLoading(true);
       const res = await AdminApiRequest.get("/material/list");
       setMaterialList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error("Error fetching material list:", error);
       toast.fetchError("nguyên liệu");
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  };
 
   useEffect(() => {
     fetchMaterialList();
-  }, [fetchMaterialList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const exportExcel = () => {
     const exportData = materialList.map((material) => ({
@@ -146,9 +149,10 @@ const AdminMaterialList = () => {
   };
   useEffect(() => {
     if (!searchKeyword.trim()) {
-      fetchMaterialList();
+      setMaterialList([]);
     }
-  }, [searchKeyword, fetchMaterialList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchKeyword]);
 
   return (
     <div className="container-fluid">

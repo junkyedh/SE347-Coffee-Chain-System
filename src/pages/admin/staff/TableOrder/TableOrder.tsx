@@ -11,6 +11,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Button, Card, Form, message, Modal, Select, Tooltip } from "antd";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./TableOrder.scss";
@@ -37,6 +38,7 @@ const AdminTableOrder = () => {
       setTableList(res.data);
       setFilteredTableList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       message.error("Lấy danh sách bàn thất bại!");
     } finally {
       setLoading(false);
@@ -45,6 +47,7 @@ const AdminTableOrder = () => {
 
   useEffect(() => {
     fetchTableList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFilterChange = (value: string | number) => {
@@ -101,35 +104,8 @@ const AdminTableOrder = () => {
   };
 
   const handleViewActiveOrder = async (table: any) => {
-    try {
-      setLoading(true);
-      const res = await AdminApiRequest.get("branch-order/list");
-      const activeOrders = res.data.filter(
-        (order: any) =>
-          order.tableId === table.id &&
-          ["Chờ xác nhận", "Đang chuẩn bị", "Sẵn sàng", "Đang giao"].includes(
-            order.status,
-          ),
-      );
-
-      if (activeOrders) {
-        navigate(ROUTES.STAFF.ORDER_PLACE, {
-          state: {
-            orderId: activeOrders[0].id,
-            isNewOrder: false,
-            tableId: table.id,
-            tableName: `Bàn ${table.id}`,
-            serviceType: "Dine In",
-          },
-        });
-      } else {
-        message.error("Không tìm thấy đơn hàng của bàn này.");
-      }
-    } catch (error) {
-      message.error("Có lỗi xảy ra khi lấy đơn hàng.");
-    } finally {
-      setLoading(false);
-    }
+    // Chỉ navigate đến trang danh sách đơn hàng, không filter
+    navigate(ROUTES.STAFF.ORDER_LIST);
   };
 
   const handleDeleteTable = (tableId: number) => {

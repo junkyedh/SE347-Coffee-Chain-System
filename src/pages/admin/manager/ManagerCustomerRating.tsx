@@ -1,5 +1,6 @@
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { Image, Rate, Select, Table, message } from 'antd';
+import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import '../adminPage.scss';
@@ -16,6 +17,7 @@ const ManagerCustomerRating = () => {
       setRatingsList(res.data);
       setAllRatings(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error('Failed to fetch ratings', error);
       message.error('Không thể tải đánh giá');
     }
@@ -26,6 +28,7 @@ const ManagerCustomerRating = () => {
       const res = await AdminApiRequest.get('/product/list');
       setProductList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error('Failed to fetch product list', error);
       message.error('Không thể tải danh sách sản phẩm');
     }
@@ -34,6 +37,7 @@ const ManagerCustomerRating = () => {
   useEffect(() => {
     fetchRatingsList();
     fetchProductList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleProductFilterChange = (value: number | undefined) => {

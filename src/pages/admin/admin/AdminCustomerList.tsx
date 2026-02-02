@@ -6,6 +6,7 @@ import { useToast } from '@/components/common/Toast/Toast';
 import { AdminApiRequest } from '@/services/AdminApiRequest';
 import { DownloadOutlined } from '@ant-design/icons';
 import { Form, message, Modal, Space, Table } from 'antd';
+import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
@@ -24,6 +25,7 @@ const AdminCustomerList = () => {
       const res = await AdminApiRequest.get('/customer/list');
       setCustomerList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error('Error fetching customer list:', error);
       message.error('Lấy danh sách khách hàng thất bại.');
     }
@@ -31,12 +33,13 @@ const AdminCustomerList = () => {
 
   useEffect(() => {
     fetchCustomerList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSearchKeyword = () => {
+  const handleSearchKeyword = async () => {
     const keyword = searchKeyword.trim().toLowerCase();
     if (!keyword) {
-      fetchCustomerList();
+      await fetchCustomerList();
       return;
     }
 
@@ -49,11 +52,6 @@ const AdminCustomerList = () => {
     });
     setCustomerList(filtered);
   };
-  useEffect(() => {
-    if (!searchKeyword.trim()) {
-      fetchCustomerList();
-    }
-  }, [searchKeyword]);
 
   const exportExcel = () => {
     const exportData = customerList.map((customer) => ({

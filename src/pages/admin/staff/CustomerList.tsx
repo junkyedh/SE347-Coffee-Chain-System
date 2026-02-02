@@ -5,8 +5,9 @@ import SearchInput from "@/components/common/SearchInput/SearchInput";
 import { AdminApiRequest } from "@/services/AdminApiRequest";
 import { DownloadOutlined } from "@ant-design/icons";
 import { Form, message, Modal, Space, Table, Tag } from "antd";
+import axios from "axios";
 import moment from "moment";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import "../adminPage.scss";
 
@@ -17,24 +18,26 @@ const CustomerList = () => {
   const [editingCustomer, setEditingCustomer] = useState<any | null>(null);
   const [form] = Form.useForm();
 
-  const fetchCustomerList = useCallback(async () => {
+  const fetchCustomerList = async () => {
     try {
       const res = await AdminApiRequest.get("/customer/list");
       setCustomerList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return; // Ignore canceled requests
       console.error("Error fetching customer list:", error);
       message.error("Failed to fetch customer list.");
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchCustomerList();
-  }, [fetchCustomerList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleSearchKeyword = () => {
+  const handleSearchKeyword = async () => {
     const keyword = searchKeyword.trim().toLowerCase();
     if (!keyword) {
-      fetchCustomerList();
+      await fetchCustomerList();
       return;
     }
 
@@ -51,11 +54,6 @@ const CustomerList = () => {
     });
     setCustomerList(filtered);
   };
-  useEffect(() => {
-    if (!searchKeyword.trim()) {
-      fetchCustomerList();
-    }
-  }, [searchKeyword, fetchCustomerList]);
 
   const exportExcel = () => {
     const exportData = customerList.map((customer) => ({

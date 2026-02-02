@@ -4,7 +4,8 @@ import img3 from '@/assets/cup32.jpg';
 import img4 from '@/assets/juice13.jpg';
 import img5 from '@/assets/tea1.jpg';
 import img2 from '@/assets/tea2.jpg';
-import { MainApiRequest } from '@/services/MainApiRequest';
+import axios from 'axios';
+import { UnifiedApiRequest } from '@/services/UnifiedApiRequest';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CategoryShowcase.scss';
@@ -71,22 +72,62 @@ const CategoryShowcase: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+    const abortController = new AbortController();
+
     const fetchCounts = async () => {
       try {
-        const res = await MainApiRequest.get('/product/list');
-        const data: Product[] = res.data;
+        const res = await UnifiedApiRequest.get('/product/list', {
+          signal: abortController.signal
+        });
+        
+        if (!isMounted) return;
+        
+        // Handle different response formats
+        const data: Product[] = res.data?.data || res.data || [];
+        
+        if (!Array.isArray(data)) {
+          console.error('Unexpected API response format:', res.data);
+          return;
+        }
 
         const counts: Record<string, number> = {};
         for (const cat of CATEGORY_CONFIG) {
-          counts[cat.id] = data.filter((p) => cat.keyWords.includes(p.category.trim())).length;
+          counts[cat.id] = data.filter((p) => 
+            p.category && cat.keyWords.includes(p.category.trim())
+          ).length;
         }
-        setProductCounts(counts);
+        
+        if (isMounted) {
+          setProductCounts(counts);
+        }
       } catch (error) {
+        if (!isMounted) return;
+        
+        // Handle canceled requests gracefully
+        if (axios.isCancel(error)) {
+          console.debug('Category count fetch was canceled');
+          return;
+        }
         console.error('Failed to fetch product list', error);
+        
+        // Set default counts to prevent showing 0
+        if (isMounted) {
+          const defaultCounts: Record<string, number> = {};
+          CATEGORY_CONFIG.forEach(cat => {
+            defaultCounts[cat.id] = 0;
+          });
+          setProductCounts(defaultCounts);
+        }
       }
     };
 
     fetchCounts();
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, []);
 
   return (

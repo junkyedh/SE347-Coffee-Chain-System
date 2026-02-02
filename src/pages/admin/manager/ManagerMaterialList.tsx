@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Form, Modal, Table, Space, message } from 'antd';
+import axios from 'axios';
 import moment from 'moment';
 import * as XLSX from 'xlsx';
 import '../adminPage.scss';
@@ -21,6 +22,7 @@ const ManagerMaterialList = () => {
       const res = await AdminApiRequest.get('/branch-material/list');
       setMaterialList(res.data);
     } catch (error) {
+      if (axios.isCancel(error)) return;
       console.error('Error fetching material list:', error);
       message.error('Không thể tải danh sách nguyên liệu. Vui lòng thử lại.');
     }
@@ -28,6 +30,7 @@ const ManagerMaterialList = () => {
 
   useEffect(() => {
     fetchMaterialList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const exportExcel = () => {
