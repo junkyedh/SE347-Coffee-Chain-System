@@ -81,7 +81,6 @@ const Menu: React.FC = () => {
   const { addToCart } = useCart();
   const { isLoggedIn } = useAuth();
 
-  // Handler cho add to cart với login check
   const handleAddToCart = async (
     productId: number,
     size: string,
@@ -160,7 +159,6 @@ const Menu: React.FC = () => {
     }
   }, [selectedBranch, selectedCategory]);
 
-  // Handler cho product click
   const handleProductClick = (productId: string, productName: string) => {
     navigate(createProductUrl(productName, productId));
   };
@@ -169,7 +167,6 @@ const Menu: React.FC = () => {
     setSelectedBranch(branchId);
     setCurrentPage(1);
 
-    // Update URL
     if (branchId === 'all') {
       searchParams.delete('branch');
     } else {
@@ -178,12 +175,10 @@ const Menu: React.FC = () => {
     setSearchParams(searchParams);
   };
 
-  // Handler để update cả state và URL khi thay đổi category
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setCurrentPage(1);
 
-    // Update URL
     if (categoryId === 'all') {
       searchParams.delete('category');
     } else {
@@ -192,7 +187,6 @@ const Menu: React.FC = () => {
     setSearchParams(searchParams);
   };
 
-  // Read URL params on mount
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
     const branchFromUrl = searchParams.get('branch');
@@ -206,18 +200,15 @@ const Menu: React.FC = () => {
     }
   }, [searchParams]);
 
-  // Initial fetch
   useEffect(() => {
     fetchBranchList();
     fetchAllProducts();
   }, []);
 
-  // Fetch filtered products when category or branch changes
   useEffect(() => {
     fetchFilteredProducts();
   }, [fetchFilteredProducts]);
 
-  // Generate categories with counts from all products
   const categories: Category[] = useMemo(() => {
     const counts: Record<string, number> = {};
     allProducts.forEach((p) => {
@@ -247,7 +238,6 @@ const Menu: React.FC = () => {
     ];
   }, [allProducts]);
 
-  // Frontend filtering for search and price (after backend filtering)
   const filtered = useMemo(() => {
     return products.filter((p) => {
       if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -300,7 +290,6 @@ const Menu: React.FC = () => {
 
   const totalPages = Math.ceil(sorted.length / itemsPerPage);
 
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, priceFilter, sortBy]);

@@ -34,7 +34,6 @@ const Login: React.FC = () => {
         const role = data.user?.role || 'CUSTOMER';
         
         if (token) {
-          // setAuth will handle storing token and fetching user info
           setAuth(token, role);
           message.success('Đăng nhập thành công!');
           navigate(ROUTES.HOME);

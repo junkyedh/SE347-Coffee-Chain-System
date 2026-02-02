@@ -16,7 +16,6 @@ export const AdminApiRequest = axios.create({
 let isRedirecting401 = false;
 const ADMIN_AUTH_ERROR_KEY = 'ADMIN_AUTH_401';
 
-// Reset redirect flag after a delay
 const resetRedirectFlag = () => {
   setTimeout(() => {
     isRedirecting401 = false;

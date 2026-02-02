@@ -168,7 +168,6 @@ export const Checkout: React.FC = () => {
     if (!items.length) return;
     
     const loadBranches = async () => {
-      // Kiểm tra xem có chi nhánh cố định từ giỏ hàng không
       const cartBranchId = getCartBranchId();
       
       if (cartBranchId) {
@@ -225,7 +224,6 @@ export const Checkout: React.FC = () => {
     fetchMembershipRank();
   }, []);
 
-  // Reset coupon khi đổi chi nhánh để tránh áp coupon của chi nhánh cũ
   useEffect(() => {
     if (!appliedCoupon) return;
     setAppliedCoupon(null);
@@ -268,7 +266,6 @@ export const Checkout: React.FC = () => {
         `/promote/coupon/check?code=${encodeURIComponent(code)}&branchId=${selectedBranch}`
       );
       
-      // Xử lý response: có thể là array hoặc object
       let couponData: Coupon | null = null;
       
       if (Array.isArray(res.data)) {
@@ -283,7 +280,6 @@ export const Checkout: React.FC = () => {
         return;
       }
       
-      // Kiểm tra status của coupon
       if (couponData.status?.toLowerCase() === 'hết hạn') {
         toast.error('Chương trình khuyến mãi đã kết thúc.');
         setAppliedCoupon(null);
@@ -296,7 +292,6 @@ export const Checkout: React.FC = () => {
         return;
       }
       
-      // Nếu có membership rank, hiển thị modal thông báo
       if (membershipRank) {
         Modal.confirm({
           title: 'Xác nhận áp dụng mã giảm giá',
@@ -327,7 +322,6 @@ export const Checkout: React.FC = () => {
             toast.success(`Áp dụng mã giảm giá "${couponData.code}" thành công!`);
           },
           onCancel: () => {
-            // Không làm gì khi hủy
           },
         });
       } else {

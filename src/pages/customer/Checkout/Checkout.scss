@@ -494,7 +494,6 @@
   }
 }
 
-// Fix modal visibility issue - ensure it appears above everything
 :global(.modal-overlay) {
   z-index: 99999 !important;
 }

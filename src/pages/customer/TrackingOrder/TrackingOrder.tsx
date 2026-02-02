@@ -477,14 +477,12 @@ export const TrackingOrder: React.FC = () => {
                   Tổng cộng: <span>{total.toLocaleString('vi-VN')}₫</span>
                 </div>
 
-                {/* NÚT THANH TOÁN ĐƯỢC ĐẶT TẠI ĐÂY */}
                 {canRetryPayment && (
                   <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
                     <Button
                       variant="primary"
                       onClick={handleRetryPayment}
                       disabled={isProcessingPayment}
-                      // Style nút cho nổi bật (Màu tối như trong ảnh bạn gửi)
                       style={{
                         backgroundColor: '#334155',
                         borderColor: '#334155',

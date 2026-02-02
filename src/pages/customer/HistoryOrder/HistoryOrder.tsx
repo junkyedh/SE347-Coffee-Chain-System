@@ -15,15 +15,13 @@ import { useNavigate } from 'react-router-dom';
 import './HistoryOrder.scss';
 import { getProductDisplayInfo } from '@/utils/productSize';
 
-// --- Interfaces khớp với dữ liệu Backend ---
-
 interface ProductSize {
   sizeName: string;
   price: number;
 }
 
 interface Product {
-  id: string | number; // JSON trả về string, nhưng để flexible
+  id: string | number;
   name: string;
   category: string;
   image: string;
@@ -65,7 +63,6 @@ const statusMap: Record<string, { label: string; color: string; icon: React.Comp
 const HistoryOrder: React.FC = () => {
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<OrderSummary[]>([]);
-  // Thay vì lưu details riêng lẻ, ta lưu toàn bộ danh sách sản phẩm
   const [products, setProducts] = useState<Product[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -77,23 +74,18 @@ const HistoryOrder: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn, userInfo, isInitialized } = useSystemContext();
 
-  // 1. Tạo Map để tra cứu sản phẩm nhanh (O(1)) thay vì find
   const productMap = useMemo(() => {
     const map = new Map<string, Product>();
     products.forEach((p) => {
-      // Quan trọng: Chuyển ID sang string để khớp với mọi kiểu dữ liệu
       map.set(String(p.id), p);
     });
     return map;
   }, [products]);
 
-  // 2. Fetch danh sách sản phẩm (Chỉ chạy 1 lần khi mount)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Gọi API lấy list sản phẩm để map dữ liệu
         const res = await MainApiRequest.get<Product[]>('/product/list');
-        // Xử lý response tùy theo cấu trúc trả về (res.data hoặc res.data.data)
         const rawProducts = Array.isArray(res.data) ? res.data : (res.data as any).data || [];
         setProducts(rawProducts);
       } catch (error) {
@@ -103,7 +95,6 @@ const HistoryOrder: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // 3. Xử lý logic Phone & Guest
   useEffect(() => {
     if (!isInitialized) return;
 
@@ -118,7 +109,6 @@ const HistoryOrder: React.FC = () => {
     if (history.length > 0) setPhone(history[0].phone);
   }, [isInitialized, isLoggedIn, userInfo?.phone]);
 
-  // 4. Fetch danh sách đơn hàng
   useEffect(() => {
     const fetchOrders = async () => {
       if (!phone && (!guestHistory || guestHistory.length === 0)) return;
@@ -128,12 +118,9 @@ const HistoryOrder: React.FC = () => {
         let fetchedOrders: OrderSummary[] = [];
 
         if (phone) {
-          // Trường hợp User đã đăng nhập: Gọi 1 API duy nhất
           const res = await MainApiRequest.get<OrderSummary[]>(`/order/customer/${encodeURIComponent(phone)}`);
           fetchedOrders = res.data;
         } else if (guestHistory) {
-          // Trường hợp Guest: Phải gọi từng đơn (nhưng số lượng ít)
-          // Dùng Promise.all để gọi song song
           const results = await Promise.all(
             guestHistory.map(async ({ orderId, phone }) => {
               try {
@@ -149,7 +136,6 @@ const HistoryOrder: React.FC = () => {
           fetchedOrders = results.filter((o): o is OrderSummary => o !== null);
         }
 
-        // Sắp xếp đơn mới nhất lên đầu
         fetchedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
 
         setOrders(fetchedOrders);
@@ -185,12 +171,10 @@ const HistoryOrder: React.FC = () => {
   }, [orders, searchTerm, statusFilter]);
 
   const getRenderItem = (itemRaw: OrderDetailRaw) => {
-    // Tìm sản phẩm trong Map
     const product = productMap.get(String(itemRaw.productId));
 
     const { price, displaySize, isValid } = getProductDisplayInfo(product, itemRaw.size);
 
-    // Nếu chưa tải xong products hoặc không tìm thấy
     if (!isValid || !product) {
       return {
         ...itemRaw,
@@ -293,7 +277,6 @@ const HistoryOrder: React.FC = () => {
             </div>
           ) : (
             filteredOrders.map((order) => {
-              // Map dữ liệu chi tiết cho từng đơn hàng
               const renderItems = (order.order_details || []).map(getRenderItem);
               const totalPrice = renderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 

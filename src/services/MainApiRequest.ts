@@ -50,10 +50,8 @@ const shouldSilence401 = (url?: string) => {
 
   if (!url) return false;
 
-  // Không hiện message cho các request auth
   if (url.includes('/auth/signin') || url.includes('/auth/register')) return true;
 
-  // Không hiện message cho các callback auth
   if (url.includes('/auth/callback')) return true;
 
   return false;
@@ -79,7 +77,6 @@ MainApiRequest.interceptors.response.use(
 
     if (status === 401) {
 
-      // Show message only once and only if not on auth pages
       if (!shouldSilence401(url) && !isRedirecting401) {
         message.error({ key: AUTH_ERROR_KEY, content: 'Phiên đăng nhập hết hạn' });
       }
@@ -101,7 +98,6 @@ MainApiRequest.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Các status khác: chỉ hiển thị 1 message theo key để không spam
     if (status) {
       const map: Record<number, string> = {
         400: 'Yêu cầu không hợp lệ',
